@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stanza. | Exhibition Gallery</title>
+  <meta name="description" content="Explore the Stanza. poetry exhibition — hover to unveil stanzas, select up to 4 lines to craft custom shareable cards with optional Spotify or YouTube Music soundtracks.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Stanza. | Poetry Exhibition Gallery">
+  <meta property="og:description" content="Explore the Stanza. poetry exhibition — read, select up to 4 lines, and share custom museum cards with music.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/gallery.css">
+</head>
+<body>
+  <div class="paper-grain" aria-hidden="true"></div>
+
+  <!-- Split-Curtain Intro & Page Transition -->
+  <div id="intro-overlay">
+    <div class="curtain-panel"></div>
+    <div class="curtain-panel"></div>
+    <div class="curtain-panel"></div>
+    <div class="curtain-panel"></div>
+    <div class="intro-content" id="intro-content">
+      <div class="intro-title-mask">
+        <h1 id="intro-text">Gallery.</h1>
+      </div>
+      <div class="intro-rule"></div>
+      <div class="intro-sub-mask">
+        <div id="intro-subtext">Hover to Unveil · Click to Read, Select Lines &amp; Share</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Magnetic Cursor -->
+  <div id="cursor-ring" aria-hidden="true"><span id="cursor-label"></span></div>
+  <div id="cursor-dot" aria-hidden="true"></div>
+
+  <!-- Top Navigation -->
+  <nav class="nav" aria-label="Gallery Navigation">
+    <div class="nav-left">
+      <a href="index.html" class="brand transition-link hover-target">Stanza.</a>
+      <span class="nav-collection-name" id="nav-collection-name">Cut on the Life of a Weeping Man</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-hint">Hover to unveil · Click to read &amp; share up to 4 lines</span>
+      <a href="index.html" id="back-to-experience" class="menu-item transition-link hover-target">Back to Experience</a>
+    </div>
+  </nav>
+
+  <!-- Accordion Exhibition Strips -->
+  <main class="gallery-wrapper" id="gallery-wrapper" aria-label="Poetry Exhibition Strips"></main>
+
+  <!-- Interactive Fullscreen Poem Reader Lightbox -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Poem Inspection & Line Selection">
+    <header class="lightbox-header">
+      <div class="lb-title-group">
+        <span class="lb-index" id="lb-index">01 / 08</span>
+        <h2 class="lb-title" id="lb-title">All Smiles and White Teeth</h2>
+      </div>
+
+      <div class="lb-controls">
+        <div class="selection-pill" id="selection-pill">
+          <span>Selected: <strong id="selected-count">0 / 4</strong> lines</span>
+          <button type="button" class="selection-clear-btn" id="btn-clear-lines">Clear</button>
+        </div>
+        <button type="button" class="lb-btn lb-btn-accent" id="lb-share">Share Card</button>
+        <button type="button" class="lb-btn" id="lb-close">Close [ESC]</button>
+      </div>
+    </header>
+
+    <div class="lb-poem-stage" id="lb-poem-stage">
+      <article class="lb-poem-sheet">
+        <p class="lb-poem-subtitle" id="lb-subtitle"></p>
+        <div class="lb-stanzas-grid" id="lb-stanzas-grid"></div>
+      </article>
+    </div>
+
+    <footer class="lightbox-footer">
+      <button type="button" class="lb-btn" id="lb-prev">← Prev</button>
+      <div class="lb-caption" id="lb-caption">Click any line to highlight for your share card (up to 4 lines)</div>
+      <button type="button" class="lb-btn" id="lb-next">Next →</button>
+    </footer>
+  </div>
+
+  <!-- Share Card Studio Modal -->
+  <div id="share-modal" role="dialog" aria-modal="true" aria-label="Share Poetry Card Studio">
+    <div class="share-panel">
+      <div class="share-preview-col">
+        <canvas id="share-preview-canvas"></canvas>
+        <div class="share-music-preview" id="share-music-preview"></div>
+      </div>
+
+      <div class="share-controls-col">
+        <div class="share-head">
+          <h3>Share Card Studio</h3>
+          <button type="button" class="lb-btn" id="share-close">Close</button>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <span class="field-label">Selected Verses</span>
+            <span class="field-count" id="share-lines-count">0 / 4 lines</span>
+          </div>
+          <div class="selected-lines-list" id="share-selected-lines"></div>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label">Design Card Style</span>
+          <div class="pill-row" id="card-pills">
+            <button type="button" class="opt-pill active" data-card="museum">Museum</button>
+            <button type="button" class="opt-pill" data-card="noir">Noir</button>
+            <button type="button" class="opt-pill" data-card="broadsheet">Broadsheet</button>
+            <button type="button" class="opt-pill" data-card="atmosphere">Atmosphere</button>
+            <button type="button" class="opt-pill" data-card="keepsake">Keepsake</button>
+          </div>
+        </div>
+
+        <label class="toggle-row">
+          <span>Include Poem Title &amp; Collection</span>
+          <input type="checkbox" id="share-title-toggle" checked>
+          <div class="toggle-switch"></div>
+        </label>
+
+        <div class="field-group">
+          <label class="field-label" for="share-music-input">Soundtrack Link (Spotify or YouTube Music)</label>
+          <input
+            type="url"
+            id="share-music-input"
+            class="music-input"
+            placeholder="Paste a Spotify or YouTube Music URL (optional)"
+            autocomplete="off"
+          >
+          <div class="music-status" id="share-music-status">Optional — plays as an ambient soundtrack when the shared link is opened</div>
+        </div>
+
+        <div class="share-actions">
+          <button type="button" class="action-primary" id="btn-copy-link">Copy Share Link</button>
+          <button type="button" class="action-secondary" id="btn-download-card">Download PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Link Showcase View (auto-opens on /share/:id) -->
+  <div id="shared-showcase" aria-label="Shared Poetry Card">
+    <div class="showcase-glow" id="showcase-glow"></div>
+    <button id="showcase-audio-btn" type="button" aria-label="Play or pause soundtrack">
+      <span class="audio-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span id="showcase-audio-icon">▶</span>
+      <span id="showcase-audio-label">Tap for Music</span>
+    </button>
+    <div class="showcase-inner">
+      <canvas id="showcase-canvas"></canvas>
+      <div class="showcase-actions">
+        <button type="button" class="action-primary" id="showcase-explore" style="flex: none; padding: 0.78rem 1.45rem;">Read Full Poem in Gallery</button>
+        <button type="button" class="action-secondary" id="showcase-download">Download Card</button>
+        <a href="index.html?collection=cut-on-the-life-of-a-weeping-man&mode=read" id="showcase-experience-link" class="action-secondary transition-link" style="text-decoration: none;">Enter Experience Mode</a>
+      </div>
+    </div>
+    <div id="showcase-audio-host" aria-hidden="true"></div>
+  </div>
+
+  <div class="stanza-toast" id="stanza-toast" role="status" aria-live="polite"></div>
+
+  <script src="js/data-store.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/cursor.js"></script>
+  <script src="js/share-cards.js"></script>
+  <script src="js/gallery.js"></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stanza. — Digital Poetry House &amp; Interactive Experience</title>
+  <meta name="description" content="Stanza. An atmospheric digital poetry house featuring Cut on the Life of a Weeping Man — experience interactive ink-reveal readings, gallery exhibitions, and shareable verse cards.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Stanza. — Digital Poetry House">
+  <meta property="og:description" content="Cut on the Life of a Weeping Man — an interactive poetry exhibition inspired by museum print and vinyl listening rooms.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/experience.css">
+</head>
+<body>
+  <div class="paper-grain" aria-hidden="true"></div>
+  <div id="ambient-glow-a" class="ambient-glow is-active" aria-hidden="true"></div>
+  <div id="ambient-glow-b" class="ambient-glow" aria-hidden="true"></div>
+  <div id="ambient-vignette" aria-hidden="true"></div>
+  <div id="scroll-progress-line" aria-hidden="true"></div>
+
+  <!-- Cinematic 4-Panel Split-Curtain Intro & View Transition -->
+  <div id="intro-overlay">
+    <div class="curtain-panel"></div>
+    <div class="curtain-panel"></div>
+    <div class="curtain-panel"></div>
+    <div class="curtain-panel"></div>
+    <div class="intro-content" id="intro-content">
+      <div class="intro-title-mask">
+        <h1 id="intro-text">Stanza.</h1>
+      </div>
+      <div class="intro-rule"></div>
+      <div class="intro-sub-mask">
+        <div id="intro-subtext">Poetry Exhibition &amp; Listening Room</div>
+      </div>
+      <div class="intro-progress-track">
+        <div class="intro-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dual-Ring Magnetic Custom Cursor -->
+  <div id="cursor-ring" aria-hidden="true"><span id="cursor-label"></span></div>
+  <div id="cursor-dot" aria-hidden="true"></div>
+
+  <!-- Primary Navigation Header -->
+  <header class="top-header">
+    <a href="index.html" id="brand-link" class="brand hover-target">Stanza.</a>
+    <nav class="top-menu" aria-label="Primary Navigation">
+      <button type="button" id="nav-back-shelf" class="menu-item reader-only-nav hover-target">← Collection Shelf</button>
+      <a href="gallery.html" id="nav-gallery-link" class="menu-item transition-link hover-target">Gallery Mode</a>
+      <button type="button" id="nav-add-volume" class="menu-item hover-target">+ New Volume</button>
+    </nav>
+  </header>
+
+  <!-- ============================================
+       VIEW 1: COLLECTION SHELF (Apple Top 100 Albums / Vinyl Folio Style)
+       ============================================ -->
+  <main id="shelf-view" aria-label="Poetry Collection Shelf">
+    <section class="shelf-hero">
+      <div class="shelf-eyebrow-row">
+        <div>
+          <p class="shelf-kicker">Curated Anthology Shelf</p>
+          <h2 class="shelf-heading">Collected Volumes, <em>Pressed in Ink</em></h2>
+        </div>
+        <p class="shelf-count-note" id="shelf-count-note">Select a sleeve to enter its lived-in experience</p>
+      </div>
+
+      <div class="vinyl-shelf-stage" id="vinyl-shelf-stage" aria-live="polite">
+        <!-- Populated dynamically from /api/collections -->
+      </div>
+    </section>
+
+    <footer class="shelf-footer">
+      <span>Stanza. Digital Poetry House</span>
+      <span>Hover sleeve to inspect · Click to enter Experience Mode</span>
+    </footer>
+  </main>
+
+  <!-- ============================================
+       VIEW 2: IMMERSIVE EXPERIENCE MODE (Inside a Collection)
+       ============================================ -->
+  <div id="reader-view" aria-label="Interactive Poetry Experience">
+    <div id="scroll-container"></div>
+
+    <div id="fixed-view">
+      <canvas id="inkCanvas"></canvas>
+      <div id="poem-stage"></div>
+    </div>
+
+    <!-- Left-Edge Vertical Chapter Rail -->
+    <aside class="chapter-rail" id="chapter-rail" aria-label="Poem Chapters"></aside>
+
+    <!-- Bottom-Left Editorial Placard -->
+    <div class="artwork-placard" id="artwork-placard">
+      <div class="placard-index" id="placard-index">01 / 08</div>
+      <div class="placard-title-wrap">
+        <h2 class="placard-title" id="placard-title">All Smiles and White Teeth</h2>
+      </div>
+      <p class="placard-subtitle" id="placard-subtitle">Study I — Porcelain Armor &amp; Wet Sleeves</p>
+      <div class="reveal-meter">
+        <div class="reveal-bar-track">
+          <div class="reveal-bar-fill" id="reveal-bar-fill"></div>
+        </div>
+        <span class="reveal-pct" id="reveal-pct">0% Illuminated</span>
+      </div>
+    </div>
+
+    <!-- Center Brush Cue -->
+    <div id="hint">Glide Brush Across Lines to Illuminate Ink</div>
+
+    <!-- Bottom-Right Interactive Ink Controls -->
+    <div class="canvas-controls" id="canvas-controls">
+      <button class="ctrl-btn mobile-nav-btn" id="btn-prev-chapter" aria-label="Previous poem">↑</button>
+      <button class="ctrl-btn hover-target" id="btn-bloom" title="Cascade ink reveal across every stanza">Bloom Reveal</button>
+      <button class="ctrl-btn hover-target" id="btn-reset" title="Reset poem to faint draft state">Reset Ink</button>
+      <a class="ctrl-btn hover-target transition-link" id="btn-share-poem" href="gallery.html" style="text-decoration: none;">Share Lines</a>
+      <button class="ctrl-btn mobile-nav-btn" id="btn-next-chapter" aria-label="Next poem">↓</button>
+    </div>
+
+    <!-- Colophon Finale (Last Scroll Chapter) -->
+    <section id="colophon-section" aria-label="Collection Colophon">
+      <div class="contact-stack">
+        <div class="contact-eyebrow" id="contact-eyebrow">End of Volume</div>
+
+        <a id="colophon-gallery-link" href="gallery.html" class="contact-card transition-link hover-target" style="transition-delay: 0.06s;">
+          <div>
+            <h3>Exhibition</h3>
+            <p>Open Gallery &amp; Share Lines</p>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <button type="button" id="colophon-shelf-btn" class="contact-card hover-target" style="transition-delay: 0.14s;">
+          <div>
+            <h3>Anthology</h3>
+            <p>Return to Collection Shelf</p>
+          </div>
+          <span class="card-arrow">←</span>
+        </button>
+
+        <button type="button" id="colophon-add-btn" class="contact-card hover-target" style="transition-delay: 0.22s;">
+          <div>
+            <h3>Archive</h3>
+            <p>Add a New Volume</p>
+          </div>
+          <span class="card-arrow">+</span>
+        </button>
+
+        <button id="back-to-top" class="hover-target" style="transition-delay: 0.30s;">
+          Back to First Poem ↑
+        </button>
+      </div>
+    </section>
+
+    <!-- Bottom Kinetic Marquee Footer -->
+    <footer class="gallery-footer">
+      <div class="ticker-wrap" id="ticker-wrap"></div>
+    </footer>
+  </div>
+
+  <!-- Add New Poetry Collection Modal (Full-Stack POST /api/collections) -->
+  <div class="modal-backdrop" id="archive-modal-backdrop" role="dialog" aria-modal="true" aria-label="Archive New Poetry Volume">
+    <div class="archive-modal">
+      <div class="modal-head">
+        <h2>Archive New Poetry Volume</h2>
+        <button type="button" class="modal-close-btn" id="archive-modal-close">Close</button>
+      </div>
+      <form class="form-grid" id="archive-volume-form">
+        <div class="form-field">
+          <label for="col-title">Collection Title</label>
+          <input type="text" id="col-title" required placeholder="e.g., Letters Never Sent to Manila">
+        </div>
+        <div class="form-field">
+          <label for="col-subtitle">Subtitle / Study Note</label>
+          <input type="text" id="col-subtitle" placeholder="e.g., Nocturnes &amp; Quiet Departures">
+        </div>
+        <div class="form-field">
+          <label for="col-epigraph">Epigraph (Optional)</label>
+          <input type="text" id="col-epigraph" placeholder="A single opening line for the sleeve">
+        </div>
+        <div class="form-field">
+          <label for="first-poem-title">Opening Poem Title</label>
+          <input type="text" id="first-poem-title" required placeholder="e.g., Midnight Rain on Taft Avenue">
+        </div>
+        <div class="form-field">
+          <label for="first-poem-body">Opening Poem Verses (separate stanzas with a blank line)</label>
+          <textarea id="first-poem-body" required placeholder="Write or paste your stanzas here..."></textarea>
+        </div>
+        <button type="submit" class="modal-submit-btn">Press Volume to Shelf</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="stanza-toast" id="stanza-toast" role="status" aria-live="polite"></div>
+
+  <script src="js/data-store.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/cursor.js"></script>
+  <script src="js/experience.js"></script>
+</body>
+</html>

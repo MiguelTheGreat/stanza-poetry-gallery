@@ -1,0 +1,443 @@
+/* ============================================
+   STANZA. — SHARED MUSEUM DESIGN SYSTEM
+   Translated from the Lumina. Exhibition Language
+   ============================================ */
+
+:root {
+  --bg-paper: #f5f2e9;
+  --bg-paper-deep: #ece6d8;
+  --bg-paper-focus: #fcfaf4;
+  --ink-primary: #1a1917;
+  --ink-secondary: #5c5850;
+  --ink-muted: rgba(26, 25, 23, 0.38);
+  --accent-warm: #a67c52;
+  --border-subtle: rgba(26, 25, 23, 0.1);
+  --border-hairline: rgba(26, 25, 23, 0.08);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --font-display: 'Syncopate', sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  background-color: var(--bg-paper);
+  color: var(--ink-primary);
+  overflow-x: clip;
+}
+
+body {
+  background-color: var(--bg-paper);
+  color: var(--ink-primary);
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle museum paper grain overlay */
+.paper-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Adaptive ambient lighting layers */
+.ambient-glow {
+  position: fixed;
+  inset: -10%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  will-change: opacity, transform;
+  transform: translateZ(0);
+  transition: opacity 1.35s var(--ease-expo);
+}
+
+.ambient-glow.is-active {
+  opacity: 1;
+}
+
+#ambient-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+  background: radial-gradient(circle at 50% 50%, transparent 48%, rgba(26, 25, 23, 0.085) 100%);
+  transition: opacity 0.8s var(--ease-expo);
+}
+
+/* ============================================
+   CINEMATIC 4-PANEL SPLIT-CURTAIN INTRO & TRANSITIONS
+   ============================================ */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: all;
+  overflow: hidden;
+}
+
+.curtain-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 25.2%;
+  background-color: #161513;
+  transform: scaleY(1);
+  transform-origin: top center;
+  transition: transform 1.05s var(--ease-expo);
+  will-change: transform;
+}
+
+.curtain-panel:nth-child(1) { left: 0%; transition-delay: 0.04s; }
+.curtain-panel:nth-child(2) { left: 25%; transition-delay: 0.11s; }
+.curtain-panel:nth-child(3) { left: 50%; transition-delay: 0.18s; }
+.curtain-panel:nth-child(4) { left: 75%; transition-delay: 0.25s; }
+
+#intro-overlay.curtain-open {
+  pointer-events: none;
+}
+
+#intro-overlay.curtain-open .curtain-panel {
+  transform: scaleY(0);
+  transform-origin: top center;
+}
+
+#intro-overlay.curtain-closing {
+  pointer-events: all;
+}
+
+#intro-overlay.curtain-closing .curtain-panel {
+  transform: scaleY(1);
+  transform-origin: bottom center;
+}
+
+.intro-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 1.5rem;
+  transition: opacity 0.55s var(--ease-quart), transform 0.65s var(--ease-expo);
+}
+
+#intro-overlay.curtain-open .intro-content {
+  opacity: 0;
+  transform: translateY(-24px) scale(0.96);
+}
+
+.intro-title-mask {
+  overflow: hidden;
+  padding: 0.2rem 0;
+}
+
+#intro-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 5.5vw, 3.6rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--bg-paper);
+  margin: 0;
+  transform: translateY(115%);
+  animation: revealUp 1.05s var(--ease-expo) 0.16s forwards;
+}
+
+.intro-rule {
+  width: 0;
+  height: 1px;
+  background: rgba(245, 242, 233, 0.35);
+  margin: 1.15rem auto;
+  animation: expandRule 0.9s var(--ease-expo) 0.42s forwards;
+}
+
+.intro-sub-mask {
+  overflow: hidden;
+}
+
+#intro-subtext {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  letter-spacing: 0.16em;
+  color: rgba(245, 242, 233, 0.72);
+  transform: translateY(115%);
+  animation: revealUp 0.95s var(--ease-expo) 0.48s forwards;
+}
+
+.intro-progress-track {
+  width: 140px;
+  height: 1px;
+  background: rgba(245, 242, 233, 0.14);
+  margin: 1.65rem auto 0;
+  overflow: hidden;
+}
+
+.intro-progress-bar {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-paper);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: fillProgress 1.25s var(--ease-expo) 0.2s forwards;
+}
+
+@keyframes revealUp {
+  to { transform: translateY(0%); }
+}
+
+@keyframes expandRule {
+  to { width: 120px; }
+}
+
+@keyframes fillProgress {
+  to { transform: scaleX(1); }
+}
+
+/* ============================================
+   DUAL-RING MAGNETIC CUSTOM CURSOR
+   ============================================ */
+#cursor-dot,
+#cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 600;
+  transform: translate(-50%, -50%);
+  will-change: transform, width, height, opacity;
+}
+
+#cursor-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--ink-primary);
+  transition: transform 0.2s var(--ease-expo), opacity 0.3s ease;
+}
+
+#cursor-ring {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(26, 25, 23, 0.5);
+  background: rgba(245, 242, 233, 0.08);
+  backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.46rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bg-paper);
+  transition: width 0.38s var(--ease-expo), height 0.38s var(--ease-expo),
+              border-color 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
+}
+
+body.cursor-hover #cursor-ring {
+  width: 54px;
+  height: 54px;
+  border-color: var(--ink-primary);
+  background: rgba(26, 25, 23, 0.06);
+}
+
+body.cursor-hover #cursor-dot {
+  opacity: 0;
+}
+
+body.cursor-painting #cursor-ring {
+  width: 50px;
+  height: 50px;
+  border-color: var(--accent-warm);
+  background: rgba(166, 124, 82, 0.1);
+}
+
+body.cursor-inspect #cursor-ring {
+  width: 78px;
+  height: 78px;
+  background: rgba(26, 25, 23, 0.88);
+  border-color: var(--ink-primary);
+}
+
+body.cursor-inspect #cursor-dot {
+  opacity: 0;
+}
+
+body.modal-open #cursor-ring,
+body.modal-open #cursor-dot,
+body.cursor-hidden #cursor-ring,
+body.cursor-hidden #cursor-dot {
+  opacity: 0;
+}
+
+.cursor-ripple {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(26, 25, 23, 0.42);
+  pointer-events: none;
+  z-index: 590;
+  transform: translate(-50%, -50%) scale(0.4);
+  animation: rippleExpand 0.7s var(--ease-expo) forwards;
+}
+
+@keyframes rippleExpand {
+  0% { opacity: 0.65; transform: translate(-50%, -50%) scale(0.4); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(3.4); }
+}
+
+/* ============================================
+   SHARED BRAND & NAVIGATION
+   ============================================ */
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  color: var(--ink-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  transition: letter-spacing 0.5s var(--ease-expo), opacity 0.3s ease;
+}
+
+.brand:hover {
+  letter-spacing: 0.4em;
+}
+
+.menu-item {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-primary);
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  padding: 0.35rem 0;
+  background: none;
+  border: none;
+  transition: color 0.3s ease;
+}
+
+.menu-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--ink-primary);
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.45s var(--ease-expo);
+}
+
+.menu-item:hover::after,
+.menu-item.is-active::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Pill action buttons (Lumina style) */
+.ctrl-btn {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-primary);
+  background: rgba(245, 242, 233, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-subtle);
+  padding: 0.62rem 1.05rem;
+  border-radius: 999px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.35s ease, border-color 0.35s ease, transform 0.4s var(--ease-expo), background-color 0.35s ease;
+}
+
+.ctrl-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink-primary);
+  transform: translateY(102%);
+  transition: transform 0.45s var(--ease-expo);
+  z-index: -1;
+}
+
+.ctrl-btn:hover {
+  color: var(--bg-paper);
+  border-color: var(--ink-primary);
+  transform: translateY(-2px);
+}
+
+.ctrl-btn:hover::before {
+  transform: translateY(0%);
+}
+
+/* Toast notification */
+.stanza-toast {
+  position: fixed;
+  bottom: 2.2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 950;
+  background: rgba(22, 21, 19, 0.92);
+  color: var(--bg-paper);
+  border: 1px solid rgba(245, 242, 233, 0.16);
+  backdrop-filter: blur(12px);
+  padding: 0.68rem 1.35rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.45s var(--ease-expo);
+}
+
+.stanza-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (hover: none) {
+  #cursor-ring,
+  #cursor-dot {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curtain-panel,
+  .ambient-glow {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

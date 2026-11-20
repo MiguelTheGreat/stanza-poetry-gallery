@@ -1,0 +1,5 @@
+node_modules/
+data/stanza.db
+data/stanza.db-shm
+data/stanza.db-wal
+.DS_Store

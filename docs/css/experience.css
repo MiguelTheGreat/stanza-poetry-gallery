@@ -1,0 +1,1279 @@
+/* ============================================
+   EXPERIENCE MODE: COLLECTION SHELF + IMMERSIVE READER
+   ============================================ */
+
+/* Top Scroll Progress Line (active in reader mode) */
+#scroll-progress-line {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+  background: linear-gradient(90deg, var(--ink-primary), var(--accent-warm));
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+body.mode-reader #scroll-progress-line {
+  opacity: 1;
+}
+
+/* ============================================
+   PRIMARY HEADER
+   ============================================ */
+.top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  padding: clamp(1.2rem, 2.8vw, 2.15rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-14px);
+  transition: opacity 0.9s var(--ease-expo) 0.2s, transform 0.9s var(--ease-expo) 0.2s;
+}
+
+body.app-ready .top-header {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.top-header .brand,
+.top-header .top-menu {
+  pointer-events: auto;
+}
+
+.top-menu {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.6vw, 2.25rem);
+}
+
+.reader-only-nav {
+  display: none;
+}
+
+body.mode-reader .reader-only-nav {
+  display: inline-block;
+}
+
+/* ============================================
+   VIEW 1: APPLE-STYLE VINYL / FOLIO COLLECTION SHELF
+   ============================================ */
+#shelf-view {
+  position: relative;
+  z-index: 25;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(5.5rem, 11vh, 7.5rem) clamp(1.5rem, 5vw, 4.5rem) 2.5rem;
+  transition: opacity 0.6s var(--ease-expo);
+}
+
+body.mode-reader #shelf-view {
+  display: none;
+}
+
+.shelf-hero {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.8rem, 4vh, 3rem);
+}
+
+.shelf-eyebrow-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 1.15rem;
+}
+
+.shelf-kicker {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent-warm);
+  margin: 0 0 0.55rem;
+}
+
+.shelf-heading {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 4.2vw, 3.35rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink-primary);
+}
+
+.shelf-heading em {
+  font-style: italic;
+  color: var(--ink-secondary);
+}
+
+.shelf-count-note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.08rem;
+  color: var(--ink-secondary);
+  margin: 0;
+}
+
+/* Horizontal Vinyl / Folio Shelf Track */
+.vinyl-shelf-stage {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: clamp(2rem, 4.5vw, 4rem);
+  overflow-x: auto;
+  padding: 1.75rem 0.5rem 2.75rem;
+  scroll-snap-type: x mandatory;
+}
+
+/* Tactile museum shelf ledge line underneath the sleeves */
+.vinyl-shelf-stage::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.65rem;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(26, 25, 23, 0.18), rgba(166, 124, 82, 0.25), rgba(26, 25, 23, 0.06));
+  pointer-events: none;
+}
+
+/* Featured Collection Vinyl/Folio Card */
+.album-card {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: min(760px, 88vw);
+  display: grid;
+  grid-template-columns: minmax(250px, 340px) 1fr;
+  gap: clamp(1.75rem, 4vw, 3.25rem);
+  align-items: center;
+  position: relative;
+}
+
+.sleeve-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  perspective: 1200px;
+  cursor: pointer;
+}
+
+/* Peeking Vinyl / Archival Manuscript Disc behind the cover */
+.vinyl-disc {
+  position: absolute;
+  top: 4%;
+  right: 2%;
+  width: 92%;
+  height: 92%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #f5f2e9 0%, #f5f2e9 15%, #a67c52 15.5%, #a67c52 17.5%, #191816 18%, #1d1b19 32%, #141311 46%, #1f1d1a 60%, #141311 76%, #22201d 90%, #121110 100%);
+  box-shadow: 0 18px 42px rgba(26, 25, 23, 0.22);
+  transform: translateX(0) rotate(0deg);
+  transition: transform 0.85s var(--ease-expo);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.vinyl-disc::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 25deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.09) 28deg,
+    transparent 65deg,
+    transparent 180deg,
+    rgba(255, 255, 255, 0.07) 210deg,
+    transparent 250deg
+  );
+}
+
+.sleeve-wrapper:hover .vinyl-disc {
+  transform: translateX(26%) rotate(38deg);
+}
+
+/* Square Tactile Cover Sleeve */
+.sleeve-cover {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f5f2e9;
+  border: 1px solid rgba(26, 25, 23, 0.14);
+  box-shadow:
+    0 24px 55px rgba(26, 25, 23, 0.14),
+    0 4px 12px rgba(26, 25, 23, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  transform-style: preserve-3d;
+  transition: transform 0.65s var(--ease-expo), box-shadow 0.65s var(--ease-expo);
+  will-change: transform;
+}
+
+.sleeve-wrapper:hover .sleeve-cover {
+  box-shadow:
+    0 34px 72px rgba(26, 25, 23, 0.2),
+    0 8px 20px rgba(26, 25, 23, 0.09);
+}
+
+/* Spine crease & gloss sheen */
+.sleeve-cover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 11px;
+  width: 1px;
+  background: rgba(26, 25, 23, 0.12);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.35);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.sleeve-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(132deg, rgba(255, 255, 255, 0.22) 0%, transparent 45%, rgba(26, 25, 23, 0.08) 100%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.sleeve-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.9s var(--ease-expo);
+}
+
+.sleeve-wrapper:hover .sleeve-cover img {
+  transform: scale(1.035);
+}
+
+/* Typographic fallback cover for newly added user collections */
+.sleeve-typo-cover {
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(155deg, #f8f5ee 0%, #ebe3d3 100%);
+}
+
+.sleeve-typo-vol {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  color: var(--accent-warm);
+}
+
+.sleeve-typo-title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 2rem;
+  line-height: 1.12;
+  color: var(--ink-primary);
+  margin: 0;
+}
+
+.sleeve-typo-foot {
+  font-family: var(--font-display);
+  font-size: 0.54rem;
+  letter-spacing: 0.22em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+
+.sleeve-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1.4rem;
+  z-index: 5;
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  letter-spacing: 0.24em;
+  color: var(--ink-primary);
+  background: rgba(245, 242, 233, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(26, 25, 23, 0.1);
+}
+
+/* Editorial Metadata Column beside the Vinyl Sleeve */
+.album-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-left: 0.75rem;
+}
+
+.album-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent-warm);
+}
+
+.album-meta-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+}
+
+.album-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.3vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.32;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--ink-primary);
+}
+
+.album-subtitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.22rem;
+  line-height: 1.4;
+  color: var(--ink-secondary);
+  margin: 0;
+}
+
+.album-epigraph {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: rgba(26, 25, 23, 0.64);
+  border-left: 1.5px solid var(--accent-warm);
+  padding-left: 0.9rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.album-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.btn-enter-exp {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: var(--ink-primary);
+  color: var(--bg-paper);
+  border: 1px solid var(--ink-primary);
+  padding: 0.9rem 1.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.4s var(--ease-expo), background-color 0.3s ease, box-shadow 0.4s ease;
+}
+
+.btn-enter-exp:hover {
+  transform: translateY(-2px);
+  background: #2c2925;
+  box-shadow: 0 12px 28px rgba(26, 25, 23, 0.16);
+}
+
+.btn-open-gallery {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--ink-primary);
+  border: 1px solid rgba(26, 25, 23, 0.26);
+  padding: 0.9rem 1.4rem;
+  border-radius: 999px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.4s var(--ease-expo);
+}
+
+.btn-open-gallery:hover {
+  background: rgba(26, 25, 23, 0.06);
+  transform: translateY(-2px);
+}
+
+/* Future / Add New Collection Sleeve on the Shelf */
+.add-volume-card {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.add-sleeve-box {
+  width: 260px;
+  height: 260px;
+  border-radius: 4px;
+  border: 1px dashed rgba(26, 25, 23, 0.26);
+  background: rgba(252, 250, 244, 0.52);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  cursor: pointer;
+  color: var(--ink-secondary);
+  transition: border-color 0.35s ease, background-color 0.35s ease, transform 0.55s var(--ease-expo), color 0.35s ease;
+}
+
+.add-sleeve-box:hover {
+  border-color: var(--accent-warm);
+  background: rgba(252, 250, 244, 0.92);
+  color: var(--ink-primary);
+  transform: translateY(-6px);
+}
+
+.add-plus {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  font-weight: 300;
+}
+
+.add-sleeve-label {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.add-sleeve-note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--ink-secondary);
+  margin: 0;
+  text-align: center;
+}
+
+/* Shelf footer strip */
+.shelf-footer {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(26, 25, 23, 0.08);
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+
+/* ============================================
+   VIEW 2: IMMERSIVE SCROLL-DRIVEN POEM EXPERIENCE
+   (Faithful to Lumina's AdrianArtReimagined.html)
+   ============================================ */
+#reader-view {
+  display: none;
+}
+
+body.mode-reader #reader-view {
+  display: block;
+}
+
+#scroll-container {
+  height: 2400vh;
+  width: 1px;
+  pointer-events: none;
+}
+
+#fixed-view {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Watercolor & Ink Dust Particle Canvas behind verses */
+#inkCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Choreographed Poem Broadsheet Stage */
+#poem-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5.2rem clamp(1.5rem, 11vw, 12.5rem) 7.2rem;
+  pointer-events: none;
+}
+
+.poem-scene {
+  position: absolute;
+  width: min(940px, 76vw);
+  max-height: calc(100vh - 12.2rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform-origin: center center;
+}
+
+.poem-scene.is-active {
+  pointer-events: auto;
+}
+
+.poem-scene-header {
+  text-align: center;
+  margin-bottom: clamp(1rem, 2.2vh, 1.8rem);
+}
+
+.poem-scene-num {
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  letter-spacing: 0.3em;
+  color: var(--accent-warm);
+  margin-bottom: 0.45rem;
+}
+
+.poem-scene-title {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--ink-primary);
+}
+
+/* Two-column archival broadsheet layout for spacious readability */
+.poem-spread {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 4vw, 3.6rem);
+  align-items: start;
+  position: relative;
+}
+
+.poem-spread::before {
+  content: '';
+  position: absolute;
+  top: 4%;
+  bottom: 4%;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(26, 25, 23, 0.1), transparent);
+  pointer-events: none;
+}
+
+.poem-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.85rem, 1.8vh, 1.35rem);
+}
+
+.stanza-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.14rem;
+}
+
+/* Interactive Ink-Reveal Verse Line */
+.ink-line {
+  font-family: var(--font-serif);
+  font-size: clamp(0.98rem, 1.32vw, 1.24rem);
+  line-height: 1.46;
+  color: var(--ink-primary);
+  opacity: 0.22;
+  filter: blur(1.35px);
+  transform: translateY(2px);
+  transition:
+    opacity 0.72s var(--ease-expo),
+    filter 0.72s var(--ease-expo),
+    transform 0.72s var(--ease-expo),
+    color 0.5s ease;
+  user-select: text;
+  cursor: default;
+}
+
+.ink-line.is-inked {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+}
+
+/* Left-Edge Vertical Chapter Navigation Rail */
+.chapter-rail {
+  position: fixed;
+  left: clamp(1.15rem, 2.8vw, 2.15rem);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  pointer-events: auto;
+}
+
+.chapter-dot-btn {
+  background: none;
+  border: none;
+  padding: 0.2rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  color: var(--ink-muted);
+  transition: color 0.4s var(--ease-expo), transform 0.4s var(--ease-expo);
+  text-align: left;
+}
+
+.chapter-dot-btn:hover {
+  color: var(--ink-primary);
+  transform: translateX(4px);
+}
+
+.chapter-dot-btn.active {
+  color: var(--ink-primary);
+}
+
+.chapter-indicator {
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.55s var(--ease-expo), background-color 0.4s ease;
+}
+
+.chapter-dot-btn.active .chapter-indicator {
+  width: 30px;
+  height: 1.5px;
+  background: var(--ink-primary);
+}
+
+.chapter-label {
+  font-family: var(--font-display);
+  font-size: 0.54rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.52;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.4s ease;
+}
+
+.chapter-dot-btn.active .chapter-label,
+.chapter-dot-btn:hover .chapter-label {
+  opacity: 1;
+}
+
+/* Bottom-Left Editorial Placard (Lumina Signature) */
+.artwork-placard {
+  position: fixed;
+  left: clamp(1.15rem, 2.8vw, 2.15rem);
+  bottom: 4.1rem;
+  z-index: 42;
+  pointer-events: none;
+  max-width: 320px;
+  transition: opacity 0.7s var(--ease-expo), transform 0.7s var(--ease-expo);
+}
+
+.artwork-placard.placard-hidden {
+  opacity: 0 !important;
+  transform: translateY(14px) !important;
+}
+
+.placard-index {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  letter-spacing: 0.25em;
+  color: var(--accent-warm);
+  margin-bottom: 0.3rem;
+}
+
+.placard-title-wrap {
+  overflow: hidden;
+}
+
+.placard-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.88rem, 1.5vw, 1.15rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--ink-primary);
+  transition: transform 0.6s var(--ease-expo), opacity 0.4s ease;
+}
+
+.placard-title.switching {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.placard-subtitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.96rem;
+  color: var(--ink-secondary);
+  margin: 0.18rem 0 0.55rem;
+  transition: opacity 0.4s ease, transform 0.5s var(--ease-expo);
+}
+
+.placard-subtitle.switching {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.reveal-meter {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.reveal-bar-track {
+  width: 96px;
+  height: 2px;
+  background: rgba(26, 25, 23, 0.12);
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.reveal-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--ink-primary);
+  transition: width 0.28s ease-out;
+}
+
+.reveal-pct {
+  font-family: var(--font-sans);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bottom-Right Interactive Ink Controls */
+.canvas-controls {
+  position: fixed;
+  right: clamp(1.15rem, 2.8vw, 2.15rem);
+  bottom: 4.1rem;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  pointer-events: auto;
+  transition: opacity 0.7s var(--ease-expo), transform 0.7s var(--ease-expo);
+}
+
+.canvas-controls.controls-hidden {
+  opacity: 0 !important;
+  transform: translateY(16px) !important;
+  pointer-events: none;
+}
+
+.mobile-nav-btn {
+  display: none;
+}
+
+/* Center Hint */
+#hint {
+  position: fixed;
+  bottom: 4.35rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(26, 25, 23, 0.42);
+  z-index: 40;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.5s ease, color 0.5s ease;
+}
+
+/* Bottom Kinetic Marquee Footer */
+.gallery-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.65rem 0 0.85rem;
+  border-top: 1px solid rgba(26, 25, 23, 0.06);
+  background: linear-gradient(180deg, rgba(245, 242, 233, 0), rgba(245, 242, 233, 0.75) 55%);
+  pointer-events: none;
+}
+
+.ticker-wrap {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.ticker-item {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 0.64rem;
+  font-weight: 400;
+  letter-spacing: 0.44em;
+  text-transform: uppercase;
+  color: #4a473f;
+  padding-right: 2.5rem;
+}
+
+/* ============================================
+   COLOPHON FINALE SECTION (Chapter 09)
+   ============================================ */
+#colophon-section {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: clamp(1.5rem, 6vw, 6vw);
+}
+
+.contact-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 400px;
+}
+
+.contact-eyebrow {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.18rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  margin-bottom: 0.85rem;
+  opacity: 0;
+  transform: translateX(48px);
+  transition: opacity 0.7s var(--ease-expo), transform 0.75s var(--ease-expo);
+}
+
+.contact-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  background: rgba(255, 253, 248, 0.88);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(26, 25, 23, 0.08);
+  padding: 1.2rem 1.65rem;
+  margin: 0.42rem 0;
+  width: 100%;
+  border-radius: 3px;
+  box-shadow: 0 12px 32px rgba(26, 25, 23, 0.04);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(90px) scale(0.96);
+  filter: blur(6px);
+  pointer-events: none;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.75s var(--ease-expo),
+    opacity 0.65s var(--ease-expo),
+    filter 0.65s var(--ease-expo),
+    background-color 0.35s ease,
+    box-shadow 0.4s ease,
+    border-color 0.35s ease;
+}
+
+.contact-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--ink-primary);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.45s var(--ease-expo);
+}
+
+.contact-card.is-visible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  filter: blur(0px);
+  pointer-events: auto;
+}
+
+.contact-card.is-visible:hover {
+  background: #ffffff;
+  border-color: rgba(26, 25, 23, 0.22);
+  transform: translateX(-10px) scale(1.01);
+  box-shadow: 0 18px 40px rgba(26, 25, 23, 0.08);
+}
+
+.contact-card.is-visible:hover::before {
+  transform: scaleY(1);
+  transform-origin: top;
+}
+
+.contact-card h3 {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  margin: 0 0 0.3rem;
+}
+
+.contact-card p {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink-primary);
+  margin: 0;
+}
+
+.card-arrow {
+  font-size: 1.1rem;
+  color: var(--ink-secondary);
+  transition: transform 0.45s var(--ease-expo), color 0.3s ease;
+}
+
+.contact-card:hover .card-arrow {
+  transform: translate(5px, -3px);
+  color: var(--ink-primary);
+}
+
+#back-to-top {
+  margin-top: 0.9rem;
+  padding: 0.9rem 1.75rem;
+  font-family: var(--font-display);
+  font-size: 0.64rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-primary);
+  border: 1px solid var(--ink-primary);
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(90px);
+  pointer-events: none;
+  transition: transform 0.75s var(--ease-expo), opacity 0.65s var(--ease-expo), color 0.35s ease;
+}
+
+#back-to-top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink-primary);
+  transform: translateY(102%);
+  transition: transform 0.45s var(--ease-expo);
+  z-index: -1;
+}
+
+#back-to-top.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+#back-to-top.is-visible:hover {
+  color: var(--bg-paper);
+  transform: translateY(-3px);
+}
+
+#back-to-top.is-visible:hover::before {
+  transform: translateY(0%);
+}
+
+/* ============================================
+   ADD NEW COLLECTION MODAL (FULL-STACK ARCHIVE)
+   ============================================ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(16, 15, 13, 0.82);
+  backdrop-filter: blur(18px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.25rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-expo);
+}
+
+.modal-backdrop.is-open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.archive-modal {
+  background: #1c1a17;
+  color: var(--bg-paper);
+  border: 1px solid rgba(245, 242, 233, 0.14);
+  border-radius: 8px;
+  width: min(620px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: clamp(1.35rem, 3vw, 2.2rem);
+  transform: translateY(18px) scale(0.97);
+  transition: transform 0.5s var(--ease-expo);
+}
+
+.modal-backdrop.is-open .archive-modal {
+  transform: translateY(0) scale(1);
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(245, 242, 233, 0.12);
+  padding-bottom: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.modal-head h2 {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.modal-close-btn {
+  background: none;
+  border: 1px solid rgba(245, 242, 233, 0.25);
+  color: var(--bg-paper);
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.48rem 0.95rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.modal-close-btn:hover {
+  background: var(--bg-paper);
+  color: var(--ink-primary);
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-field label {
+  font-family: var(--font-display);
+  font-size: 0.54rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 242, 233, 0.65);
+}
+
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  background: rgba(245, 242, 233, 0.06);
+  border: 1px solid rgba(245, 242, 233, 0.16);
+  border-radius: 6px;
+  padding: 0.72rem 0.9rem;
+  color: var(--bg-paper);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.25s ease;
+}
+
+.form-field textarea {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  min-height: 140px;
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  border-color: var(--accent-warm);
+}
+
+.modal-submit-btn {
+  margin-top: 0.4rem;
+  background: var(--bg-paper);
+  color: var(--ink-primary);
+  border: 1px solid var(--bg-paper);
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.92rem 1.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.3s var(--ease-expo);
+}
+
+.modal-submit-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+@media (max-width: 960px) {
+  .album-card {
+    grid-template-columns: 1fr;
+    width: min(440px, 86vw);
+    gap: 1.5rem;
+  }
+
+  .album-details {
+    padding-left: 0;
+  }
+
+  .chapter-rail {
+    display: none;
+  }
+
+  #hint {
+    display: none;
+  }
+
+  .mobile-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    padding: 0.52rem 0.72rem;
+  }
+
+  #poem-stage {
+    padding: 4.5rem 1.1rem 10.5rem;
+  }
+
+  .poem-scene {
+    width: 92vw;
+    max-height: calc(100dvh - 14.5rem);
+    overflow-y: auto;
+    justify-content: flex-start;
+    padding-top: 0.5rem;
+  }
+
+  .poem-spread {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .poem-spread::before {
+    display: none;
+  }
+
+  .artwork-placard {
+    left: 1rem;
+    right: 1rem;
+    bottom: 6.7rem;
+    max-width: none;
+    background: rgba(245, 242, 233, 0.84);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 0.65rem 0.9rem;
+  }
+
+  .canvas-controls {
+    left: 1rem;
+    right: 1rem;
+    bottom: 3.1rem;
+    justify-content: center;
+    gap: 0.45rem;
+  }
+
+  #colophon-section {
+    justify-content: center;
+    padding: 5.5rem 1.25rem 4rem;
+  }
+
+  .contact-stack {
+    align-items: stretch;
+    width: min(100%, 420px);
+  }
+}

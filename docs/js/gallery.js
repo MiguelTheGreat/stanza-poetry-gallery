@@ -117,6 +117,48 @@
     navCollectionName.textContent = collection.title;
     backToExperience.href = `index.html?collection=${encodeURIComponent(collection.slug)}&mode=read`;
 
+    const stripEls = [];
+
+    function applyStripFocus(hoverIdx) {
+      stripEls.forEach((el, i) => {
+        const d = Math.abs(i - hoverIdx);
+        let flexVal = 1;
+        let opVal = 1;
+        if (d === 0) {
+          flexVal = 4.35;
+          opVal = 1;
+        } else if (d === 1) {
+          flexVal = 0.96;
+          opVal = 0.84;
+        } else if (d === 2) {
+          flexVal = 0.74;
+          opVal = 0.68;
+        } else if (d === 3) {
+          flexVal = 0.56;
+          opVal = 0.54;
+        } else {
+          flexVal = 0.42;
+          opVal = 0.42;
+        }
+        el.style.setProperty('--strip-flex', String(flexVal));
+        el.style.setProperty('--strip-opacity', String(opVal));
+        el.classList.toggle('is-expanded', d === 0);
+      });
+    }
+
+    function resetStripFocus() {
+      stripEls.forEach((el) => {
+        el.style.setProperty('--strip-flex', '1');
+        el.style.setProperty('--strip-opacity', '1');
+        el.classList.remove('is-expanded');
+      });
+    }
+
+    galleryWrapper.addEventListener('mouseleave', () => {
+      resetStripFocus();
+      if (cursorApi) cursorApi.setInspect('');
+    });
+
     poems.forEach((poem, idx) => {
       const strip = document.createElement('article');
       strip.className = 'gallery-strip';
@@ -131,8 +173,10 @@
         <span class="strip-spine-title">${escapeHtml(poem.title)}</span>
 
         <div class="poem-preview-card">
-          <span class="preview-quote-mark" aria-hidden="true">“</span>
-          <p class="preview-stanza">${openingStanza}</p>
+          <div class="poem-preview-inner">
+            <span class="preview-quote-mark" aria-hidden="true">“</span>
+            <p class="preview-stanza">${openingStanza}</p>
+          </div>
         </div>
 
         <div class="card-info">
@@ -142,15 +186,15 @@
         </div>
       `;
 
-      // Radial hover reveal origin + 3D parallax tilt (Lumina signature)
       const aura = strip.querySelector('.strip-aura');
-      const previewCard = strip.querySelector('.poem-preview-card');
+      const previewInner = strip.querySelector('.poem-preview-inner');
       let cachedRect = null;
       let tiltRaf = null;
       let pendingX = 0;
       let pendingY = 0;
 
       strip.addEventListener('mouseenter', (e) => {
+        applyStripFocus(idx);
         cachedRect = strip.getBoundingClientRect();
         const mx = ((e.clientX - cachedRect.left) / cachedRect.width) * 100;
         const my = ((e.clientY - cachedRect.top) / cachedRect.height) * 100;
@@ -162,12 +206,13 @@
       strip.addEventListener(
         'mousemove',
         (e) => {
-          if (!cachedRect) cachedRect = strip.getBoundingClientRect();
-          pendingX = ((e.clientX - cachedRect.left) / cachedRect.width - 0.5) * 2;
-          pendingY = ((e.clientY - cachedRect.top) / cachedRect.height - 0.5) * 2;
+          if (!strip.classList.contains('is-expanded')) return;
+          const rect = strip.getBoundingClientRect();
+          pendingX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+          pendingY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
           if (!tiltRaf) {
             tiltRaf = requestAnimationFrame(() => {
-              previewCard.style.transform = `perspective(900px) rotateY(${pendingX * 4.5}deg) rotateX(${-pendingY * 4.5}deg) translate3d(${pendingX * 8}px, ${pendingY * 6}px, 0)`;
+              previewInner.style.transform = `perspective(900px) rotateY(${pendingX * 3.5}deg) rotateX(${-pendingY * 3.5}deg) translate3d(${pendingX * 6}px, ${pendingY * 4}px, 0)`;
               tiltRaf = null;
             });
           }
@@ -181,11 +226,11 @@
           cancelAnimationFrame(tiltRaf);
           tiltRaf = null;
         }
-        previewCard.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) translate3d(0, 0, 0)';
-        if (cursorApi) cursorApi.setInspect('');
+        previewInner.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) translate3d(0, 0, 0)';
       });
 
       strip.addEventListener('click', () => openLightbox(idx));
+      stripEls.push(strip);
       galleryWrapper.appendChild(strip);
     });
   }

@@ -133,13 +133,11 @@
         <div class="poem-preview-card">
           <span class="preview-quote-mark" aria-hidden="true">“</span>
           <p class="preview-stanza">${openingStanza}</p>
-          <div class="preview-mood">${escapeHtml(poem.mood || 'Archival Verse')}</div>
         </div>
 
         <div class="card-info">
           <span class="card-index">${poem.indexLabel}</span>
           <h2 class="card-title">${escapeHtml(poem.title)}</h2>
-          <p class="card-meta">${escapeHtml(poem.subtitle)}</p>
           <span class="card-cta">Click to Read &amp; Share Lines →</span>
         </div>
       `;
@@ -232,7 +230,7 @@
       selectedLines = [];
       lbIndex.textContent = poem.indexLabel;
       lbTitle.textContent = poem.title;
-      lbSubtitle.textContent = `${poem.subtitle} · ${collection.title}`;
+      lbSubtitle.textContent = collection.title;
 
       lbStanzasGrid.innerHTML = '';
       let globalLineIdx = 0;

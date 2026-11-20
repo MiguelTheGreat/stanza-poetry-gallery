@@ -244,7 +244,7 @@
             <span>${col.year}</span>
           </div>
           <h3 class="album-title">${col.title}</h3>
-          <p class="album-subtitle">${col.subtitle}</p>
+          ${col.subtitle ? `<p class="album-subtitle">${col.subtitle}</p>` : ''}
           ${col.epigraph ? `<blockquote class="album-epigraph">“${col.epigraph}”</blockquote>` : ''}
           <div class="album-actions">
             <button type="button" class="btn-enter-exp hover-target" data-enter="${col.slug}">Enter Experience →</button>
@@ -631,7 +631,8 @@
     const apply = () => {
       placardIndex.textContent = sc.poem.indexLabel;
       placardTitle.textContent = sc.poem.title;
-      placardSubtitle.textContent = sc.poem.subtitle;
+      placardSubtitle.textContent = sc.poem.subtitle || '';
+      placardSubtitle.style.display = sc.poem.subtitle ? '' : 'none';
       updateShareButtonLink(sc);
       placardTitle.classList.remove('switching');
       placardSubtitle.classList.remove('switching');

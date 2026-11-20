@@ -293,12 +293,6 @@
         g.fillStyle = accent;
         g.font = '700 13px "Syncopate", sans-serif';
         g.fillText(hasMusic ? '♪ SOUNDTRACK ATTACHED' : 'SELECTED VERSE', cw - padX, footerY - 2);
-
-        if (poemSubtitle) {
-          g.fillStyle = muted;
-          g.font = '400 15px "Inter", sans-serif';
-          g.fillText(poem?.mood || 'Archival Edition', cw - padX, footerY + 30);
-        }
       }
     }
   }

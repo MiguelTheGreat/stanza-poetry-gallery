@@ -13,13 +13,11 @@
   <link rel="preload" as="image" href="assets/weeping-man-cover.webp" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet"></noscript>
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/experience.css">
+  <link rel="stylesheet" href="css/base.css?v=3">
+  <link rel="stylesheet" href="css/experience.css?v=3">
 </head>
 <body>
   <div class="paper-grain" aria-hidden="true"></div>
-  <div id="ambient-glow-a" class="ambient-glow is-active" aria-hidden="true"></div>
-  <div id="ambient-glow-b" class="ambient-glow" aria-hidden="true"></div>
   <div id="ambient-vignette" aria-hidden="true"></div>
   <div id="scroll-progress-line" aria-hidden="true"></div>
 
@@ -53,7 +51,7 @@
     <nav class="top-menu" aria-label="Primary Navigation">
       <button type="button" id="nav-back-shelf" class="menu-item reader-only-nav hover-target">← Collection Shelf</button>
       <a href="gallery.html" id="nav-gallery-link" class="menu-item transition-link hover-target">Gallery Mode</a>
-      <button type="button" id="nav-add-volume" class="menu-item hover-target">+ New Volume</button>
+      <button type="button" id="nav-add-volume" class="menu-item owner-only hover-target">+ New Volume</button>
     </nav>
   </header>
 
@@ -71,7 +69,7 @@
       </div>
 
       <div class="vinyl-shelf-stage" id="vinyl-shelf-stage" aria-live="polite">
-        <!-- Populated dynamically from /api/collections -->
+        <!-- Populated dynamically -->
       </div>
     </section>
 
@@ -88,7 +86,6 @@
     <div id="scroll-container"></div>
 
     <div id="fixed-view">
-      <canvas id="inkCanvas"></canvas>
       <div id="poem-stage"></div>
     </div>
 
@@ -106,18 +103,17 @@
         <div class="reveal-bar-track">
           <div class="reveal-bar-fill" id="reveal-bar-fill"></div>
         </div>
-        <span class="reveal-pct" id="reveal-pct">0% Illuminated</span>
+        <span class="reveal-pct" id="reveal-pct">Stanza 1 / 6</span>
       </div>
     </div>
 
-    <!-- Center Brush Cue -->
-    <div id="hint">Glide Brush Across Lines to Illuminate Ink</div>
+    <!-- Center Subtle Reading Cue -->
+    <div id="hint">Scroll to Read Stanza by Stanza · Click Any Line to Underline</div>
 
-    <!-- Bottom-Right Interactive Ink Controls -->
+    <!-- Bottom-Right Interactive Reading Controls -->
     <div class="canvas-controls" id="canvas-controls">
       <button class="ctrl-btn mobile-nav-btn" id="btn-prev-chapter" aria-label="Previous poem">↑</button>
-      <button class="ctrl-btn hover-target" id="btn-bloom" title="Cascade ink reveal across every stanza">Bloom Reveal</button>
-      <button class="ctrl-btn hover-target" id="btn-reset" title="Reset poem to faint draft state">Reset Ink</button>
+      <button class="ctrl-btn hover-target" id="btn-reading-mode" title="Toggle between Focus Stanza and Full Poem layout">Full Poem</button>
       <a class="ctrl-btn hover-target transition-link" id="btn-share-poem" href="gallery.html" style="text-decoration: none;">Share Lines</a>
       <button class="ctrl-btn mobile-nav-btn" id="btn-next-chapter" aria-label="Next poem">↓</button>
     </div>
@@ -143,7 +139,7 @@
           <span class="card-arrow">←</span>
         </button>
 
-        <button type="button" id="colophon-add-btn" class="contact-card hover-target" style="transition-delay: 0.22s;">
+        <button type="button" id="colophon-add-btn" class="contact-card owner-only hover-target" style="transition-delay: 0.22s;">
           <div>
             <h3>Archive</h3>
             <p>Add a New Volume</p>
@@ -163,7 +159,7 @@
     </footer>
   </div>
 
-  <!-- Add New Poetry Collection Modal (Full-Stack POST /api/collections) -->
+  <!-- Add New Poetry Collection Modal (Owner Only) -->
   <div class="modal-backdrop" id="archive-modal-backdrop" role="dialog" aria-modal="true" aria-label="Archive New Poetry Volume">
     <div class="archive-modal">
       <div class="modal-head">
@@ -198,9 +194,9 @@
 
   <div class="stanza-toast" id="stanza-toast" role="status" aria-live="polite"></div>
 
-  <script src="js/data-store.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/cursor.js"></script>
-  <script src="js/experience.js"></script>
+  <script src="js/data-store.js?v=3"></script>
+  <script src="js/audio.js?v=3"></script>
+  <script src="js/cursor.js?v=3"></script>
+  <script src="js/experience.js?v=3"></script>
 </body>
 </html>

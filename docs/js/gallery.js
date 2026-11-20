@@ -70,11 +70,18 @@
   // ============================================
   // SPLIT-CURTAIN TRANSITIONS
   // ============================================
+  let hideCurtainTimer = null;
   function openCurtain() {
+    clearTimeout(hideCurtainTimer);
     introContent.style.opacity = '';
     overlay.classList.remove('curtain-closing');
     overlay.classList.add('curtain-open');
     document.body.classList.add('gallery-ready');
+    hideCurtainTimer = setTimeout(() => {
+      if (overlay.classList.contains('curtain-open')) {
+        overlay.classList.add('curtain-hidden');
+      }
+    }, 680);
   }
 
   window.addEventListener('pageshow', (event) => {
@@ -90,12 +97,14 @@
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const target = link.href;
+        clearTimeout(hideCurtainTimer);
         introContent.style.opacity = '0';
-        overlay.classList.remove('curtain-open');
+        overlay.classList.remove('curtain-hidden', 'curtain-open');
+        void overlay.offsetWidth;
         overlay.classList.add('curtain-closing');
         setTimeout(() => {
           window.location.href = target;
-        }, 620);
+        }, 560);
       });
     });
   }
@@ -117,7 +126,7 @@
       const openingStanza = (poem.stanzas[0] || []).map((l) => escapeHtml(l)).join('<br>');
 
       strip.innerHTML = `
-        <div class="strip-aura" style="background: ${poem.glow};"></div>
+        <div class="strip-aura"></div>
         <span class="strip-watermark">${poem.watermark}</span>
         <span class="strip-spine-title">${escapeHtml(poem.title)}</span>
 
@@ -463,9 +472,6 @@
     const showcaseGlow = document.getElementById('showcase-glow');
     const showcaseExpLink = document.getElementById('showcase-experience-link');
 
-    if (data.poem?.glow) {
-      showcaseGlow.style.background = data.poem.glow;
-    }
     if (data.collection?.slug) {
       showcaseExpLink.href = `index.html?collection=${encodeURIComponent(data.collection.slug)}&mode=read`;
     }
@@ -514,18 +520,33 @@
     const params = new URLSearchParams(window.location.search);
     const colSlug = sharedCollectionSlug || params.get('collection') || DEFAULT_COLLECTION_SLUG;
     const poemParam = params.get('poem');
+    const pickParam = params.get('pick');
 
     collection = await window.StanzaStore.getCollection(colSlug);
     poems = collection.poems || [];
     renderGalleryStrips();
 
-    setTimeout(openCurtain, 260);
+    setTimeout(openCurtain, 240);
 
     // If navigated directly to a specific poem (e.g., from Experience Mode's "Share Lines" button)
     if (poemParam && !sharedCollectionSlug) {
       const targetIdx = poems.findIndex((p) => p.slug === poemParam);
       if (targetIdx !== -1) {
-        setTimeout(() => openLightbox(targetIdx), 480);
+        setTimeout(() => {
+          openLightbox(targetIdx);
+          if (pickParam) {
+            const wanted = pickParam
+              .split(',')
+              .map((n) => parseInt(n, 10))
+              .filter((n) => !Number.isNaN(n))
+              .slice(0, MAX_SELECTED_LINES);
+            const allLines = poems[targetIdx].stanzas.flat();
+            selectedLines = wanted
+              .filter((i) => allLines[i])
+              .map((idx) => ({ idx, text: allLines[idx] }));
+            updateSelectionUI();
+          }
+        }, 460);
       }
     }
   })();

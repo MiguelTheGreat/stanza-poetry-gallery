@@ -66,6 +66,22 @@ body.mode-reader .reader-only-nav {
   display: inline-block;
 }
 
+.owner-only {
+  display: none !important;
+}
+
+body.is-owner .owner-only {
+  display: inline-flex !important;
+}
+
+body.is-owner .add-volume-card.owner-only {
+  display: flex !important;
+}
+
+body.is-owner .contact-card.owner-only {
+  display: flex !important;
+}
+
 /* ============================================
    VIEW 1: APPLE-STYLE VINYL / FOLIO COLLECTION SHELF
    ============================================ */
@@ -541,17 +557,7 @@ body.mode-reader #reader-view {
   pointer-events: none;
 }
 
-/* Watercolor & Ink Dust Particle Canvas behind verses */
-#inkCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Choreographed Poem Broadsheet Stage */
+/* Choreographed Single-Column Chapbook Stage */
 #poem-stage {
   position: absolute;
   inset: 0;
@@ -559,18 +565,18 @@ body.mode-reader #reader-view {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5.2rem clamp(1.5rem, 11vw, 12.5rem) 7.2rem;
+  padding: 5rem clamp(1.5rem, 11vw, 12.5rem) 7rem;
   pointer-events: none;
 }
 
 .poem-scene {
   position: absolute;
-  width: min(940px, 76vw);
-  max-height: calc(100vh - 12.2rem);
+  width: min(680px, 80vw);
+  height: calc(100vh - 12rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
@@ -583,7 +589,8 @@ body.mode-reader #reader-view {
 
 .poem-scene-header {
   text-align: center;
-  margin-bottom: clamp(1rem, 2.2vh, 1.8rem);
+  margin-bottom: clamp(1rem, 2.5vh, 1.8rem);
+  flex-shrink: 0;
 }
 
 .poem-scene-num {
@@ -596,7 +603,7 @@ body.mode-reader #reader-view {
 
 .poem-scene-title {
   font-family: var(--font-display);
-  font-size: clamp(1rem, 2vw, 1.55rem);
+  font-size: clamp(1rem, 2vw, 1.48rem);
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -604,61 +611,142 @@ body.mode-reader #reader-view {
   color: var(--ink-primary);
 }
 
-/* Two-column archival broadsheet layout for spacious readability */
-.poem-spread {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(1.5rem, 4vw, 3.6rem);
-  align-items: start;
+/* Single-Column Stanza Focus Viewport */
+.stanza-viewport {
   position: relative;
-}
-
-.poem-spread::before {
-  content: '';
-  position: absolute;
-  top: 4%;
-  bottom: 4%;
-  left: 50%;
-  width: 1px;
-  background: linear-gradient(180deg, transparent, rgba(26, 25, 23, 0.1), transparent);
-  pointer-events: none;
-}
-
-.poem-col {
+  width: 100%;
+  flex: 1;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: clamp(0.85rem, 1.8vh, 1.35rem);
+  align-items: center;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+}
+
+.stanza-track {
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  gap: 2.35rem;
+  padding: 16vh 0 24vh;
+  transition: transform 0.78s var(--ease-expo);
+  will-change: transform;
 }
 
 .stanza-block {
   display: flex;
   flex-direction: column;
-  gap: 0.14rem;
-}
-
-/* Interactive Ink-Reveal Verse Line */
-.ink-line {
-  font-family: var(--font-serif);
-  font-size: clamp(0.98rem, 1.32vw, 1.24rem);
-  line-height: 1.46;
-  color: var(--ink-primary);
+  gap: 0.28rem;
+  padding-left: 1.35rem;
+  border-left: 1.5px solid transparent;
   opacity: 0.22;
-  filter: blur(1.35px);
-  transform: translateY(2px);
+  filter: blur(1.15px);
+  transform: scale(0.975);
+  transform-origin: left center;
+  cursor: pointer;
   transition:
-    opacity 0.72s var(--ease-expo),
-    filter 0.72s var(--ease-expo),
-    transform 0.72s var(--ease-expo),
-    color 0.5s ease;
-  user-select: text;
-  cursor: default;
+    opacity 0.65s var(--ease-expo),
+    filter 0.65s var(--ease-expo),
+    transform 0.65s var(--ease-expo),
+    border-color 0.5s ease;
 }
 
-.ink-line.is-inked {
+.stanza-block:hover {
+  opacity: 0.58;
+  filter: blur(0px);
+}
+
+.stanza-block.is-focused {
   opacity: 1;
   filter: blur(0px);
-  transform: translateY(0);
+  transform: scale(1);
+  border-left-color: rgba(166, 124, 82, 0.55);
+}
+
+.stanza-num-tag {
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  letter-spacing: 0.26em;
+  color: var(--accent-warm);
+  margin-bottom: 0.3rem;
+  opacity: 0.65;
+}
+
+/* Full Poem Mode (clean single-column scrollable chapbook) */
+body.reading-full .stanza-viewport {
+  overflow-y: auto;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+body.reading-full .stanza-track {
+  transform: none !important;
+  padding: 0.5rem 0 3.5rem;
+  gap: 1.65rem;
+}
+
+body.reading-full .stanza-block {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  border-left-color: rgba(26, 25, 23, 0.1);
+}
+
+/* Interactive Verse Line with Archival Pencil Underline */
+.verse-line {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  font-family: var(--font-serif);
+  font-size: clamp(1.22rem, 1.85vw, 1.62rem);
+  line-height: 1.54;
+  color: var(--ink-primary);
+  padding: 0.08rem 0.2rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.35s var(--ease-expo);
+}
+
+body.reading-full .verse-line {
+  font-size: clamp(1.08rem, 1.42vw, 1.32rem);
+  line-height: 1.52;
+}
+
+.verse-line::after {
+  content: '';
+  position: absolute;
+  left: 0.2rem;
+  right: 0.2rem;
+  bottom: 0.12rem;
+  height: 1.5px;
+  background: var(--accent-warm);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-expo);
+}
+
+.verse-line:hover {
+  transform: translateX(4px);
+}
+
+.verse-line.is-underlined {
+  color: #12110f;
+}
+
+.verse-line.is-underlined::after {
+  transform: scaleX(1);
+}
+
+.verse-line.is-underlined::before {
+  content: '✦';
+  position: absolute;
+  left: -1.15rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.55rem;
+  color: var(--accent-warm);
 }
 
 /* Left-Edge Vertical Chapter Navigation Rail */

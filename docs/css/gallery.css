@@ -122,17 +122,18 @@ body.gallery-ready .gallery-strip {
   opacity: 1 !important;
 }
 
-/* Radial watercolor hover reveal layer (mirrors Lumina's circular color reveal) */
+/* Subtle warm museum paper spotlight on hover (no colored ambient wash) */
 .strip-aura {
   position: absolute;
   inset: 0;
   z-index: 1;
   opacity: 0;
   pointer-events: none;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 253, 248, 0.92) 0%, rgba(245, 242, 233, 0.2) 65%, transparent 100%) !important;
   clip-path: circle(0% at var(--mx, 50%) var(--my, 50%));
   transition:
-    opacity 0.65s ease,
-    clip-path 0.95s var(--ease-expo);
+    opacity 0.55s ease,
+    clip-path 0.85s var(--ease-expo);
 }
 
 .gallery-strip:hover .strip-aura {
@@ -441,7 +442,7 @@ body.gallery-ready .gallery-strip {
 }
 
 .lb-poem-sheet {
-  width: min(860px, 100%);
+  width: min(620px, 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -452,16 +453,16 @@ body.gallery-ready .gallery-strip {
   font-style: italic;
   font-size: 1.08rem;
   color: rgba(245, 242, 233, 0.55);
-  margin: 0 0 1.85rem;
+  margin: 0 0 1.95rem;
   text-align: center;
 }
 
 .lb-stanzas-grid {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.75rem 3rem;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 1.85rem;
+  padding-bottom: 1.5rem;
 }
 
 .lb-stanza {

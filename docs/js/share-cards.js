@@ -36,12 +36,13 @@
     collection,
     poem,
     lines,
-    cardStyle = 'museum',
+    cardStyle = 'etched',
+    format = 'post',
     showTitle = true,
     hasMusic = false
   }) {
     const cw = 1080;
-    const ch = 1350;
+    const ch = format === 'story' ? 1920 : 1350;
     targetCanvas.width = cw;
     targetCanvas.height = ch;
     const g = targetCanvas.getContext('2d');
@@ -51,7 +52,6 @@
     const volLabel = collection?.volume || 'VOL. 01';
     const poemTitle = (poem?.title || 'Untitled').toUpperCase();
     const poemIndex = poem?.indexLabel || '01 / 08';
-    const poemSubtitle = poem?.subtitle || '';
     const accent = poem?.accentHex || '#a67c52';
     const rgb = poem?.watercolorRgb || '166, 124, 82';
 
@@ -61,7 +61,12 @@
     let muted = '#6b655c';
     let border = 'rgba(26, 25, 23, 0.14)';
 
-    if (cardStyle === 'noir') {
+    if (cardStyle === 'etched') {
+      bg = '#f3efe5';
+      fg = '#191816';
+      muted = '#676158';
+      border = 'rgba(26, 25, 23, 0.22)';
+    } else if (cardStyle === 'noir') {
       bg = '#151412';
       fg = '#f5f2e9';
       muted = 'rgba(245, 242, 233, 0.58)';
@@ -87,73 +92,128 @@
     g.fillStyle = bg;
     g.fillRect(0, 0, cw, ch);
 
-    // Style-specific atmospheric & architectural layers
-    if (cardStyle === 'museum') {
-      // Soft radial warmth
-      const wash = g.createRadialGradient(cw * 0.5, ch * 0.44, 40, cw * 0.5, ch * 0.44, 620);
-      wash.addColorStop(0, `rgba(${rgb}, 0.10)`);
-      wash.addColorStop(1, 'rgba(245, 242, 233, 0)');
-      g.fillStyle = wash;
-      g.fillRect(0, 0, cw, ch);
+    const storySafeTop = format === 'story' ? 140 : 0;
+    const storySafeBottom = format === 'story' ? 150 : 0;
 
+    // Style-specific atmospheric & architectural layers
+    if (cardStyle === 'etched') {
+      // Fine intaglio outer margin cross-hatching
+      g.save();
+      g.strokeStyle = 'rgba(26, 25, 23, 0.045)';
+      g.lineWidth = 1;
+      for (let y = 0; y < ch; y += 6) {
+        if (y < 52 + storySafeTop || y > ch - 52 - storySafeBottom) {
+          g.beginPath();
+          g.moveTo(0, y);
+          g.lineTo(cw, y);
+          g.stroke();
+        }
+      }
+      for (let x = 0; x < cw; x += 7) {
+        if (x < 52 || x > cw - 52) {
+          g.beginPath();
+          g.moveTo(x, 0);
+          g.lineTo(x, ch);
+          g.stroke();
+        }
+      }
+      g.restore();
+
+      // Recessed copperplate indentation (plate-mark)
+      const px = 52;
+      const py = 52 + storySafeTop;
+      const pw = cw - 104;
+      const ph = ch - 104 - storySafeTop - storySafeBottom;
+
+      g.fillStyle = '#f8f5ed';
+      g.fillRect(px, py, pw, ph);
+
+      g.strokeStyle = 'rgba(130, 120, 104, 0.45)';
+      g.lineWidth = 2;
+      g.strokeRect(px, py, pw, ph);
+
+      g.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      g.lineWidth = 1.5;
+      g.strokeRect(px + 2, py + 2, pw - 4, ph - 4);
+
+      // Inner engraved double hairline frame
+      g.strokeStyle = 'rgba(26, 25, 23, 0.72)';
+      g.lineWidth = 1.2;
+      g.strokeRect(px + 22, py + 22, pw - 44, ph - 44);
+
+      g.strokeStyle = 'rgba(166, 124, 82, 0.72)';
+      g.lineWidth = 1;
+      g.strokeRect(px + 30, py + 30, pw - 60, ph - 60);
+
+      // Engraved corner registration crosses
+      const corners = [
+        [px + 22, py + 22],
+        [px + pw - 22, py + 22],
+        [px + 22, py + ph - 22],
+        [px + pw - 22, py + ph - 22]
+      ];
+      g.strokeStyle = '#191816';
+      g.lineWidth = 1.2;
+      corners.forEach(([cx, cy]) => {
+        g.beginPath();
+        g.moveTo(cx - 12, cy);
+        g.lineTo(cx + 12, cy);
+        g.moveTo(cx, cy - 12);
+        g.lineTo(cx, cy + 12);
+        g.stroke();
+      });
+
+      // Vertical incised "cut" mark at top center
+      g.strokeStyle = 'rgba(166, 124, 82, 0.78)';
+      g.lineWidth = 1.2;
+      g.beginPath();
+      g.moveTo(cw / 2, py + 54);
+      g.lineTo(cw / 2, py + 104);
+      g.stroke();
+
+      drawSubtleGrain(g, cw, ch, 0.028);
+    } else if (cardStyle === 'museum') {
       // Double museum hairline frame
       g.strokeStyle = border;
       g.lineWidth = 1.5;
-      g.strokeRect(42, 42, cw - 84, ch - 84);
+      g.strokeRect(42, 42 + storySafeTop, cw - 84, ch - 84 - storySafeTop - storySafeBottom);
       g.strokeStyle = 'rgba(26, 25, 23, 0.06)';
       g.lineWidth = 1;
-      g.strokeRect(56, 56, cw - 112, ch - 112);
+      g.strokeRect(56, 56 + storySafeTop, cw - 112, ch - 112 - storySafeTop - storySafeBottom);
 
       drawSubtleGrain(g, cw, ch, 0.025);
     } else if (cardStyle === 'noir') {
-      const wash = g.createRadialGradient(cw * 0.5, ch * 0.42, 30, cw * 0.5, ch * 0.42, 620);
-      wash.addColorStop(0, `rgba(${rgb}, 0.22)`);
-      wash.addColorStop(0.6, `rgba(${rgb}, 0.06)`);
-      wash.addColorStop(1, 'rgba(21, 20, 18, 0)');
-      g.fillStyle = wash;
-      g.fillRect(0, 0, cw, ch);
-
       g.strokeStyle = border;
       g.lineWidth = 1.5;
-      g.strokeRect(44, 44, cw - 88, ch - 88);
+      g.strokeRect(44, 44 + storySafeTop, cw - 88, ch - 88 - storySafeTop - storySafeBottom);
     } else if (cardStyle === 'broadsheet') {
-      // Horizontal archival folio rules
       g.strokeStyle = border;
       g.lineWidth = 1.5;
       g.beginPath();
-      g.moveTo(84, 132);
-      g.lineTo(cw - 84, 132);
-      g.moveTo(84, 140);
-      g.lineTo(cw - 84, 140);
-      g.moveTo(84, ch - 196);
-      g.lineTo(cw - 84, ch - 196);
+      g.moveTo(84, 132 + storySafeTop);
+      g.lineTo(cw - 84, 132 + storySafeTop);
+      g.moveTo(84, 140 + storySafeTop);
+      g.lineTo(cw - 84, 140 + storySafeTop);
+      g.moveTo(84, ch - 196 - storySafeBottom);
+      g.lineTo(cw - 84, ch - 196 - storySafeBottom);
       g.stroke();
 
-      // Left margin red/bronze rule
-      g.strokeStyle = `rgba(${rgb}, 0.35)`;
+      g.strokeStyle = 'rgba(166, 124, 82, 0.35)';
       g.lineWidth = 1.5;
       g.beginPath();
-      g.moveTo(156, 195);
-      g.lineTo(156, ch - 250);
+      g.moveTo(156, 195 + storySafeTop);
+      g.lineTo(156, ch - 250 - storySafeBottom);
       g.stroke();
 
       drawSubtleGrain(g, cw, ch, 0.022);
     } else if (cardStyle === 'atmosphere') {
-      // Rich layered chromatic wash
       const grad1 = g.createRadialGradient(cw * 0.28, ch * 0.30, 40, cw * 0.28, ch * 0.30, 740);
-      grad1.addColorStop(0, `rgba(${rgb}, 0.55)`);
-      grad1.addColorStop(0.55, `rgba(${rgb}, 0.16)`);
+      grad1.addColorStop(0, `rgba(${rgb}, 0.42)`);
+      grad1.addColorStop(0.55, `rgba(${rgb}, 0.14)`);
       grad1.addColorStop(1, 'rgba(23, 21, 19, 0)');
       g.fillStyle = grad1;
       g.fillRect(0, 0, cw, ch);
 
-      const grad2 = g.createRadialGradient(cw * 0.78, ch * 0.76, 30, cw * 0.78, ch * 0.76, 620);
-      grad2.addColorStop(0, 'rgba(166, 124, 82, 0.32)');
-      grad2.addColorStop(1, 'rgba(23, 21, 19, 0)');
-      g.fillStyle = grad2;
-      g.fillRect(0, 0, cw, ch);
-
-      // Vignette
       const vig = g.createRadialGradient(cw * 0.5, ch * 0.5, cw * 0.28, cw * 0.5, ch * 0.5, cw * 0.85);
       vig.addColorStop(0, 'rgba(0,0,0,0)');
       vig.addColorStop(1, 'rgba(10, 9, 8, 0.52)');
@@ -162,21 +222,14 @@
 
       g.strokeStyle = 'rgba(248, 244, 236, 0.15)';
       g.lineWidth = 1;
-      g.strokeRect(48, 48, cw - 96, ch - 96);
+      g.strokeRect(48, 48 + storySafeTop, cw - 96, ch - 96 - storySafeTop - storySafeBottom);
     } else if (cardStyle === 'keepsake') {
-      // Polaroid / Keepsake inner matte window
       const matX = 76;
-      const matY = 76;
+      const matY = 76 + storySafeTop;
       const matW = cw - 152;
-      const matH = ch - 310;
+      const matH = ch - 310 - storySafeTop - storySafeBottom;
 
       g.fillStyle = '#1b1916';
-      g.fillRect(matX, matY, matW, matH);
-
-      const matGlow = g.createRadialGradient(cw * 0.5, matY + matH * 0.45, 30, cw * 0.5, matY + matH * 0.45, 560);
-      matGlow.addColorStop(0, `rgba(${rgb}, 0.30)`);
-      matGlow.addColorStop(1, 'rgba(27, 25, 22, 0)');
-      g.fillStyle = matGlow;
       g.fillRect(matX, matY, matW, matH);
 
       g.strokeStyle = 'rgba(245, 242, 233, 0.12)';
@@ -186,8 +239,8 @@
 
     // Header bar
     const isKeepsake = cardStyle === 'keepsake';
-    const headerY = isKeepsake ? 138 : 104;
-    const padX = cardStyle === 'broadsheet' ? 84 : (isKeepsake ? 124 : 96);
+    const headerY = (isKeepsake ? 138 : cardStyle === 'etched' ? 128 : 104) + storySafeTop;
+    const padX = cardStyle === 'broadsheet' ? 84 : (isKeepsake ? 124 : cardStyle === 'etched' ? 118 : 96);
 
     g.fillStyle = isKeepsake ? 'rgba(245, 242, 233, 0.58)' : muted;
     g.font = '700 15px "Syncopate", sans-serif';
@@ -204,7 +257,7 @@
     const verseLineHeight = Math.round(verseFontSize * 1.48);
 
     g.font = `italic 400 ${verseFontSize}px "Cormorant Garamond", Georgia, serif`;
-    const maxTextW = cardStyle === 'broadsheet' ? cw - 290 : (isKeepsake ? cw - 280 : cw - 220);
+    const maxTextW = cardStyle === 'broadsheet' ? cw - 290 : (isKeepsake || cardStyle === 'etched' ? cw - 260 : cw - 220);
 
     // Pre-wrap all selected lines so we can vertically center cleanly
     const wrappedEntries = safeLines.map((line, idx) => ({
@@ -219,15 +272,15 @@
       if (i < wrappedEntries.length - 1) totalTextHeight += stanzaGap;
     });
 
-    const stageTop = isKeepsake ? 190 : 190;
-    const stageBottom = isKeepsake ? ch - 260 : (showTitle ? ch - 260 : ch - 130);
+    const stageTop = 190 + storySafeTop;
+    const stageBottom = (isKeepsake ? ch - 260 : (showTitle ? ch - 260 : ch - 130)) - storySafeBottom;
     let cursorY = stageTop + Math.max(40, (stageBottom - stageTop - totalTextHeight) / 2) + verseFontSize * 0.7;
 
     // Opening quotation mark glyph
     if (cardStyle !== 'broadsheet') {
       g.save();
       g.font = 'italic 400 124px "Cormorant Garamond", Georgia, serif';
-      g.fillStyle = isKeepsake ? 'rgba(216, 180, 137, 0.25)' : `rgba(${rgb}, 0.28)`;
+      g.fillStyle = isKeepsake ? 'rgba(216, 180, 137, 0.25)' : 'rgba(166, 124, 82, 0.28)';
       g.textAlign = 'left';
       g.fillText('“', padX - 8, cursorY - 56);
       g.restore();
@@ -238,7 +291,7 @@
       if (cardStyle === 'broadsheet') {
         g.save();
         g.font = '600 14px "Syncopate", sans-serif';
-        g.fillStyle = `rgba(${rgb}, 0.72)`;
+        g.fillStyle = 'rgba(166, 124, 82, 0.75)';
         g.textAlign = 'right';
         g.fillText(entry.num, 136, cursorY - 6);
         g.restore();
@@ -262,28 +315,27 @@
         g.textAlign = 'center';
         g.fillStyle = '#1a1917';
         g.font = 'italic 600 40px "Cormorant Garamond", Georgia, serif';
-        g.fillText(poem?.title || 'Untitled', cw / 2, ch - 138);
+        g.fillText(poem?.title || 'Untitled', cw / 2, ch - 138 - storySafeBottom);
 
         g.fillStyle = '#767067';
         g.font = '400 14px "Syncopate", sans-serif';
-        g.fillText(colTitle, cw / 2, ch - 92);
+        g.fillText(colTitle, cw / 2, ch - 92 - storySafeBottom);
 
         if (hasMusic) {
           g.fillStyle = accent;
           g.font = '600 12px "Syncopate", sans-serif';
-          g.fillText('♪  WITH SOUNDTRACK', cw / 2, ch - 54);
+          g.fillText('♪  WITH SOUNDTRACK', cw / 2, ch - 54 - storySafeBottom);
         }
       } else {
-        const footerY = ch - 132;
+        const footerY = ch - 132 - storySafeBottom;
 
-        // Short bronze accent bar above title
         g.fillStyle = accent;
         g.fillRect(padX, footerY - 46, 54, 2);
 
         g.textAlign = 'left';
         g.fillStyle = fg;
         g.font = '700 24px "Syncopate", sans-serif';
-        g.fillText(poemTitle.length > 32 ? poemTitle.slice(0, 31) + '…' : poemTitle, padX, footerY);
+        g.fillText(poemTitle.length > 30 ? poemTitle.slice(0, 29) + '…' : poemTitle, padX, footerY);
 
         g.fillStyle = muted;
         g.font = 'italic 26px "Cormorant Garamond", Georgia, serif';

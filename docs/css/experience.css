@@ -175,171 +175,237 @@ body.mode-reader #shelf-view {
   pointer-events: none;
 }
 
-/* Featured Collection Vinyl/Folio Card */
+/* Featured Collection 3D Angled Folio Card */
 .album-card {
   scroll-snap-align: start;
   flex: 0 0 auto;
-  width: min(760px, 88vw);
+  width: min(860px, 90vw);
   display: grid;
-  grid-template-columns: minmax(250px, 340px) 1fr;
-  gap: clamp(1.75rem, 4vw, 3.25rem);
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  gap: clamp(2rem, 5vw, 4.2rem);
   align-items: center;
   position: relative;
 }
 
-.sleeve-wrapper {
+.folio-stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  perspective: 1200px;
+  aspect-ratio: 4 / 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1400px;
   cursor: pointer;
+  padding: 0.75rem 0;
 }
 
-/* Peeking Vinyl / Archival Manuscript Disc behind the cover */
-.vinyl-disc {
+/* Grounded plinth contact shadow beneath the angled 3D book */
+.folio-shadow {
   position: absolute;
-  top: 4%;
-  right: 2%;
-  width: 92%;
-  height: 92%;
+  bottom: 0.2rem;
+  left: 14%;
+  right: 12%;
+  height: 26px;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 50%, #f5f2e9 0%, #f5f2e9 15%, #a67c52 15.5%, #a67c52 17.5%, #191816 18%, #1d1b19 32%, #141311 46%, #1f1d1a 60%, #141311 76%, #22201d 90%, #121110 100%);
-  box-shadow: 0 18px 42px rgba(26, 25, 23, 0.22);
-  transform: translateX(0) rotate(0deg);
-  transition: transform 0.85s var(--ease-expo);
-  z-index: 1;
+  background: radial-gradient(ellipse at center, rgba(22, 20, 17, 0.28) 0%, rgba(22, 20, 17, 0.08) 55%, transparent 78%);
+  filter: blur(8px);
+  transform: skewX(-18deg);
+  transition: transform 0.75s var(--ease-expo), opacity 0.65s ease;
   pointer-events: none;
 }
 
-.vinyl-disc::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 25deg,
-    transparent 0deg,
-    rgba(255, 255, 255, 0.09) 28deg,
-    transparent 65deg,
-    transparent 180deg,
-    rgba(255, 255, 255, 0.07) 210deg,
-    transparent 250deg
-  );
+.folio-stage:hover .folio-shadow {
+  transform: skewX(-14deg) scale(1.06);
+  opacity: 0.78;
 }
 
-.sleeve-wrapper:hover .vinyl-disc {
-  transform: translateX(26%) rotate(38deg);
-}
-
-/* Square Tactile Cover Sleeve */
-.sleeve-cover {
+/* 3D Physical Hardcover Book Object (Angled at rest!) */
+.folio-book {
   position: relative;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  border-radius: 4px;
-  overflow: hidden;
-  background: #f5f2e9;
-  border: 1px solid rgba(26, 25, 23, 0.14);
-  box-shadow:
-    0 24px 55px rgba(26, 25, 23, 0.14),
-    0 4px 12px rgba(26, 25, 23, 0.06),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  width: 82%;
+  height: 92%;
   transform-style: preserve-3d;
-  transition: transform 0.65s var(--ease-expo), box-shadow 0.65s var(--ease-expo);
+  transform: rotateY(-24deg) rotateX(9deg) rotateZ(-1.5deg);
+  transition: transform 0.85s var(--ease-expo);
   will-change: transform;
 }
 
-.sleeve-wrapper:hover .sleeve-cover {
-  box-shadow:
-    0 34px 72px rgba(26, 25, 23, 0.2),
-    0 8px 20px rgba(26, 25, 23, 0.09);
+.folio-stage:hover .folio-book {
+  transform: rotateY(-12deg) rotateX(4deg) rotateZ(0deg) translateY(-8px) translateZ(14px);
 }
 
-/* Spine crease & gloss sheen */
-.sleeve-cover::before {
+/* Front Linen / Cotton Paper Cover */
+.folio-front {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(16px);
+  border-radius: 2px 5px 5px 2px;
+  background:
+    repeating-linear-gradient(0deg, rgba(26, 25, 23, 0.014) 0px, rgba(26, 25, 23, 0.014) 1px, transparent 1px, transparent 4px),
+    linear-gradient(148deg, #faf7f0 0%, #f1eadc 58%, #e8dfd0 100%);
+  border: 1px solid rgba(26, 25, 23, 0.14);
+  box-shadow:
+    inset 14px 0 22px -12px rgba(26, 25, 23, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.65),
+    12px 24px 48px rgba(22, 20, 17, 0.16);
+  padding: 1.5rem 1.45rem 1.45rem 1.95rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+
+/* Spine hinge groove on front cover */
+.folio-front::before {
   content: '';
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 11px;
-  width: 1px;
-  background: rgba(26, 25, 23, 0.12);
-  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.35);
-  z-index: 4;
+  left: 16px;
+  width: 2px;
+  background: linear-gradient(90deg, rgba(26, 25, 23, 0.16), rgba(255, 255, 255, 0.55));
   pointer-events: none;
 }
 
-.sleeve-cover::after {
+/* Studio light specular sheen */
+.folio-front::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(132deg, rgba(255, 255, 255, 0.22) 0%, transparent 45%, rgba(26, 25, 23, 0.08) 100%);
-  z-index: 3;
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.34) 0%, transparent 42%, rgba(26, 25, 23, 0.07) 100%);
   pointer-events: none;
 }
 
-.sleeve-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.9s var(--ease-expo);
-}
-
-.sleeve-wrapper:hover .sleeve-cover img {
-  transform: scale(1.035);
-}
-
-/* Typographic fallback cover for newly added user collections */
-.sleeve-typo-cover {
-  width: 100%;
-  height: 100%;
-  padding: 2rem;
+/* Recessed blind-debossed etched plate frame inside cover */
+.folio-plate {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  border: 1px solid rgba(26, 25, 23, 0.18);
+  box-shadow:
+    inset 0 0 0 4px rgba(247, 244, 236, 0.8),
+    inset 0 0 0 5px rgba(166, 124, 82, 0.42);
+  padding: 1.35rem 1.1rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: linear-gradient(155deg, #f8f5ee 0%, #ebe3d3 100%);
+  align-items: center;
+  text-align: center;
 }
 
-.sleeve-typo-vol {
+.folio-top-meta {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-family: var(--font-display);
-  font-size: 0.62rem;
-  letter-spacing: 0.28em;
+  font-size: 0.48rem;
+  letter-spacing: 0.24em;
   color: var(--accent-warm);
-}
-
-.sleeve-typo-title {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 2rem;
-  line-height: 1.12;
-  color: var(--ink-primary);
-  margin: 0;
-}
-
-.sleeve-typo-foot {
-  font-family: var(--font-display);
-  font-size: 0.54rem;
-  letter-spacing: 0.22em;
-  color: var(--ink-secondary);
   text-transform: uppercase;
 }
 
-.sleeve-badge {
-  position: absolute;
-  top: 1rem;
-  left: 1.4rem;
-  z-index: 5;
-  font-family: var(--font-display);
-  font-size: 0.56rem;
-  letter-spacing: 0.24em;
+.folio-cut-mark {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(180deg, transparent, var(--accent-warm), transparent);
+  margin: 0.2rem auto;
+}
+
+.folio-cover-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.35rem, 2.2vw, 1.72rem);
+  line-height: 1.18;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--ink-primary);
-  background: rgba(245, 242, 233, 0.85);
-  backdrop-filter: blur(8px);
-  padding: 0.35rem 0.65rem;
-  border: 1px solid rgba(26, 25, 23, 0.1);
+  margin: 0.25rem 0;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.folio-cover-rule {
+  width: 44px;
+  height: 1px;
+  background: rgba(166, 124, 82, 0.65);
+  margin: 0.45rem auto;
+}
+
+.folio-cover-epigraph {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.88rem;
+  line-height: 1.38;
+  color: var(--ink-secondary);
+  margin: 0;
+  max-width: 92%;
+}
+
+.folio-bottom-meta {
+  font-family: var(--font-display);
+  font-size: 0.46rem;
+  letter-spacing: 0.26em;
+  color: rgba(26, 25, 23, 0.5);
+  text-transform: uppercase;
+}
+
+/* 3D Left Charcoal Linen Spine */
+.folio-spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 32px;
+  transform-origin: left center;
+  transform: translateZ(16px) rotateY(90deg);
+  background: linear-gradient(90deg, #121110 0%, #23211e 48%, #161513 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.folio-spine-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-display);
+  font-size: 0.46rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(216, 178, 134, 0.82);
+  white-space: nowrap;
+}
+
+/* 3D Right Layered Paper Page Block */
+.folio-pages {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  right: 0;
+  width: 28px;
+  transform-origin: right center;
+  transform: translateZ(14px) rotateY(-90deg);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #f2ece0 0px,
+      #f2ece0 2px,
+      #ddd4c3 2px,
+      #ddd4c3 3px
+    );
+  box-shadow: inset 0 0 8px rgba(26, 25, 23, 0.16);
+}
+
+/* 3D Back Board */
+.folio-back {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(-16px);
+  border-radius: 2px 5px 5px 2px;
+  background: #ded6c6;
+  border: 1px solid rgba(26, 25, 23, 0.14);
 }
 
 /* Editorial Metadata Column beside the Vinyl Sleeve */

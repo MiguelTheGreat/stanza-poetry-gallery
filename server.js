@@ -310,8 +310,8 @@ app.post('/api/shares', (req, res) => {
     return res.status(400).json({ error: 'Please select between 1 and 4 lines to share.' });
   }
 
-  const allowedStyles = ['museum', 'noir', 'broadsheet', 'atmosphere', 'keepsake'];
-  const safeStyle = allowedStyles.includes(cardStyle) ? cardStyle : 'museum';
+  const allowedStyles = ['etched', 'museum', 'noir', 'broadsheet', 'atmosphere', 'keepsake'];
+  const safeStyle = allowedStyles.includes(cardStyle) ? cardStyle : 'etched';
   const cleanLines = lines.slice(0, 4).map((l) => String(l).trim()).filter(Boolean);
   if (cleanLines.length === 0) {
     return res.status(400).json({ error: 'Selected lines cannot be empty.' });

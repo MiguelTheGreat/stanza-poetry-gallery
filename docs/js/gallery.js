@@ -46,7 +46,8 @@
   let selectedLines = []; // Array of { idx, text } in order of poem appearance
 
   const shareState = {
-    cardStyle: 'museum',
+    cardStyle: 'etched',
+    format: 'story',
     showTitle: true,
     music: null
   };
@@ -377,6 +378,7 @@
       poem,
       lines: selectedLines.map((s) => s.text),
       cardStyle: shareState.cardStyle,
+      format: shareState.format,
       showTitle: shareState.showTitle,
       hasMusic: !!(shareState.music && !shareState.music.invalid)
     });
@@ -417,6 +419,14 @@
     });
   });
 
+  document.querySelectorAll('#format-pills .opt-pill').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      shareState.format = btn.dataset.format;
+      document.querySelectorAll('#format-pills .opt-pill').forEach((b) => b.classList.toggle('active', b === btn));
+      refreshSharePreview();
+    });
+  });
+
   shareTitleToggle.addEventListener('change', () => {
     shareState.showTitle = shareTitleToggle.checked;
     refreshSharePreview();
@@ -443,6 +453,76 @@
     refreshSharePreview();
   });
 
+  async function buildCurrentShareLink() {
+    const poem = poems[currentPoemIdx];
+    return window.StanzaStore.createShareUrl({
+      collectionSlug: collection.slug,
+      poemSlug: poem.slug,
+      lines: selectedLines.map((s) => s.text),
+      cardStyle: shareState.cardStyle,
+      showTitle: shareState.showTitle,
+      musicCode: shareState.music && !shareState.music.invalid ? shareState.music.code : ''
+    });
+  }
+
+  // Share to Instagram / Facebook Story (Native File Share on mobile, 9:16 PNG + link on desktop)
+  document.getElementById('btn-share-story').addEventListener('click', async () => {
+    const poem = poems[currentPoemIdx];
+    if (!poem || selectedLines.length === 0) return;
+
+    // Ensure 9:16 Story canvas is rendered for crisp Story sharing
+    const storyCanvas = document.createElement('canvas');
+    window.StanzaShare.renderPoetryCard(storyCanvas, {
+      collection,
+      poem,
+      lines: selectedLines.map((s) => s.text),
+      cardStyle: shareState.cardStyle,
+      format: 'story',
+      showTitle: shareState.showTitle,
+      hasMusic: !!(shareState.music && !shareState.music.invalid)
+    });
+
+    const shareUrl = await buildCurrentShareLink();
+    const filename = `stanza-${poem.slug}-${shareState.cardStyle}-story.png`;
+
+    try {
+      const blob = await new Promise((resolve) => storyCanvas.toBlob(resolve, 'image/png'));
+      const file = new File([blob], filename, { type: 'image/png' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `${poem.title} — ${collection.title}`,
+          text: `“${selectedLines.map((s) => s.text).join(' / ')}”`,
+          url: shareUrl
+        });
+        showToast('Opened Story Share Sheet');
+        return;
+      }
+    } catch (err) {
+      if (err && err.name === 'AbortError') return;
+    }
+
+    // Desktop fallback: download 9:16 Story PNG + copy share link for Story sticker
+    downloadCanvasPng(storyCanvas, filename);
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showToast('9:16 Story Card Saved & Link Copied — Ready for IG / FB Story');
+    } catch {
+      showToast('9:16 Story Card Saved — Upload to IG / FB Story');
+    }
+  });
+
+  // Share directly on Facebook with Etched Card OG preview + quote
+  document.getElementById('btn-share-fb').addEventListener('click', async () => {
+    const poem = poems[currentPoemIdx];
+    if (!poem || selectedLines.length === 0) return;
+    const shareUrl = await buildCurrentShareLink();
+    const quote = `“${selectedLines.map((s) => s.text).join(' / ')}” — ${poem.title} (${collection.title})`;
+    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(quote)}`;
+    window.open(fbUrl, '_blank', 'noopener,noreferrer,width=640,height=540');
+  });
+
   // Persist share card via StanzaStore (Express /api/shares or static GitHub Pages URL)
   btnCopyLink.addEventListener('click', async () => {
     const poem = poems[currentPoemIdx];
@@ -450,14 +530,7 @@
 
     btnCopyLink.textContent = 'Creating Link…';
     try {
-      const fullUrl = await window.StanzaStore.createShareUrl({
-        collectionSlug: collection.slug,
-        poemSlug: poem.slug,
-        lines: selectedLines.map((s) => s.text),
-        cardStyle: shareState.cardStyle,
-        showTitle: shareState.showTitle,
-        musicCode: shareState.music && !shareState.music.invalid ? shareState.music.code : ''
-      });
+      const fullUrl = await buildCurrentShareLink();
 
       try {
         await navigator.clipboard.writeText(fullUrl);

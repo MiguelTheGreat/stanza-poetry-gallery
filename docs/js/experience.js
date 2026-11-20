@@ -219,72 +219,91 @@
       const card = document.createElement('article');
       card.className = 'album-card';
 
-      const coverHtml = col.coverImage
-        ? `<img src="${col.coverImage}" alt="${col.title} cover art" decoding="async">`
-        : `<div class="sleeve-typo-cover">
-             <span class="sleeve-typo-vol">${col.volume}</span>
-             <h3 class="sleeve-typo-title">${col.title}</h3>
-             <span class="sleeve-typo-foot">${col.poemCount} Poems · ${col.year}</span>
-           </div>`;
-
       card.innerHTML = `
-        <div class="sleeve-wrapper" data-slug="${col.slug}" role="button" tabindex="0" aria-label="Enter ${col.title}">
-          <div class="vinyl-disc" aria-hidden="true"></div>
-          <div class="sleeve-cover">
-            <span class="sleeve-badge">${col.volume}</span>
-            ${coverHtml}
+        <div class="folio-stage" data-slug="${col.slug}" role="button" tabindex="0" aria-label="Enter ${escapeHtml(col.title)}">
+          <div class="folio-shadow" aria-hidden="true"></div>
+          <div class="folio-book">
+            <div class="folio-back" aria-hidden="true"></div>
+            <div class="folio-spine" aria-hidden="true">
+              <span class="folio-spine-text">${escapeHtml(col.volume)} · ${escapeHtml(col.title)}</span>
+            </div>
+            <div class="folio-pages" aria-hidden="true"></div>
+            <div class="folio-front">
+              <div class="folio-plate">
+                <div class="folio-top-meta">
+                  <span>${escapeHtml(col.volume)}</span>
+                  <span>${escapeHtml(col.year)}</span>
+                </div>
+                <div>
+                  <div class="folio-cut-mark" aria-hidden="true"></div>
+                  <h3 class="folio-cover-title">${escapeHtml(col.title)}</h3>
+                  <div class="folio-cover-rule" aria-hidden="true"></div>
+                  ${col.epigraph ? `<p class="folio-cover-epigraph">“${escapeHtml(col.epigraph)}”</p>` : ''}
+                </div>
+                <div class="folio-bottom-meta">${col.poemCount} ${col.poemCount === 1 ? 'Poem' : 'Poems'} · Stanza.</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="album-details">
           <div class="album-meta-row">
-            <span>${col.volume}</span>
+            <span>${escapeHtml(col.volume)}</span>
             <span class="album-meta-dot"></span>
             <span>${col.poemCount} ${col.poemCount === 1 ? 'Poem' : 'Poems'}</span>
             <span class="album-meta-dot"></span>
-            <span>${col.year}</span>
+            <span>${escapeHtml(col.year)}</span>
           </div>
-          <h3 class="album-title">${col.title}</h3>
-          ${col.subtitle ? `<p class="album-subtitle">${col.subtitle}</p>` : ''}
-          ${col.epigraph ? `<blockquote class="album-epigraph">“${col.epigraph}”</blockquote>` : ''}
+          <h3 class="album-title">${escapeHtml(col.title)}</h3>
+          ${col.subtitle ? `<p class="album-subtitle">${escapeHtml(col.subtitle)}</p>` : ''}
+          ${col.epigraph ? `<blockquote class="album-epigraph">“${escapeHtml(col.epigraph)}”</blockquote>` : ''}
           <div class="album-actions">
             <button type="button" class="btn-enter-exp hover-target" data-enter="${col.slug}">Enter Experience →</button>
             <a href="gallery.html?collection=${encodeURIComponent(col.slug)}" class="btn-open-gallery transition-link hover-target">Gallery Mode</a>
+            <button type="button" class="btn-open-gallery hover-target" data-share-fb="${col.slug}" title="Share etched card on Facebook">Share on FB ↗</button>
           </div>
         </div>
       `;
 
-      // 3D Tilt on sleeve hover
-      const sleeveWrapper = card.querySelector('.sleeve-wrapper');
-      const sleeveCover = card.querySelector('.sleeve-cover');
+      // Interactive 3D angle response around the resting angled hero pose
+      const folioStage = card.querySelector('.folio-stage');
+      const folioBook = card.querySelector('.folio-book');
       let rect = null;
 
-      sleeveWrapper.addEventListener('mouseenter', () => {
-        rect = sleeveWrapper.getBoundingClientRect();
-        if (cursorApi) cursorApi.setInspect('ENTER');
+      folioStage.addEventListener('mouseenter', () => {
+        rect = folioStage.getBoundingClientRect();
+        if (cursorApi) cursorApi.setInspect('OPEN');
       });
 
-      sleeveWrapper.addEventListener('mousemove', (e) => {
-        if (!rect) rect = sleeveWrapper.getBoundingClientRect();
+      folioStage.addEventListener('mousemove', (e) => {
+        if (!rect) rect = folioStage.getBoundingClientRect();
         const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
         const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-        sleeveCover.style.transform = `perspective(1000px) rotateY(${nx * 7}deg) rotateX(${-ny * 7}deg) translateZ(6px)`;
+        const ry = -16 + nx * 12;
+        const rx = 5 - ny * 8;
+        folioBook.style.transform = `rotateY(${ry.toFixed(1)}deg) rotateX(${rx.toFixed(1)}deg) translateY(-8px) translateZ(16px)`;
       });
 
-      sleeveWrapper.addEventListener('mouseleave', () => {
+      folioStage.addEventListener('mouseleave', () => {
         rect = null;
-        sleeveCover.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) translateZ(0)';
+        folioBook.style.transform = '';
         if (cursorApi) cursorApi.setInspect('');
       });
 
       const triggerEnter = () => enterCollectionExperience(col.slug);
-      sleeveWrapper.addEventListener('click', triggerEnter);
-      sleeveWrapper.addEventListener('keydown', (e) => {
+      folioStage.addEventListener('click', triggerEnter);
+      folioStage.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           triggerEnter();
         }
       });
       card.querySelector('[data-enter]').addEventListener('click', triggerEnter);
+
+      card.querySelector('[data-share-fb]').addEventListener('click', () => {
+        const shareUrl = window.location.origin + window.location.pathname;
+        const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+        window.open(fbUrl, '_blank', 'noopener,noreferrer,width=640,height=520');
+      });
 
       shelfStage.appendChild(card);
     });

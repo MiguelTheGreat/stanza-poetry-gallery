@@ -6,14 +6,22 @@
   <title>Stanza. | Exhibition Gallery</title>
   <meta name="description" content="Explore the Stanza. poetry exhibition — hover to unveil stanzas, select up to 4 lines to craft custom shareable cards with optional Spotify or YouTube Music soundtracks.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Stanza. | Poetry Exhibition Gallery">
-  <meta property="og:description" content="Explore the Stanza. poetry exhibition — read, select up to 4 lines, and share custom museum cards with music.">
+  <meta property="og:url" content="https://miguelthegreat.github.io/stanza-poetry-gallery/gallery.html">
+  <meta property="og:title" content="Cut on the Life of a Weeping Man | Stanza. Gallery">
+  <meta property="og:description" content="Read, select up to 4 lines, and share etched verse cards with optional music.">
+  <meta property="og:image" content="https://miguelthegreat.github.io/stanza-poetry-gallery/assets/og-etched-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cut on the Life of a Weeping Man | Stanza. Gallery">
+  <meta name="twitter:description" content="Read, select up to 4 lines, and share etched verse cards with optional music.">
+  <meta name="twitter:image" content="https://miguelthegreat.github.io/stanza-poetry-gallery/assets/og-etched-card.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet"></noscript>
-  <link rel="stylesheet" href="css/base.css?v=5">
-  <link rel="stylesheet" href="css/gallery.css?v=5">
+  <link rel="stylesheet" href="css/base.css?v=6">
+  <link rel="stylesheet" href="css/gallery.css?v=6">
 </head>
 <body>
   <div class="paper-grain" aria-hidden="true"></div>
@@ -111,11 +119,19 @@
         <div class="field-group">
           <span class="field-label">Design Card Style</span>
           <div class="pill-row" id="card-pills">
-            <button type="button" class="opt-pill active" data-card="museum">Museum</button>
+            <button type="button" class="opt-pill active" data-card="etched">Etched</button>
+            <button type="button" class="opt-pill" data-card="museum">Museum</button>
             <button type="button" class="opt-pill" data-card="noir">Noir</button>
             <button type="button" class="opt-pill" data-card="broadsheet">Broadsheet</button>
-            <button type="button" class="opt-pill" data-card="atmosphere">Atmosphere</button>
             <button type="button" class="opt-pill" data-card="keepsake">Keepsake</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label">Card Format</span>
+          <div class="pill-row" id="format-pills">
+            <button type="button" class="opt-pill active" data-format="story">9:16 IG / FB Story</button>
+            <button type="button" class="opt-pill" data-format="post">4:5 Editorial Post</button>
           </div>
         </div>
 
@@ -138,14 +154,19 @@
         </div>
 
         <div class="share-actions">
-          <button type="button" class="action-primary" id="btn-copy-link">Copy Share Link</button>
+          <button type="button" class="action-primary" id="btn-share-story">Share to IG / FB Story</button>
+          <button type="button" class="action-secondary" id="btn-share-fb">Share on FB ↗</button>
+        </div>
+
+        <div class="share-actions">
+          <button type="button" class="action-secondary" id="btn-copy-link" style="flex: 1;">Copy Share Link</button>
           <button type="button" class="action-secondary" id="btn-download-card">Download PNG</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Shared Link Showcase View (auto-opens on /share/:id) -->
+  <!-- Shared Link Showcase View (auto-opens on /share/:id or ?share=1) -->
   <div id="shared-showcase" aria-label="Shared Poetry Card">
     <div class="showcase-glow" id="showcase-glow"></div>
     <button id="showcase-audio-btn" type="button" aria-label="Play or pause soundtrack">
@@ -166,10 +187,10 @@
 
   <div class="stanza-toast" id="stanza-toast" role="status" aria-live="polite"></div>
 
-  <script src="js/data-store.js?v=5"></script>
-  <script src="js/audio.js?v=5"></script>
-  <script src="js/cursor.js?v=5"></script>
-  <script src="js/share-cards.js?v=5"></script>
-  <script src="js/gallery.js?v=5"></script>
+  <script src="js/data-store.js?v=6"></script>
+  <script src="js/audio.js?v=6"></script>
+  <script src="js/cursor.js?v=6"></script>
+  <script src="js/share-cards.js?v=6"></script>
+  <script src="js/gallery.js?v=6"></script>
 </body>
 </html>

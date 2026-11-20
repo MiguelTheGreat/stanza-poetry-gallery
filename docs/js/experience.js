@@ -209,11 +209,12 @@
 
   function renderShelf() {
     shelfStage.innerHTML = '';
-    const countText =
-      collections.length === 1
-        ? '1 Collected Volume · Select the sleeve to enter its reading room'
-        : `${collections.length} Collected Volumes · Select a sleeve to enter its reading room`;
-    shelfCountNote.textContent = countText;
+    if (shelfCountNote) {
+      shelfCountNote.textContent =
+        collections.length === 1
+          ? '1 Collected Volume · Select the sleeve to enter its reading room'
+          : `${collections.length} Collected Volumes · Select a sleeve to enter its reading room`;
+    }
 
     collections.forEach((col, idx) => {
       const card = document.createElement('article');

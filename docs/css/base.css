@@ -142,6 +142,7 @@ body {
 
 #intro-overlay.curtain-open .intro-content {
   opacity: 0;
+  pointer-events: none;
   transform: translateY(-20px) scale(0.96);
 }
 

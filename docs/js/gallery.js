@@ -71,9 +71,17 @@
   // SPLIT-CURTAIN TRANSITIONS
   // ============================================
   function openCurtain() {
+    introContent.style.opacity = '';
+    overlay.classList.remove('curtain-closing');
     overlay.classList.add('curtain-open');
     document.body.classList.add('gallery-ready');
   }
+
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      openCurtain();
+    }
+  });
 
   function bindTransitionLinks(root = document) {
     root.querySelectorAll('.transition-link').forEach((link) => {
@@ -87,7 +95,7 @@
         overlay.classList.add('curtain-closing');
         setTimeout(() => {
           window.location.href = target;
-        }, 700);
+        }, 620);
       });
     });
   }

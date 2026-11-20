@@ -137,22 +137,28 @@
   let curtainOpened = false;
   function openCurtain() {
     curtainOpened = true;
+    introContent.style.opacity = '';
     overlay.classList.remove('curtain-closing');
     overlay.classList.add('curtain-open');
     document.body.classList.add('app-ready');
   }
 
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      openCurtain();
+    }
+  });
+
   function transitionWithCurtain(title, subtitle, onMidpoint) {
     if (title) introText.textContent = title;
     if (subtitle) introSubtext.textContent = subtitle;
-    introContent.style.opacity = '1';
+    introContent.style.opacity = '';
     overlay.classList.remove('curtain-open');
     overlay.classList.add('curtain-closing');
     setTimeout(async () => {
       await onMidpoint();
       setTimeout(() => {
-        overlay.classList.remove('curtain-closing');
-        overlay.classList.add('curtain-open');
+        openCurtain();
       }, 220);
     }, 680);
   }
@@ -169,7 +175,7 @@
         overlay.classList.add('curtain-closing');
         setTimeout(() => {
           window.location.href = target;
-        }, 720);
+        }, 620);
       });
     });
   }

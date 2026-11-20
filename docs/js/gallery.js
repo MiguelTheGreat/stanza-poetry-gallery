@@ -511,13 +511,13 @@
     poems = collection.poems || [];
     renderGalleryStrips();
 
-    setTimeout(openCurtain, 780);
+    setTimeout(openCurtain, 260);
 
     // If navigated directly to a specific poem (e.g., from Experience Mode's "Share Lines" button)
     if (poemParam && !sharedCollectionSlug) {
       const targetIdx = poems.findIndex((p) => p.slug === poemParam);
       if (targetIdx !== -1) {
-        setTimeout(() => openLightbox(targetIdx), 950);
+        setTimeout(() => openLightbox(targetIdx), 480);
       }
     }
   })();

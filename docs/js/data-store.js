@@ -5,6 +5,8 @@
  */
 (function () {
   const CUSTOM_COLLECTIONS_KEY = 'stanza_custom_collections_v1';
+  const IS_LOCAL_API =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   const BUILTIN_COLLECTION = {
     slug: 'cut-on-the-life-of-a-weeping-man',
@@ -14,7 +16,7 @@
     subtitle: 'Eight Studies in Bravado, Grief & Subterranean Memory',
     epigraph: 'Words that were never meant to be songs.',
     author: 'Vince',
-    coverImage: 'assets/weeping-man-cover.jpg',
+    coverImage: 'assets/weeping-man-cover.webp',
     accentColor: '#a67c52',
     ambientGlow:
       'radial-gradient(circle at 50% 45%, rgba(166, 124, 82, 0.28) 0%, rgba(196, 168, 134, 0.14) 45%, transparent 75%)',
@@ -486,44 +488,50 @@
   }
 
   async function getCollections() {
-    try {
-      const res = await fetch('api/collections');
-      if (res.ok) {
-        const ct = res.headers.get('content-type') || '';
-        if (ct.includes('application/json')) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            return data.map(normalizeCoverPath);
+    if (IS_LOCAL_API) {
+      try {
+        const res = await fetch('api/collections');
+        if (res.ok) {
+          const ct = res.headers.get('content-type') || '';
+          if (ct.includes('application/json')) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              return data.map(normalizeCoverPath);
+            }
           }
         }
-      }
-    } catch {}
+      } catch {}
+    }
     return getStaticCollections();
   }
 
   async function getCollection(slug) {
-    try {
-      const res = await fetch(`api/collections/${encodeURIComponent(slug)}`);
-      if (res.ok) {
-        const ct = res.headers.get('content-type') || '';
-        if (ct.includes('application/json')) {
-          return normalizeCoverPath(await res.json());
+    if (IS_LOCAL_API) {
+      try {
+        const res = await fetch(`api/collections/${encodeURIComponent(slug)}`);
+        if (res.ok) {
+          const ct = res.headers.get('content-type') || '';
+          if (ct.includes('application/json')) {
+            return normalizeCoverPath(await res.json());
+          }
         }
-      }
-    } catch {}
+      } catch {}
+    }
     const all = getStaticCollections();
     return all.find((c) => c.slug === slug) || BUILTIN_COLLECTION;
   }
 
   async function createCollection({ title, subtitle, epigraph, poems }) {
-    try {
-      const res = await fetch('api/collections', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, subtitle, epigraph, poems })
-      });
-      if (res.ok) return await res.json();
-    } catch {}
+    if (IS_LOCAL_API) {
+      try {
+        const res = await fetch('api/collections', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, subtitle, epigraph, poems })
+        });
+        if (res.ok) return await res.json();
+      } catch {}
+    }
 
     // Static GitHub Pages fallback (localStorage)
     const custom = loadCustomCollections();
@@ -574,22 +582,24 @@
   }
 
   async function createShareUrl({ collectionSlug, poemSlug, lines, cardStyle, showTitle, musicCode }) {
-    try {
-      const res = await fetch('api/shares', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ collectionSlug, poemSlug, lines, cardStyle, showTitle, musicCode })
-      });
-      if (res.ok) {
-        const ct = res.headers.get('content-type') || '';
-        if (ct.includes('application/json')) {
-          const data = await res.json();
-          if (data && data.path) {
-            return `${window.location.origin}${data.path}`;
+    if (IS_LOCAL_API) {
+      try {
+        const res = await fetch('api/shares', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ collectionSlug, poemSlug, lines, cardStyle, showTitle, musicCode })
+        });
+        if (res.ok) {
+          const ct = res.headers.get('content-type') || '';
+          if (ct.includes('application/json')) {
+            const data = await res.json();
+            if (data && data.path) {
+              return `${window.location.origin}${data.path}`;
+            }
           }
         }
-      }
-    } catch {}
+      } catch {}
+    }
 
     // Static GitHub Pages URL-encoded share link (works cross-device with zero backend!)
     const baseDir = window.location.href.split('?')[0].split('#')[0].replace(/\/[^/]*$/, '/');

@@ -11,7 +11,7 @@ const INITIAL_COLLECTION = {
   subtitle: 'Eight Studies in Bravado, Grief & Subterranean Memory',
   epigraph: 'Words that were never meant to be songs.',
   author: 'Vince',
-  coverImage: '/assets/weeping-man-cover.jpg',
+  coverImage: '/assets/weeping-man-cover.webp',
   accentColor: '#a67c52',
   ambientGlow: 'radial-gradient(circle at 50% 45%, rgba(166, 124, 82, 0.28) 0%, rgba(196, 168, 134, 0.14) 45%, transparent 75%)',
   poems: [

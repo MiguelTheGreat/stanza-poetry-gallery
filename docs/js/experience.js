@@ -981,6 +981,10 @@
 
   // Initialize app
   (async function init() {
+    setTimeout(() => {
+      if (!curtainOpened) openCurtain();
+    }, 650);
+
     await loadShelfCollections();
 
     const params = new URLSearchParams(window.location.search);
@@ -993,6 +997,6 @@
 
     setTimeout(() => {
       if (!curtainOpened) openCurtain();
-    }, 950);
+    }, 260);
   })();
 })();

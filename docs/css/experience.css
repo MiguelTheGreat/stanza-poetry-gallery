@@ -83,29 +83,29 @@ body.is-owner .contact-card.owner-only {
 }
 
 /* Lock vertical scrolling on Welcome / Collection Shelf (PC + Mobile)
-   without affecting scrolling inside the Poem / Stanza Reader (.mode-reader) */
-html:has(body:not(.mode-reader)),
+   without breaking touch taps or stanza reader scrolling */
 body:not(.mode-reader) {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
   overscroll-behavior: none;
-  touch-action: none;
 }
 
 /* ============================================
-   VIEW 1: APPLE-STYLE VINYL / FOLIO COLLECTION SHELF
+   VIEW 1: APPLE-STYLE 3D ISOMETRIC FOLIO SHELF
    ============================================ */
 #shelf-view {
-  position: relative;
+  position: fixed;
+  inset: 0;
   z-index: 25;
+  width: 100%;
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: clamp(3.8rem, 7.5dvh, 5.2rem) clamp(1.25rem, 4vw, 4rem) clamp(0.85rem, 2dvh, 1.5rem);
+  padding: clamp(3.6rem, 7dvh, 5rem) clamp(1.1rem, 4vw, 4rem) clamp(0.75rem, 1.8dvh, 1.35rem);
   transition: opacity 0.6s var(--ease-expo);
 }
 
@@ -122,33 +122,33 @@ body.mode-reader #shelf-view {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: clamp(0.5rem, 1.8dvh, 1.5rem);
+  gap: clamp(0.4rem, 1.4dvh, 1.25rem);
 }
 
 .shelf-eyebrow-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
   border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: clamp(0.55rem, 1.4dvh, 0.95rem);
+  padding-bottom: clamp(0.45rem, 1.2dvh, 0.85rem);
   flex-shrink: 0;
 }
 
 .shelf-kicker {
   font-family: var(--font-display);
-  font-size: clamp(0.52rem, 1dvh, 0.6rem);
+  font-size: clamp(0.5rem, 1dvh, 0.58rem);
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--accent-warm);
-  margin: 0 0 0.3rem;
+  margin: 0 0 0.25rem;
 }
 
 .shelf-heading {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(1.45rem, min(3.4vw, 4.2dvh), 2.75rem);
+  font-size: clamp(1.35rem, min(3.2vw, 3.8dvh), 2.55rem);
   line-height: 1.06;
   letter-spacing: -0.01em;
   margin: 0;
@@ -163,12 +163,12 @@ body.mode-reader #shelf-view {
 .shelf-count-note {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: clamp(0.88rem, 1.5dvh, 1.04rem);
+  font-size: clamp(0.86rem, 1.4dvh, 1.02rem);
   color: var(--ink-secondary);
   margin: 0;
 }
 
-/* Horizontal Apple 100 Best Albums Style Shelf Track */
+/* Centered 3D Stage — overflow: visible so 3D rotated corners are NEVER clipped */
 .vinyl-shelf-stage {
   position: relative;
   flex: 1;
@@ -177,34 +177,30 @@ body.mode-reader #shelf-view {
   align-items: center;
   justify-content: center;
   gap: clamp(2rem, 5vw, 4.5rem);
-  overflow-x: auto;
-  overflow-y: hidden;
-  touch-action: pan-x;
-  padding: 0.25rem 1rem 0.5rem;
-  scroll-snap-type: x mandatory;
+  overflow: visible;
+  padding: 0;
 }
 
 /* Featured Collection — Centered Apple 100 Best Albums Isometric Slab */
 .album-card {
-  scroll-snap-align: center;
   flex: 0 0 auto;
-  width: min(560px, 92vw);
+  width: min(520px, 92vw);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: clamp(0.35rem, 1.1dvh, 0.65rem);
+  gap: clamp(0.35rem, 1dvh, 0.65rem);
   position: relative;
 }
 
-/* Floating Bronze Volume Number above the Slab (like "92" in Apple 100 Best Albums) */
+/* Floating Bronze Volume Number above the Slab */
 .slab-number {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(1.55rem, min(3.6vw, 4.2dvh), 2.65rem);
+  font-size: clamp(1.5rem, min(4vw, 4dvh), 2.5rem);
   letter-spacing: 0.08em;
   line-height: 1;
-  margin-bottom: -0.25rem;
+  margin-bottom: 0;
   background: linear-gradient(180deg, #d7b184 0%, #a67c52 58%, #7d5b39 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -215,26 +211,26 @@ body.mode-reader #shelf-view {
 
 .folio-stage {
   position: relative;
-  width: min(310px, 37dvh, 66vw);
-  aspect-ratio: 1 / 1;
+  width: min(295px, 37dvh, 66vw);
+  height: min(295px, 37dvh, 66vw);
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1150px;
+  perspective: 1100px;
   cursor: pointer;
-  margin: 0.15rem 0 0.35rem;
+  margin: clamp(0.2rem, 0.8dvh, 0.5rem) 0;
 }
 
 /* Soft floating shadow beneath the angled square slab */
 .folio-shadow {
   position: absolute;
-  bottom: -0.65rem;
-  left: 12%;
-  right: 12%;
-  height: 28px;
+  bottom: -6%;
+  left: 14%;
+  right: 14%;
+  height: 22px;
   border-radius: 50%;
   background: radial-gradient(ellipse at center, rgba(22, 20, 17, 0.24) 0%, rgba(22, 20, 17, 0.07) 55%, transparent 78%);
-  filter: blur(10px);
+  filter: blur(9px);
   transform: skewX(18deg);
   transition: transform 0.75s var(--ease-expo), opacity 0.65s ease;
   pointer-events: none;
@@ -248,37 +244,39 @@ body.mode-reader #shelf-view {
 /* 3D Isometric Square Slab angled sharply right (Apple 100 Best Albums pose) */
 .folio-book {
   position: relative;
-  width: 88%;
-  height: 88%;
+  width: 86%;
+  height: 86%;
   transform-style: preserve-3d;
-  transform: rotateY(30deg) rotateX(4deg);
+  -webkit-transform-style: preserve-3d;
+  transform: rotateY(28deg) rotateX(4deg);
   transition: transform 0.85s var(--ease-expo);
   will-change: transform;
 }
 
 .folio-stage:hover .folio-book {
-  transform: rotateY(16deg) rotateX(2deg) translateY(-6px) translateZ(14px);
+  transform: rotateY(14deg) rotateX(2deg) translateY(-6px) translateZ(12px);
 }
 
-/* Front Square Etched Slab Face */
+/* Front Square Etched Slab Face — scales proportionally at every screen size via container queries */
 .folio-front {
   position: absolute;
   inset: 0;
-  transform: translateZ(7px);
-  border-radius: 6px;
+  container-type: size;
+  transform: translateZ(6px);
+  border-radius: 5px;
   background:
     repeating-linear-gradient(0deg, rgba(26, 25, 23, 0.015) 0px, rgba(26, 25, 23, 0.015) 1px, transparent 1px, transparent 4px),
     linear-gradient(142deg, #fbf9f3 0%, #f2ecdf 56%, #e7dfd0 100%);
-  border: 1px solid rgba(166, 124, 82, 0.35);
+  border: 1px solid rgba(166, 124, 82, 0.38);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.78),
-    -18px 24px 48px rgba(22, 20, 17, 0.16);
-  padding: 1.35rem;
+    -14px 20px 40px rgba(22, 20, 17, 0.16);
+  padding: 6.5cqw;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Specular studio highlight across the angled square face */
@@ -286,6 +284,7 @@ body.mode-reader #shelf-view {
   content: '';
   position: absolute;
   inset: 0;
+  border-radius: 5px;
   background: linear-gradient(118deg, rgba(255, 255, 255, 0.42) 0%, transparent 44%, rgba(26, 25, 23, 0.08) 100%);
   pointer-events: none;
 }
@@ -297,9 +296,9 @@ body.mode-reader #shelf-view {
   flex: 1;
   border: 1px solid rgba(26, 25, 23, 0.24);
   box-shadow:
-    inset 0 0 0 4px rgba(248, 245, 237, 0.85),
-    inset 0 0 0 5px rgba(166, 124, 82, 0.5);
-  padding: 1.25rem 1.1rem;
+    inset 0 0 0 3px rgba(248, 245, 237, 0.85),
+    inset 0 0 0 4px rgba(166, 124, 82, 0.5);
+  padding: 6.5cqw 5.5cqw;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -313,67 +312,66 @@ body.mode-reader #shelf-view {
   justify-content: space-between;
   align-items: center;
   font-family: var(--font-display);
-  font-size: 0.46rem;
-  letter-spacing: 0.24em;
+  font-size: 3cqw;
+  letter-spacing: 0.22em;
   color: var(--accent-warm);
   text-transform: uppercase;
 }
 
 .folio-cut-mark {
   width: 1px;
-  height: 22px;
+  height: 7cqw;
   background: linear-gradient(180deg, transparent, var(--accent-warm), transparent);
-  margin: 0.15rem auto 0.35rem;
+  margin: 0 auto 2.5cqw;
 }
 
 .folio-cover-title {
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: clamp(1.22rem, 2.1vw, 1.56rem);
-  line-height: 1.18;
-  letter-spacing: 0.06em;
+  font-size: 8.2cqw;
+  line-height: 1.16;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink-primary);
-  margin: 0.15rem 0;
+  margin: 0;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .folio-cover-rule {
-  width: 44px;
+  width: 16cqw;
   height: 1px;
   background: rgba(166, 124, 82, 0.65);
-  margin: 0.45rem auto;
+  margin: 3.2cqw auto;
 }
 
 .folio-cover-epigraph {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 0.86rem;
-  line-height: 1.38;
+  font-size: 4.8cqw;
+  line-height: 1.35;
   color: var(--ink-secondary);
   margin: 0;
-  max-width: 92%;
+  max-width: 94%;
 }
 
 .folio-bottom-meta {
   font-family: var(--font-display);
-  font-size: 0.44rem;
-  letter-spacing: 0.26em;
-  color: rgba(26, 25, 23, 0.5);
+  font-size: 2.8cqw;
+  letter-spacing: 0.24em;
+  color: rgba(26, 25, 23, 0.52);
   text-transform: uppercase;
 }
 
-/* Precision Metallic-Bronze / Cream 3D Slab Edges (Top, Right, Left, Back) */
+/* Precision Metallic-Bronze 3D Slab Edges (12px thick, crisp on Safari & Chrome) */
 .folio-edge-right {
   position: absolute;
   top: 2px;
   bottom: 2px;
   right: 0;
-  width: 14px;
+  width: 12px;
   transform-origin: right center;
-  transform: translateZ(7px) rotateY(-90deg);
+  transform: translateZ(6px) rotateY(-90deg);
   background: linear-gradient(180deg, #cfb08a 0%, #a67c52 50%, #7d5b39 100%);
-  border-radius: 2px;
 }
 
 .folio-edge-top {
@@ -381,11 +379,10 @@ body.mode-reader #shelf-view {
   top: 0;
   left: 2px;
   right: 2px;
-  height: 14px;
+  height: 12px;
   transform-origin: top center;
-  transform: translateZ(7px) rotateX(-90deg);
+  transform: translateZ(6px) rotateX(-90deg);
   background: linear-gradient(90deg, #e7d7bf 0%, #c6a076 60%, #9b734a 100%);
-  border-radius: 2px;
 }
 
 .folio-edge-left {
@@ -393,18 +390,17 @@ body.mode-reader #shelf-view {
   top: 2px;
   bottom: 2px;
   left: 0;
-  width: 14px;
+  width: 12px;
   transform-origin: left center;
-  transform: translateZ(7px) rotateY(90deg);
+  transform: translateZ(6px) rotateY(90deg);
   background: linear-gradient(180deg, #b8946b 0%, #8c6844 55%, #65492e 100%);
-  border-radius: 2px;
 }
 
 .folio-back {
   position: absolute;
   inset: 0;
-  transform: translateZ(-7px);
-  border-radius: 6px;
+  transform: translateZ(-6px);
+  border-radius: 5px;
   background: #d8cebd;
 }
 
@@ -1338,14 +1334,29 @@ body.reading-full .verse-line {
    RESPONSIVE BREAKPOINTS
    ============================================ */
 @media (max-width: 960px) {
-  .album-card {
-    grid-template-columns: 1fr;
-    width: min(440px, 86vw);
-    gap: 1.5rem;
+  .shelf-count-note,
+  .shelf-footer {
+    display: none;
   }
 
-  .album-details {
-    padding-left: 0;
+  .shelf-eyebrow-row {
+    justify-content: center;
+    text-align: center;
+    padding-bottom: 0.55rem;
+  }
+
+  .album-card {
+    width: 92vw;
+    gap: 0.45rem;
+  }
+
+  .folio-stage {
+    width: min(260px, 39dvh, 68vw);
+    height: min(260px, 39dvh, 68vw);
+  }
+
+  .folio-book {
+    transform: rotateY(22deg) rotateX(3deg);
   }
 
   .chapter-rail {

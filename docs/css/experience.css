@@ -82,18 +82,30 @@ body.is-owner .contact-card.owner-only {
   display: flex !important;
 }
 
+/* Lock vertical scrolling on Welcome / Collection Shelf (PC + Mobile)
+   without affecting scrolling inside the Poem / Stanza Reader (.mode-reader) */
+html:has(body:not(.mode-reader)),
+body:not(.mode-reader) {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
 /* ============================================
    VIEW 1: APPLE-STYLE VINYL / FOLIO COLLECTION SHELF
    ============================================ */
 #shelf-view {
   position: relative;
   z-index: 25;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: clamp(5.5rem, 11vh, 7.5rem) clamp(1.5rem, 5vw, 4.5rem) 2.5rem;
+  padding: clamp(3.8rem, 7.5dvh, 5.2rem) clamp(1.25rem, 4vw, 4rem) clamp(0.85rem, 2dvh, 1.5rem);
   transition: opacity 0.6s var(--ease-expo);
 }
 
@@ -104,36 +116,40 @@ body.mode-reader #shelf-view {
 .shelf-hero {
   max-width: 1280px;
   width: 100%;
+  flex: 1;
+  min-height: 0;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(1.8rem, 4vh, 3rem);
+  justify-content: space-between;
+  gap: clamp(0.5rem, 1.8dvh, 1.5rem);
 }
 
 .shelf-eyebrow-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
   border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 1.15rem;
+  padding-bottom: clamp(0.55rem, 1.4dvh, 0.95rem);
+  flex-shrink: 0;
 }
 
 .shelf-kicker {
   font-family: var(--font-display);
-  font-size: 0.62rem;
+  font-size: clamp(0.52rem, 1dvh, 0.6rem);
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--accent-warm);
-  margin: 0 0 0.55rem;
+  margin: 0 0 0.3rem;
 }
 
 .shelf-heading {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(2rem, 4.2vw, 3.35rem);
-  line-height: 1.08;
+  font-size: clamp(1.45rem, min(3.4vw, 4.2dvh), 2.75rem);
+  line-height: 1.06;
   letter-spacing: -0.01em;
   margin: 0;
   color: var(--ink-primary);
@@ -147,7 +163,7 @@ body.mode-reader #shelf-view {
 .shelf-count-note {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 1.08rem;
+  font-size: clamp(0.88rem, 1.5dvh, 1.04rem);
   color: var(--ink-secondary);
   margin: 0;
 }
@@ -155,12 +171,16 @@ body.mode-reader #shelf-view {
 /* Horizontal Apple 100 Best Albums Style Shelf Track */
 .vinyl-shelf-stage {
   position: relative;
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(2.5rem, 6vw, 5.5rem);
+  gap: clamp(2rem, 5vw, 4.5rem);
   overflow-x: auto;
-  padding: 1.25rem 1.5rem 2.25rem;
+  overflow-y: hidden;
+  touch-action: pan-x;
+  padding: 0.25rem 1rem 0.5rem;
   scroll-snap-type: x mandatory;
 }
 
@@ -168,12 +188,12 @@ body.mode-reader #shelf-view {
 .album-card {
   scroll-snap-align: center;
   flex: 0 0 auto;
-  width: min(460px, 88vw);
+  width: min(560px, 92vw);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.75rem;
+  gap: clamp(0.35rem, 1.1dvh, 0.65rem);
   position: relative;
 }
 
@@ -181,10 +201,10 @@ body.mode-reader #shelf-view {
 .slab-number {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(2.1rem, 4vw, 3.1rem);
+  font-size: clamp(1.55rem, min(3.6vw, 4.2dvh), 2.65rem);
   letter-spacing: 0.08em;
   line-height: 1;
-  margin-bottom: -0.35rem;
+  margin-bottom: -0.25rem;
   background: linear-gradient(180deg, #d7b184 0%, #a67c52 58%, #7d5b39 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -195,14 +215,14 @@ body.mode-reader #shelf-view {
 
 .folio-stage {
   position: relative;
-  width: min(350px, 78vw);
+  width: min(310px, 37dvh, 66vw);
   aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
   perspective: 1150px;
   cursor: pointer;
-  margin: 0.35rem 0 0.65rem;
+  margin: 0.15rem 0 0.35rem;
 }
 
 /* Soft floating shadow beneath the angled square slab */
@@ -393,15 +413,15 @@ body.mode-reader #shelf-view {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.45rem;
-  margin-top: 0.35rem;
+  gap: clamp(0.22rem, 0.7dvh, 0.4rem);
+  margin-top: 0.15rem;
 }
 
 .album-title {
   font-family: var(--font-sans);
-  font-size: clamp(1.18rem, 2vw, 1.45rem);
+  font-size: clamp(1.05rem, min(2vw, 2.5dvh), 1.4rem);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.2;
   letter-spacing: -0.01em;
   margin: 0;
   color: var(--ink-primary);
@@ -411,10 +431,10 @@ body.mode-reader #shelf-view {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
+  gap: 0.6rem;
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 1.08rem;
+  font-size: clamp(0.92rem, 1.6dvh, 1.05rem);
   color: var(--ink-secondary);
 }
 
@@ -429,19 +449,19 @@ body.mode-reader #shelf-view {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.65rem;
-  margin-top: 0.85rem;
+  gap: 0.5rem;
+  margin-top: clamp(0.35rem, 1.1dvh, 0.75rem);
 }
 
 .btn-enter-exp {
   font-family: var(--font-display);
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
+  font-size: clamp(0.52rem, 1vw, 0.6rem);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   background: var(--ink-primary);
   color: var(--bg-paper);
   border: 1px solid var(--ink-primary);
-  padding: 0.9rem 1.55rem;
+  padding: clamp(0.62rem, 1.2dvh, 0.82rem) clamp(1rem, 2vw, 1.4rem);
   border-radius: 999px;
   cursor: pointer;
   transition: transform 0.4s var(--ease-expo), background-color 0.3s ease, box-shadow 0.4s ease;
@@ -455,17 +475,18 @@ body.mode-reader #shelf-view {
 
 .btn-open-gallery {
   font-family: var(--font-display);
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
+  font-size: clamp(0.52rem, 1vw, 0.6rem);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   background: transparent;
   color: var(--ink-primary);
   border: 1px solid rgba(26, 25, 23, 0.26);
-  padding: 0.9rem 1.4rem;
+  padding: clamp(0.62rem, 1.2dvh, 0.82rem) clamp(0.95rem, 1.8vw, 1.25rem);
   border-radius: 999px;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.4s var(--ease-expo);
 }
 

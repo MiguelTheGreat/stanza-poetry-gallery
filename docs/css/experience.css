@@ -152,103 +152,108 @@ body.mode-reader #shelf-view {
   margin: 0;
 }
 
-/* Horizontal Vinyl / Folio Shelf Track */
+/* Horizontal Apple 100 Best Albums Style Shelf Track */
 .vinyl-shelf-stage {
   position: relative;
   display: flex;
-  align-items: stretch;
-  gap: clamp(2rem, 4.5vw, 4rem);
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2.5rem, 6vw, 5.5rem);
   overflow-x: auto;
-  padding: 1.75rem 0.5rem 2.75rem;
+  padding: 1.25rem 1.5rem 2.25rem;
   scroll-snap-type: x mandatory;
 }
 
-/* Tactile museum shelf ledge line underneath the sleeves */
-.vinyl-shelf-stage::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0.65rem;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(26, 25, 23, 0.18), rgba(166, 124, 82, 0.25), rgba(26, 25, 23, 0.06));
-  pointer-events: none;
+/* Featured Collection — Centered Apple 100 Best Albums Isometric Slab */
+.album-card {
+  scroll-snap-align: center;
+  flex: 0 0 auto;
+  width: min(460px, 88vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  position: relative;
 }
 
-/* Featured Collection 3D Angled Folio Card */
-.album-card {
-  scroll-snap-align: start;
-  flex: 0 0 auto;
-  width: min(860px, 90vw);
-  display: grid;
-  grid-template-columns: minmax(260px, 340px) 1fr;
-  gap: clamp(2rem, 5vw, 4.2rem);
-  align-items: center;
-  position: relative;
+/* Floating Bronze Volume Number above the Slab (like "92" in Apple 100 Best Albums) */
+.slab-number {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.1rem, 4vw, 3.1rem);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  margin-bottom: -0.35rem;
+  background: linear-gradient(180deg, #d7b184 0%, #a67c52 58%, #7d5b39 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 3px 6px rgba(26, 25, 23, 0.14));
+  user-select: none;
 }
 
 .folio-stage {
   position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 5;
+  width: min(350px, 78vw);
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1400px;
+  perspective: 1150px;
   cursor: pointer;
-  padding: 0.75rem 0;
+  margin: 0.35rem 0 0.65rem;
 }
 
-/* Grounded plinth contact shadow beneath the angled 3D book */
+/* Soft floating shadow beneath the angled square slab */
 .folio-shadow {
   position: absolute;
-  bottom: 0.2rem;
-  left: 14%;
+  bottom: -0.65rem;
+  left: 12%;
   right: 12%;
-  height: 26px;
+  height: 28px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(22, 20, 17, 0.28) 0%, rgba(22, 20, 17, 0.08) 55%, transparent 78%);
-  filter: blur(8px);
-  transform: skewX(-18deg);
+  background: radial-gradient(ellipse at center, rgba(22, 20, 17, 0.24) 0%, rgba(22, 20, 17, 0.07) 55%, transparent 78%);
+  filter: blur(10px);
+  transform: skewX(18deg);
   transition: transform 0.75s var(--ease-expo), opacity 0.65s ease;
   pointer-events: none;
 }
 
 .folio-stage:hover .folio-shadow {
-  transform: skewX(-14deg) scale(1.06);
-  opacity: 0.78;
+  transform: skewX(12deg) scale(1.06);
+  opacity: 0.72;
 }
 
-/* 3D Physical Hardcover Book Object (Angled at rest!) */
+/* 3D Isometric Square Slab angled sharply right (Apple 100 Best Albums pose) */
 .folio-book {
   position: relative;
-  width: 82%;
-  height: 92%;
+  width: 88%;
+  height: 88%;
   transform-style: preserve-3d;
-  transform: rotateY(-24deg) rotateX(9deg) rotateZ(-1.5deg);
+  transform: rotateY(30deg) rotateX(4deg);
   transition: transform 0.85s var(--ease-expo);
   will-change: transform;
 }
 
 .folio-stage:hover .folio-book {
-  transform: rotateY(-12deg) rotateX(4deg) rotateZ(0deg) translateY(-8px) translateZ(14px);
+  transform: rotateY(16deg) rotateX(2deg) translateY(-6px) translateZ(14px);
 }
 
-/* Front Linen / Cotton Paper Cover */
+/* Front Square Etched Slab Face */
 .folio-front {
   position: absolute;
   inset: 0;
-  transform: translateZ(16px);
-  border-radius: 2px 5px 5px 2px;
+  transform: translateZ(7px);
+  border-radius: 6px;
   background:
-    repeating-linear-gradient(0deg, rgba(26, 25, 23, 0.014) 0px, rgba(26, 25, 23, 0.014) 1px, transparent 1px, transparent 4px),
-    linear-gradient(148deg, #faf7f0 0%, #f1eadc 58%, #e8dfd0 100%);
-  border: 1px solid rgba(26, 25, 23, 0.14);
+    repeating-linear-gradient(0deg, rgba(26, 25, 23, 0.015) 0px, rgba(26, 25, 23, 0.015) 1px, transparent 1px, transparent 4px),
+    linear-gradient(142deg, #fbf9f3 0%, #f2ecdf 56%, #e7dfd0 100%);
+  border: 1px solid rgba(166, 124, 82, 0.35);
   box-shadow:
-    inset 14px 0 22px -12px rgba(26, 25, 23, 0.14),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.65),
-    12px 24px 48px rgba(22, 20, 17, 0.16);
-  padding: 1.5rem 1.45rem 1.45rem 1.95rem;
+    inset 0 0 0 1px rgba(255, 255, 255, 0.78),
+    -18px 24px 48px rgba(22, 20, 17, 0.16);
+  padding: 1.35rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -256,37 +261,25 @@ body.mode-reader #shelf-view {
   backface-visibility: hidden;
 }
 
-/* Spine hinge groove on front cover */
-.folio-front::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 16px;
-  width: 2px;
-  background: linear-gradient(90deg, rgba(26, 25, 23, 0.16), rgba(255, 255, 255, 0.55));
-  pointer-events: none;
-}
-
-/* Studio light specular sheen */
+/* Specular studio highlight across the angled square face */
 .folio-front::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(125deg, rgba(255, 255, 255, 0.34) 0%, transparent 42%, rgba(26, 25, 23, 0.07) 100%);
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.42) 0%, transparent 44%, rgba(26, 25, 23, 0.08) 100%);
   pointer-events: none;
 }
 
-/* Recessed blind-debossed etched plate frame inside cover */
+/* Recessed blind-debossed etched plate inside the square slab */
 .folio-plate {
   position: relative;
   z-index: 2;
   flex: 1;
-  border: 1px solid rgba(26, 25, 23, 0.18);
+  border: 1px solid rgba(26, 25, 23, 0.24);
   box-shadow:
-    inset 0 0 0 4px rgba(247, 244, 236, 0.8),
-    inset 0 0 0 5px rgba(166, 124, 82, 0.42);
-  padding: 1.35rem 1.1rem;
+    inset 0 0 0 4px rgba(248, 245, 237, 0.85),
+    inset 0 0 0 5px rgba(166, 124, 82, 0.5);
+  padding: 1.25rem 1.1rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -300,7 +293,7 @@ body.mode-reader #shelf-view {
   justify-content: space-between;
   align-items: center;
   font-family: var(--font-display);
-  font-size: 0.48rem;
+  font-size: 0.46rem;
   letter-spacing: 0.24em;
   color: var(--accent-warm);
   text-transform: uppercase;
@@ -308,21 +301,21 @@ body.mode-reader #shelf-view {
 
 .folio-cut-mark {
   width: 1px;
-  height: 28px;
+  height: 22px;
   background: linear-gradient(180deg, transparent, var(--accent-warm), transparent);
-  margin: 0.2rem auto;
+  margin: 0.15rem auto 0.35rem;
 }
 
 .folio-cover-title {
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: clamp(1.35rem, 2.2vw, 1.72rem);
+  font-size: clamp(1.22rem, 2.1vw, 1.56rem);
   line-height: 1.18;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-primary);
-  margin: 0.25rem 0;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  margin: 0.15rem 0;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .folio-cover-rule {
@@ -335,7 +328,7 @@ body.mode-reader #shelf-view {
 .folio-cover-epigraph {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   line-height: 1.38;
   color: var(--ink-secondary);
   margin: 0;
@@ -344,87 +337,85 @@ body.mode-reader #shelf-view {
 
 .folio-bottom-meta {
   font-family: var(--font-display);
-  font-size: 0.46rem;
+  font-size: 0.44rem;
   letter-spacing: 0.26em;
   color: rgba(26, 25, 23, 0.5);
   text-transform: uppercase;
 }
 
-/* 3D Left Charcoal Linen Spine */
-.folio-spine {
+/* Precision Metallic-Bronze / Cream 3D Slab Edges (Top, Right, Left, Back) */
+.folio-edge-right {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  right: 0;
+  width: 14px;
+  transform-origin: right center;
+  transform: translateZ(7px) rotateY(-90deg);
+  background: linear-gradient(180deg, #cfb08a 0%, #a67c52 50%, #7d5b39 100%);
+  border-radius: 2px;
+}
+
+.folio-edge-top {
   position: absolute;
   top: 0;
-  bottom: 0;
-  left: 0;
-  width: 32px;
-  transform-origin: left center;
-  transform: translateZ(16px) rotateY(90deg);
-  background: linear-gradient(90deg, #121110 0%, #23211e 48%, #161513 100%);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  left: 2px;
+  right: 2px;
+  height: 14px;
+  transform-origin: top center;
+  transform: translateZ(7px) rotateX(-90deg);
+  background: linear-gradient(90deg, #e7d7bf 0%, #c6a076 60%, #9b734a 100%);
+  border-radius: 2px;
 }
 
-.folio-spine-text {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-family: var(--font-display);
-  font-size: 0.46rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: rgba(216, 178, 134, 0.82);
-  white-space: nowrap;
-}
-
-/* 3D Right Layered Paper Page Block */
-.folio-pages {
+.folio-edge-left {
   position: absolute;
-  top: 4px;
-  bottom: 4px;
-  right: 0;
-  width: 28px;
-  transform-origin: right center;
-  transform: translateZ(14px) rotateY(-90deg);
-  background:
-    repeating-linear-gradient(
-      90deg,
-      #f2ece0 0px,
-      #f2ece0 2px,
-      #ddd4c3 2px,
-      #ddd4c3 3px
-    );
-  box-shadow: inset 0 0 8px rgba(26, 25, 23, 0.16);
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  width: 14px;
+  transform-origin: left center;
+  transform: translateZ(7px) rotateY(90deg);
+  background: linear-gradient(180deg, #b8946b 0%, #8c6844 55%, #65492e 100%);
+  border-radius: 2px;
 }
 
-/* 3D Back Board */
 .folio-back {
   position: absolute;
   inset: 0;
-  transform: translateZ(-16px);
-  border-radius: 2px 5px 5px 2px;
-  background: #ded6c6;
-  border: 1px solid rgba(26, 25, 23, 0.14);
+  transform: translateZ(-7px);
+  border-radius: 6px;
+  background: #d8cebd;
 }
 
-/* Editorial Metadata Column beside the Vinyl Sleeve */
+/* Centered Title & Controls directly underneath the Isometric Slab */
 .album-details {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  padding-left: 0.75rem;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+}
+
+.album-title {
+  font-family: var(--font-sans);
+  font-size: clamp(1.18rem, 2vw, 1.45rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink-primary);
 }
 
 .album-meta-row {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  font-family: var(--font-display);
-  font-size: 0.6rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--accent-warm);
+  justify-content: center;
+  gap: 0.65rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.08rem;
+  color: var(--ink-secondary);
 }
 
 .album-meta-dot {
@@ -434,40 +425,12 @@ body.mode-reader #shelf-view {
   background: var(--ink-muted);
 }
 
-.album-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.2rem, 2.3vw, 1.75rem);
-  font-weight: 700;
-  line-height: 1.32;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin: 0;
-  color: var(--ink-primary);
-}
-
-.album-subtitle {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.22rem;
-  line-height: 1.4;
-  color: var(--ink-secondary);
-  margin: 0;
-}
-
-.album-epigraph {
-  font-family: var(--font-serif);
-  font-size: 1rem;
-  color: rgba(26, 25, 23, 0.64);
-  border-left: 1.5px solid var(--accent-warm);
-  padding-left: 0.9rem;
-  margin: 0.25rem 0 0.5rem;
-}
-
 .album-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 0.4rem;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 0.85rem;
 }
 
 .btn-enter-exp {

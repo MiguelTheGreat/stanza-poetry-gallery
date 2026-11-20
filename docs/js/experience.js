@@ -215,19 +215,20 @@
         : `${collections.length} Collected Volumes · Select a sleeve to enter its reading room`;
     shelfCountNote.textContent = countText;
 
-    collections.forEach((col) => {
+    collections.forEach((col, idx) => {
       const card = document.createElement('article');
       card.className = 'album-card';
+      const volNum = String(idx + 1).padStart(2, '0');
 
       card.innerHTML = `
+        <div class="slab-number" aria-hidden="true">${volNum}</div>
         <div class="folio-stage" data-slug="${col.slug}" role="button" tabindex="0" aria-label="Enter ${escapeHtml(col.title)}">
           <div class="folio-shadow" aria-hidden="true"></div>
           <div class="folio-book">
             <div class="folio-back" aria-hidden="true"></div>
-            <div class="folio-spine" aria-hidden="true">
-              <span class="folio-spine-text">${escapeHtml(col.volume)} · ${escapeHtml(col.title)}</span>
-            </div>
-            <div class="folio-pages" aria-hidden="true"></div>
+            <div class="folio-edge-top" aria-hidden="true"></div>
+            <div class="folio-edge-right" aria-hidden="true"></div>
+            <div class="folio-edge-left" aria-hidden="true"></div>
             <div class="folio-front">
               <div class="folio-plate">
                 <div class="folio-top-meta">
@@ -246,16 +247,12 @@
           </div>
         </div>
         <div class="album-details">
+          <h3 class="album-title">${escapeHtml(col.title)}</h3>
           <div class="album-meta-row">
-            <span>${escapeHtml(col.volume)}</span>
-            <span class="album-meta-dot"></span>
             <span>${col.poemCount} ${col.poemCount === 1 ? 'Poem' : 'Poems'}</span>
             <span class="album-meta-dot"></span>
             <span>${escapeHtml(col.year)}</span>
           </div>
-          <h3 class="album-title">${escapeHtml(col.title)}</h3>
-          ${col.subtitle ? `<p class="album-subtitle">${escapeHtml(col.subtitle)}</p>` : ''}
-          ${col.epigraph ? `<blockquote class="album-epigraph">“${escapeHtml(col.epigraph)}”</blockquote>` : ''}
           <div class="album-actions">
             <button type="button" class="btn-enter-exp hover-target" data-enter="${col.slug}">Enter Experience →</button>
             <a href="gallery.html?collection=${encodeURIComponent(col.slug)}" class="btn-open-gallery transition-link hover-target">Gallery Mode</a>
@@ -264,7 +261,7 @@
         </div>
       `;
 
-      // Interactive 3D angle response around the resting angled hero pose
+      // Interactive 3D angle response around the Apple-100-Albums right-angled hero pose
       const folioStage = card.querySelector('.folio-stage');
       const folioBook = card.querySelector('.folio-book');
       let rect = null;
@@ -278,9 +275,9 @@
         if (!rect) rect = folioStage.getBoundingClientRect();
         const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
         const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-        const ry = -16 + nx * 12;
-        const rx = 5 - ny * 8;
-        folioBook.style.transform = `rotateY(${ry.toFixed(1)}deg) rotateX(${rx.toFixed(1)}deg) translateY(-8px) translateZ(16px)`;
+        const ry = 22 + nx * 12;
+        const rx = 3 - ny * 7;
+        folioBook.style.transform = `rotateY(${ry.toFixed(1)}deg) rotateX(${rx.toFixed(1)}deg) translateY(-6px) translateZ(14px)`;
       });
 
       folioStage.addEventListener('mouseleave', () => {

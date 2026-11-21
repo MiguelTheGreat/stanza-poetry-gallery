@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Stanza. — Digital Poetry House &amp; Interactive Experience</title>
-  <meta name="description" content="Stanza. An atmospheric digital poetry house featuring Cut on the Life of a Weeping Man — experience interactive ink-reveal readings, gallery exhibitions, and shareable verse cards.">
+  <meta name="description" content="Stanza. An atmospheric digital poetry house featuring Cut on the Life of a Weeping Man — experience intimate stanza-by-stanza readings, gallery exhibitions, and etched shareable verse cards.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://miguelthegreat.github.io/stanza-poetry-gallery/">
   <meta property="og:title" content="Cut on the Life of a Weeping Man — Stanza.">
@@ -19,8 +19,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=10">
-  <link rel="stylesheet" href="css/experience.css?v=10">
+  <link rel="stylesheet" href="css/base.css?v=11">
+  <link rel="stylesheet" href="css/experience.css?v=11">
 </head>
 <body>
   <div class="paper-grain" aria-hidden="true"></div>
@@ -55,9 +55,12 @@
   <header class="top-header">
     <a href="index.html" id="brand-link" class="brand hover-target">Stanza.</a>
     <nav class="top-menu" aria-label="Primary Navigation">
-      <button type="button" id="nav-back-shelf" class="menu-item reader-only-nav hover-target">← Collection Shelf</button>
-      <a href="gallery.html" id="nav-gallery-link" class="menu-item transition-link hover-target">Gallery Mode</a>
-      <button type="button" id="nav-add-volume" class="menu-item owner-only hover-target">+ New Volume</button>
+      <button type="button" id="nav-back-shelf" class="menu-item reader-only-nav hover-target">← Shelf</button>
+      <button type="button" id="nav-toc" class="menu-item reader-only-nav hover-target">Index</button>
+      <button type="button" id="nav-ambience" class="menu-item reader-only-nav hover-target" title="Ambient reading room soundscape">Room: Off</button>
+      <button type="button" id="nav-theme" class="menu-item hover-target" title="Toggle Night Lamp reading mode">Night</button>
+      <a href="gallery.html" id="nav-gallery-link" class="menu-item transition-link hover-target">Gallery</a>
+      <button type="button" id="nav-add-volume" class="menu-item owner-only hover-target">+ Volume</button>
     </nav>
   </header>
 
@@ -87,33 +90,52 @@
       <div id="poem-stage"></div>
     </div>
 
-    <!-- Left-Edge Vertical Chapter Rail -->
+    <!-- Left-Edge Vertical Chapter Rail (Desktop) -->
     <aside class="chapter-rail" id="chapter-rail" aria-label="Poem Chapters"></aside>
 
-    <!-- Bottom-Left Editorial Placard -->
-    <div class="artwork-placard" id="artwork-placard">
-      <div class="placard-index" id="placard-index">01 / 08</div>
-      <div class="placard-title-wrap">
-        <h2 class="placard-title" id="placard-title">All Smiles and White Teeth</h2>
+    <!-- Discreet Margin Note Popover -->
+    <div class="margin-note-popover" id="margin-note-popover" role="region" aria-label="Poem Margin Note">
+      <div class="margin-note-head">
+        <span>Margin Note</span>
+        <button type="button" id="margin-note-close" aria-label="Close note">✕</button>
       </div>
-      <p class="placard-subtitle" id="placard-subtitle" style="display:none;"></p>
-      <div class="reveal-meter">
-        <div class="reveal-bar-track">
-          <div class="reveal-bar-fill" id="reveal-bar-fill"></div>
-        </div>
-        <span class="reveal-pct" id="reveal-pct">Stanza 1 / 6</span>
+      <p class="margin-note-body" id="margin-note-body"></p>
+      <div class="margin-note-editor owner-only" id="margin-note-editor">
+        <textarea id="margin-note-input" rows="2" placeholder="Write a brief margin note for this poem…"></textarea>
+        <button type="button" id="margin-note-save">Save Note</button>
       </div>
     </div>
 
-    <!-- Center Subtle Reading Cue -->
-    <div id="hint">Scroll to Read Stanza by Stanza · Click Any Line to Underline</div>
+    <!-- Bottom-Left Editorial Placard (Desktop) / Unified Bottom Dock (Mobile) -->
+    <div class="reader-hud" id="reader-hud">
+      <div class="artwork-placard" id="artwork-placard">
+        <div class="placard-top-row">
+          <div class="placard-index" id="placard-index">01 / 08</div>
+          <span class="reveal-pct mobile-only-stanza" id="mobile-stanza-pct">Stanza 1 / 6</span>
+        </div>
+        <div class="placard-title-wrap">
+          <h2 class="placard-title" id="placard-title">All Smiles and White Teeth</h2>
+        </div>
+        <p class="placard-subtitle" id="placard-subtitle" style="display:none;"></p>
+        <div class="reveal-meter">
+          <div class="reveal-bar-track">
+            <div class="reveal-bar-fill" id="reveal-bar-fill"></div>
+          </div>
+          <span class="reveal-pct desktop-only-stanza" id="reveal-pct">Stanza 1 / 6</span>
+        </div>
+      </div>
 
-    <!-- Bottom-Right Interactive Reading Controls -->
-    <div class="canvas-controls" id="canvas-controls">
-      <button class="ctrl-btn mobile-nav-btn" id="btn-prev-chapter" aria-label="Previous poem">↑</button>
-      <button class="ctrl-btn hover-target" id="btn-reading-mode" title="Toggle between Focus Stanza and Full Poem layout">Full Poem</button>
-      <a class="ctrl-btn hover-target transition-link" id="btn-share-poem" href="gallery.html" style="text-decoration: none;">Share Lines</a>
-      <button class="ctrl-btn mobile-nav-btn" id="btn-next-chapter" aria-label="Next poem">↓</button>
+      <!-- Center Subtle Reading Cue (Desktop) -->
+      <div id="hint">Scroll or Space to Read · Click Any Line to Underline</div>
+
+      <!-- Bottom-Right Interactive Reading Controls -->
+      <div class="canvas-controls" id="canvas-controls">
+        <button class="ctrl-btn mobile-nav-btn" id="btn-prev-chapter" aria-label="Previous poem">←</button>
+        <button class="ctrl-btn hover-target" id="btn-reading-mode" title="Toggle between Focus Stanza and Full Poem layout">Full Poem</button>
+        <button class="ctrl-btn hover-target" id="btn-poem-note" style="display:none;" title="Read margin note">Note</button>
+        <a class="ctrl-btn hover-target transition-link" id="btn-share-poem" href="gallery.html" style="text-decoration: none;">Share Lines</a>
+        <button class="ctrl-btn mobile-nav-btn" id="btn-next-chapter" aria-label="Next poem">→</button>
+      </div>
     </div>
 
     <!-- Colophon Finale (Last Scroll Chapter) -->
@@ -151,10 +173,21 @@
       </div>
     </section>
 
-    <!-- Bottom Kinetic Marquee Footer -->
+    <!-- Bottom Kinetic Marquee Footer (Desktop) -->
     <footer class="gallery-footer">
       <div class="ticker-wrap" id="ticker-wrap"></div>
     </footer>
+  </div>
+
+  <!-- Table of Contents / Poem Index Drawer -->
+  <div class="modal-backdrop" id="toc-backdrop" role="dialog" aria-modal="true" aria-label="Table of Contents">
+    <div class="toc-drawer">
+      <div class="modal-head">
+        <h2 id="toc-collection-title">Table of Contents</h2>
+        <button type="button" class="modal-close-btn" id="toc-close">Close</button>
+      </div>
+      <div class="toc-list" id="toc-list"></div>
+    </div>
   </div>
 
   <!-- Add New Poetry Collection Modal (Owner Only) -->
@@ -170,12 +203,12 @@
           <input type="text" id="col-title" required placeholder="e.g., Letters Never Sent to Manila">
         </div>
         <div class="form-field">
-          <label for="col-subtitle">Subtitle / Study Note</label>
-          <input type="text" id="col-subtitle" placeholder="e.g., Nocturnes &amp; Quiet Departures">
+          <label for="col-subtitle">Subtitle (Optional)</label>
+          <input type="text" id="col-subtitle" placeholder="Optional">
         </div>
         <div class="form-field">
           <label for="col-epigraph">Epigraph (Optional)</label>
-          <input type="text" id="col-epigraph" placeholder="A single opening line for the sleeve">
+          <input type="text" id="col-epigraph" placeholder="A single opening line for the cover">
         </div>
         <div class="form-field">
           <label for="first-poem-title">Opening Poem Title</label>
@@ -192,9 +225,9 @@
 
   <div class="stanza-toast" id="stanza-toast" role="status" aria-live="polite"></div>
 
-  <script src="js/data-store.js?v=10"></script>
-  <script src="js/audio.js?v=10"></script>
-  <script src="js/cursor.js?v=10"></script>
-  <script src="js/experience.js?v=10"></script>
+  <script src="js/data-store.js?v=11"></script>
+  <script src="js/audio.js?v=11"></script>
+  <script src="js/cursor.js?v=11"></script>
+  <script src="js/experience.js?v=11"></script>
 </body>
 </html>

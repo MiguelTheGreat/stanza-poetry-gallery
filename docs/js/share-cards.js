@@ -1,7 +1,9 @@
 /**
- * Stanza. — High-Resolution Poetry Share Card Renderer & Soundtrack Controller
- * Supports 5 editorial card styles: Museum, Noir, Broadsheet, Atmosphere, Keepsake
- * Supports Spotify & YouTube / YouTube Music soundtrack links
+ * Stanza. — High-Resolution Poetry Share Card Renderer & Song Search / Soundtrack Engine
+ * - 5 editorial card styles: Etched, Museum, Noir, Broadsheet, Keepsake
+ * - 9:16 IG/FB Story & 4:5 Editorial Post formats
+ * - Optional bronze line emphasis (highlightIndex)
+ * - Live Song Search via iTunes Search API (30s native audio previews) + Spotify / YouTube Music URL support
  */
 (function () {
   function wrapTextLines(ctx, text, maxWidth) {
@@ -25,8 +27,8 @@
     ctx.save();
     ctx.fillStyle = `rgba(26, 25, 23, ${alpha})`;
     for (let i = 0; i < 1800; i++) {
-      const x = ((i * 7919) % w);
-      const y = ((i * 6271) % h);
+      const x = (i * 7919) % w;
+      const y = (i * 6271) % h;
       ctx.fillRect(x, y, 1.5, 1.5);
     }
     ctx.restore();
@@ -39,7 +41,9 @@
     cardStyle = 'etched',
     format = 'post',
     showTitle = true,
-    hasMusic = false
+    hasMusic = false,
+    musicLabel = '',
+    highlightIndex = -1
   }) {
     const cw = 1080;
     const ch = format === 'story' ? 1920 : 1350;
@@ -52,10 +56,9 @@
     const volLabel = collection?.volume || 'VOL. 01';
     const poemTitle = (poem?.title || 'Untitled').toUpperCase();
     const poemIndex = poem?.indexLabel || '01 / 08';
-    const accent = poem?.accentHex || '#a67c52';
-    const rgb = poem?.watercolorRgb || '166, 124, 82';
+    const accent = '#a67c52';
+    const brightAccent = '#d8b489';
 
-    // Theme tokens per card style
     let bg = '#f5f2e9';
     let fg = '#1a1917';
     let muted = '#6b655c';
@@ -76,11 +79,6 @@
       fg = '#181715';
       muted = '#726c62';
       border = 'rgba(26, 25, 23, 0.16)';
-    } else if (cardStyle === 'atmosphere') {
-      bg = '#171513';
-      fg = '#f8f4ec';
-      muted = 'rgba(248, 244, 236, 0.66)';
-      border = 'rgba(248, 244, 236, 0.16)';
     } else if (cardStyle === 'keepsake') {
       bg = '#fcfbf8';
       fg = '#1a1917';
@@ -88,16 +86,13 @@
       border = 'rgba(26, 25, 23, 0.10)';
     }
 
-    // Base background fill
     g.fillStyle = bg;
     g.fillRect(0, 0, cw, ch);
 
     const storySafeTop = format === 'story' ? 140 : 0;
     const storySafeBottom = format === 'story' ? 150 : 0;
 
-    // Style-specific atmospheric & architectural layers
     if (cardStyle === 'etched') {
-      // Fine intaglio outer margin cross-hatching
       g.save();
       g.strokeStyle = 'rgba(26, 25, 23, 0.045)';
       g.lineWidth = 1;
@@ -119,7 +114,6 @@
       }
       g.restore();
 
-      // Recessed copperplate indentation (plate-mark)
       const px = 52;
       const py = 52 + storySafeTop;
       const pw = cw - 104;
@@ -136,7 +130,6 @@
       g.lineWidth = 1.5;
       g.strokeRect(px + 2, py + 2, pw - 4, ph - 4);
 
-      // Inner engraved double hairline frame
       g.strokeStyle = 'rgba(26, 25, 23, 0.72)';
       g.lineWidth = 1.2;
       g.strokeRect(px + 22, py + 22, pw - 44, ph - 44);
@@ -145,7 +138,6 @@
       g.lineWidth = 1;
       g.strokeRect(px + 30, py + 30, pw - 60, ph - 60);
 
-      // Engraved corner registration crosses
       const corners = [
         [px + 22, py + 22],
         [px + pw - 22, py + 22],
@@ -163,7 +155,6 @@
         g.stroke();
       });
 
-      // Vertical incised "cut" mark at top center
       g.strokeStyle = 'rgba(166, 124, 82, 0.78)';
       g.lineWidth = 1.2;
       g.beginPath();
@@ -173,14 +164,12 @@
 
       drawSubtleGrain(g, cw, ch, 0.028);
     } else if (cardStyle === 'museum') {
-      // Double museum hairline frame
       g.strokeStyle = border;
       g.lineWidth = 1.5;
       g.strokeRect(42, 42 + storySafeTop, cw - 84, ch - 84 - storySafeTop - storySafeBottom);
       g.strokeStyle = 'rgba(26, 25, 23, 0.06)';
       g.lineWidth = 1;
       g.strokeRect(56, 56 + storySafeTop, cw - 112, ch - 112 - storySafeTop - storySafeBottom);
-
       drawSubtleGrain(g, cw, ch, 0.025);
     } else if (cardStyle === 'noir') {
       g.strokeStyle = border;
@@ -206,23 +195,6 @@
       g.stroke();
 
       drawSubtleGrain(g, cw, ch, 0.022);
-    } else if (cardStyle === 'atmosphere') {
-      const grad1 = g.createRadialGradient(cw * 0.28, ch * 0.30, 40, cw * 0.28, ch * 0.30, 740);
-      grad1.addColorStop(0, `rgba(${rgb}, 0.42)`);
-      grad1.addColorStop(0.55, `rgba(${rgb}, 0.14)`);
-      grad1.addColorStop(1, 'rgba(23, 21, 19, 0)');
-      g.fillStyle = grad1;
-      g.fillRect(0, 0, cw, ch);
-
-      const vig = g.createRadialGradient(cw * 0.5, ch * 0.5, cw * 0.28, cw * 0.5, ch * 0.5, cw * 0.85);
-      vig.addColorStop(0, 'rgba(0,0,0,0)');
-      vig.addColorStop(1, 'rgba(10, 9, 8, 0.52)');
-      g.fillStyle = vig;
-      g.fillRect(0, 0, cw, ch);
-
-      g.strokeStyle = 'rgba(248, 244, 236, 0.15)';
-      g.lineWidth = 1;
-      g.strokeRect(48, 48 + storySafeTop, cw - 96, ch - 96 - storySafeTop - storySafeBottom);
     } else if (cardStyle === 'keepsake') {
       const matX = 76;
       const matY = 76 + storySafeTop;
@@ -237,8 +209,8 @@
       g.strokeRect(matX + 20, matY + 20, matW - 40, matH - 40);
     }
 
-    // Header bar
     const isKeepsake = cardStyle === 'keepsake';
+    const isDarkCard = cardStyle === 'noir' || isKeepsake;
     const headerY = (isKeepsake ? 138 : cardStyle === 'etched' ? 128 : 104) + storySafeTop;
     const padX = cardStyle === 'broadsheet' ? 84 : (isKeepsake ? 124 : cardStyle === 'etched' ? 118 : 96);
 
@@ -248,19 +220,19 @@
     g.fillText(`STANZA.  ·  ${volLabel}`, padX, headerY);
 
     g.textAlign = 'right';
-    g.fillStyle = isKeepsake ? '#d8b489' : accent;
+    g.fillStyle = isDarkCard ? brightAccent : accent;
     g.fillText(poemIndex, cw - padX, headerY);
 
-    // Subtle quote ornament
     const verseColor = isKeepsake ? '#f5f2e9' : fg;
+    const highlightColor = isDarkCard ? '#e4be92' : '#8b5e34';
     const verseFontSize = safeLines.length <= 2 ? 56 : safeLines.length === 3 ? 49 : 44;
     const verseLineHeight = Math.round(verseFontSize * 1.48);
 
     g.font = `italic 400 ${verseFontSize}px "Cormorant Garamond", Georgia, serif`;
     const maxTextW = cardStyle === 'broadsheet' ? cw - 290 : (isKeepsake || cardStyle === 'etched' ? cw - 260 : cw - 220);
 
-    // Pre-wrap all selected lines so we can vertically center cleanly
     const wrappedEntries = safeLines.map((line, idx) => ({
+      idx,
       num: String(idx + 1).padStart(2, '0'),
       wrapped: wrapTextLines(g, line, maxTextW)
     }));
@@ -276,29 +248,36 @@
     const stageBottom = (isKeepsake ? ch - 260 : (showTitle ? ch - 260 : ch - 130)) - storySafeBottom;
     let cursorY = stageTop + Math.max(40, (stageBottom - stageTop - totalTextHeight) / 2) + verseFontSize * 0.7;
 
-    // Opening quotation mark glyph
     if (cardStyle !== 'broadsheet') {
       g.save();
       g.font = 'italic 400 124px "Cormorant Garamond", Georgia, serif';
-      g.fillStyle = isKeepsake ? 'rgba(216, 180, 137, 0.25)' : 'rgba(166, 124, 82, 0.28)';
+      g.fillStyle = isDarkCard ? 'rgba(216, 180, 137, 0.25)' : 'rgba(166, 124, 82, 0.28)';
       g.textAlign = 'left';
       g.fillText('“', padX - 8, cursorY - 56);
       g.restore();
     }
 
-    // Draw each selected line
     wrappedEntries.forEach((entry) => {
+      const isEmphasized = entry.idx === highlightIndex;
+
       if (cardStyle === 'broadsheet') {
         g.save();
         g.font = '600 14px "Syncopate", sans-serif';
-        g.fillStyle = 'rgba(166, 124, 82, 0.75)';
+        g.fillStyle = isEmphasized ? highlightColor : 'rgba(166, 124, 82, 0.75)';
         g.textAlign = 'right';
-        g.fillText(entry.num, 136, cursorY - 6);
+        g.fillText(isEmphasized ? '✦' : entry.num, 136, cursorY - 6);
+        g.restore();
+      } else if (isEmphasized) {
+        g.save();
+        g.font = '400 22px Georgia, serif';
+        g.fillStyle = highlightColor;
+        g.textAlign = 'right';
+        g.fillText('✦', padX - 18, cursorY - 8);
         g.restore();
       }
 
-      g.font = `italic 400 ${verseFontSize}px "Cormorant Garamond", Georgia, serif`;
-      g.fillStyle = verseColor;
+      g.font = `italic ${isEmphasized ? '600' : '400'} ${verseFontSize}px "Cormorant Garamond", Georgia, serif`;
+      g.fillStyle = isEmphasized ? highlightColor : verseColor;
       g.textAlign = 'left';
       const drawX = cardStyle === 'broadsheet' ? 192 : padX;
 
@@ -309,8 +288,8 @@
       cursorY += stanzaGap;
     });
 
-    // Footer title & collection attribution
     if (showTitle) {
+      const shortMusic = musicLabel ? (musicLabel.length > 26 ? musicLabel.slice(0, 25) + '…' : musicLabel) : '';
       if (isKeepsake) {
         g.textAlign = 'center';
         g.fillStyle = '#1a1917';
@@ -324,37 +303,99 @@
         if (hasMusic) {
           g.fillStyle = accent;
           g.font = '600 12px "Syncopate", sans-serif';
-          g.fillText('♪  WITH SOUNDTRACK', cw / 2, ch - 54 - storySafeBottom);
+          g.fillText(shortMusic ? `♪  ${shortMusic.toUpperCase()}` : '♪  WITH SOUNDTRACK', cw / 2, ch - 54 - storySafeBottom);
         }
       } else {
         const footerY = ch - 132 - storySafeBottom;
 
-        g.fillStyle = accent;
+        g.fillStyle = isDarkCard ? brightAccent : accent;
         g.fillRect(padX, footerY - 46, 54, 2);
 
         g.textAlign = 'left';
         g.fillStyle = fg;
         g.font = '700 24px "Syncopate", sans-serif';
-        g.fillText(poemTitle.length > 30 ? poemTitle.slice(0, 29) + '…' : poemTitle, padX, footerY);
+        g.fillText(poemTitle.length > 28 ? poemTitle.slice(0, 27) + '…' : poemTitle, padX, footerY);
 
         g.fillStyle = muted;
         g.font = 'italic 26px "Cormorant Garamond", Georgia, serif';
         g.fillText(collection?.title || 'Cut on the Life of a Weeping Man', padX, footerY + 38);
 
         g.textAlign = 'right';
-        g.fillStyle = accent;
+        g.fillStyle = isDarkCard ? brightAccent : accent;
         g.font = '700 13px "Syncopate", sans-serif';
-        g.fillText(hasMusic ? '♪ SOUNDTRACK ATTACHED' : 'SELECTED VERSE', cw - padX, footerY - 2);
+        g.fillText(hasMusic ? '♪ SOUNDTRACK' : 'SELECTED VERSE', cw - padX, footerY - 2);
+
+        if (hasMusic && shortMusic) {
+          g.fillStyle = muted;
+          g.font = 'italic 20px "Cormorant Garamond", Georgia, serif';
+          g.fillText(shortMusic, cw - padX, footerY + 32);
+        }
       }
     }
   }
 
   // ============================================
-  // SPOTIFY & YOUTUBE MUSIC URL PARSER
+  // LIVE SONG SEARCH (iTunes Search API — CORS-enabled, zero API key)
+  // ============================================
+  async function searchSongs(query) {
+    const q = (query || '').trim();
+    if (q.length < 2) return [];
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&entity=song&limit=6`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.results || [])
+      .filter((r) => r.trackId && r.previewUrl)
+      .map((r) => ({
+        provider: 'itunes',
+        code: `it:${r.trackId}`,
+        trackId: String(r.trackId),
+        trackName: r.trackName,
+        artistName: r.artistName,
+        artwork: r.artworkUrl100 || r.artworkUrl60 || '',
+        previewUrl: r.previewUrl,
+        label: `${r.trackName} — ${r.artistName}`
+      }));
+  }
+
+  async function lookupSong(trackId) {
+    try {
+      const res = await fetch(`https://itunes.apple.com/lookup?id=${encodeURIComponent(trackId)}`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const r = (data.results || [])[0];
+      if (!r || !r.previewUrl) return null;
+      return {
+        provider: 'itunes',
+        code: `it:${r.trackId}`,
+        trackId: String(r.trackId),
+        trackName: r.trackName,
+        artistName: r.artistName,
+        artwork: r.artworkUrl100 || r.artworkUrl60 || '',
+        previewUrl: r.previewUrl,
+        label: `${r.trackName} — ${r.artistName}`
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  // ============================================
+  // SOUNDTRACK PARSER (iTunes Track ID, Spotify URL, YouTube Music URL)
   // ============================================
   function parseMusicUrl(raw) {
     const val = (raw || '').trim();
     if (!val) return null;
+
+    const itCode = val.match(/^it:(\d+)$/);
+    if (itCode) {
+      return {
+        provider: 'itunes',
+        code: val,
+        trackId: itCode[1],
+        label: 'Soundtrack'
+      };
+    }
 
     const spCode = val.match(/^sp:(track|album|playlist):([A-Za-z0-9]+)$/);
     if (spCode) {
@@ -409,12 +450,12 @@
       };
     }
 
-    return { invalid: true };
+    return null;
   }
 
   function mountMusicEmbed(container, parsed) {
     container.innerHTML = '';
-    if (!parsed || parsed.invalid) {
+    if (!parsed || parsed.invalid || parsed.provider === 'itunes') {
       container.classList.remove('has-track');
       return;
     }
@@ -450,13 +491,19 @@
     let pendingPlay = true;
     let playFn = null;
     let pauseFn = null;
+    let trackTitle = parsed.trackName ? `${parsed.trackName} — ${parsed.artistName}` : '';
 
     function setUiPlaying(playing) {
       isPlaying = playing;
       btn.classList.toggle('is-playing', playing);
       btn.classList.toggle('is-waiting', !playing && !userPaused);
       icon.textContent = playing ? '❚❚' : '▶';
-      label.textContent = playing ? 'Pause Music' : (userPaused ? 'Play Music' : 'Tap for Music');
+      if (trackTitle) {
+        const short = trackTitle.length > 28 ? trackTitle.slice(0, 27) + '…' : trackTitle;
+        label.textContent = playing ? short : (userPaused ? short : `Play · ${short}`);
+      } else {
+        label.textContent = playing ? 'Pause Music' : (userPaused ? 'Play Music' : 'Tap for Music');
+      }
     }
     setUiPlaying(false);
 
@@ -470,13 +517,71 @@
       if (e.target && e.target.closest && e.target.closest('#showcase-audio-btn, #showcase-explore, #showcase-download, a')) {
         return;
       }
-      if (!isPlaying && !userPaused) {
-        tryStartPlayback();
-      }
+      if (!isPlaying && !userPaused) tryStartPlayback();
     };
     ['pointerdown', 'touchend', 'click', 'keydown'].forEach((evt) => {
       window.addEventListener(evt, onAnyGesture, { passive: true });
     });
+
+    if (parsed.provider === 'itunes' && parsed.trackId) {
+      let audioEl = null;
+      (async () => {
+        const track = parsed.previewUrl ? parsed : await lookupSong(parsed.trackId);
+        if (!track || !track.previewUrl) {
+          btn.classList.remove('is-visible');
+          return;
+        }
+        trackTitle = `${track.trackName} — ${track.artistName}`;
+        audioEl = new Audio(track.previewUrl);
+        audioEl.loop = true;
+        audioEl.volume = 0.8;
+        audioEl.addEventListener('play', () => {
+          pendingPlay = false;
+          setUiPlaying(true);
+        });
+        audioEl.addEventListener('pause', () => setUiPlaying(false));
+        isReady = true;
+        setUiPlaying(false);
+
+        playFn = () => {
+          audioEl.play().catch(() => {});
+        };
+        pauseFn = () => {
+          audioEl.pause();
+        };
+
+        if (pendingPlay && !userPaused) {
+          audioEl.play().catch(() => {});
+        }
+      })();
+
+      const onBtnClick = (e) => {
+        e.stopPropagation();
+        if (isPlaying) {
+          userPaused = true;
+          pendingPlay = false;
+          if (pauseFn) pauseFn();
+          setUiPlaying(false);
+        } else {
+          userPaused = false;
+          pendingPlay = true;
+          if (playFn) playFn();
+        }
+      };
+      btn.addEventListener('click', onBtnClick);
+
+      return () => {
+        ['pointerdown', 'touchend', 'click', 'keydown'].forEach((evt) => {
+          window.removeEventListener(evt, onAnyGesture);
+        });
+        btn.removeEventListener('click', onBtnClick);
+        if (audioEl) {
+          audioEl.pause();
+          audioEl.src = '';
+        }
+        btn.classList.remove('is-visible', 'is-playing', 'is-waiting');
+      };
+    }
 
     if (parsed.provider === 'youtube' && parsed.youtubeId) {
       const slot = document.createElement('div');
@@ -627,6 +732,8 @@
 
   window.StanzaShare = {
     renderPoetryCard,
+    searchSongs,
+    lookupSong,
     parseMusicUrl,
     mountMusicEmbed,
     setupShowcaseAudio

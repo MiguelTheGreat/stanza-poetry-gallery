@@ -1,7 +1,9 @@
 /**
  * Stanza. — Experience Mode Engine
- * 1) Collection Shelf (Apple Top 100 Albums / Vinyl Folio Showcase — Owner-gated archiving)
- * 2) Single-Column Focus-Stanza Reading Stage + Archival Pencil Underline Interactivity
+ * 1) Apple-Style 3D Isometric Collection Shelf (+ Resume Reading bookmark, Owner-gated archiving)
+ * 2) Single-Column Focus-Stanza & Full-Poem Reader + Archival Pencil Underlining
+ * 3) Locked Mobile Viewport (swipe stanza-by-stanza in Focus, isolated stanza scroll in Full Poem)
+ * 4) Night Lamp theme, Ambient Room Soundscape, Table of Contents Index Drawer & Margin Notes
  */
 (function () {
   const OWNER_KEY = 'stanza_owner_mode_v1';
@@ -21,22 +23,27 @@
   const introSubtext = document.getElementById('intro-subtext');
   const scrollProgressLine = document.getElementById('scroll-progress-line');
   const shelfStage = document.getElementById('vinyl-shelf-stage');
-  const shelfCountNote = document.getElementById('shelf-count-note');
   const navBackShelf = document.getElementById('nav-back-shelf');
+  const navToc = document.getElementById('nav-toc');
+  const navAmbience = document.getElementById('nav-ambience');
+  const navTheme = document.getElementById('nav-theme');
   const navGalleryLink = document.getElementById('nav-gallery-link');
   const navAddVolume = document.getElementById('nav-add-volume');
   const brandLink = document.getElementById('brand-link');
 
   const poemStage = document.getElementById('poem-stage');
   const chapterRail = document.getElementById('chapter-rail');
+  const readerHud = document.getElementById('reader-hud');
   const placard = document.getElementById('artwork-placard');
   const placardIndex = document.getElementById('placard-index');
   const placardTitle = document.getElementById('placard-title');
   const placardSubtitle = document.getElementById('placard-subtitle');
   const revealBarFill = document.getElementById('reveal-bar-fill');
   const revealPct = document.getElementById('reveal-pct');
+  const mobileStanzaPct = document.getElementById('mobile-stanza-pct');
   const canvasControls = document.getElementById('canvas-controls');
   const btnReadingMode = document.getElementById('btn-reading-mode');
+  const btnPoemNote = document.getElementById('btn-poem-note');
   const btnSharePoem = document.getElementById('btn-share-poem');
   const btnPrevChapter = document.getElementById('btn-prev-chapter');
   const btnNextChapter = document.getElementById('btn-next-chapter');
@@ -49,6 +56,20 @@
   const backToTopBtn = document.getElementById('back-to-top');
   const toastEl = document.getElementById('stanza-toast');
 
+  // TOC Drawer
+  const tocBackdrop = document.getElementById('toc-backdrop');
+  const tocClose = document.getElementById('toc-close');
+  const tocList = document.getElementById('toc-list');
+  const tocCollectionTitle = document.getElementById('toc-collection-title');
+
+  // Margin Note Popover
+  const notePopover = document.getElementById('margin-note-popover');
+  const noteClose = document.getElementById('margin-note-close');
+  const noteBody = document.getElementById('margin-note-body');
+  const noteInput = document.getElementById('margin-note-input');
+  const noteSave = document.getElementById('margin-note-save');
+
+  // Owner Archive Modal
   const archiveModalBackdrop = document.getElementById('archive-modal-backdrop');
   const archiveModalClose = document.getElementById('archive-modal-close');
   const archiveForm = document.getElementById('archive-volume-form');
@@ -63,6 +84,7 @@
   let chapterStops = [];
   let isReaderMode = false;
   let isFullPoemMode = false;
+  let mobileLocked = false;
   let rafId = null;
 
   let viewW = window.innerWidth;
@@ -87,6 +109,32 @@
     smoothNormX: 0,
     smoothNormY: 0
   };
+
+  function isMobileViewport() {
+    return window.innerWidth <= 960;
+  }
+
+  // ============================================
+  // THEME & AMBIENCE CONTROLS
+  // ============================================
+  function syncThemeButton() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    navTheme.textContent = isDark ? 'Paper' : 'Night';
+  }
+
+  navTheme.addEventListener('click', () => {
+    const next = window.StanzaStore.toggleTheme();
+    syncThemeButton();
+    window.StanzaAudio?.playPaperRustle(0.032);
+    showToast(next === 'dark' ? 'Night Lamp On' : 'Archival Paper');
+  });
+
+  navAmbience.addEventListener('click', () => {
+    const mode = window.StanzaAudio ? window.StanzaAudio.cycleAmbience() : 'off';
+    const labels = { off: 'Room: Off', rain: 'Room: Rain', subway: 'Room: Subway' };
+    navAmbience.textContent = labels[mode] || 'Room: Off';
+    showToast(mode === 'off' ? 'Ambient Sound Off' : `Ambient · ${mode === 'rain' ? 'Rain on Glass' : 'Late-Night Subway'}`);
+  });
 
   // ============================================
   // OWNER DETECTION (?owner=1, localhost, or Shift+Alt+O)
@@ -113,7 +161,7 @@
     toastEl.textContent = msg;
     toastEl.classList.add('is-visible');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove('is-visible'), 2400);
+    toastTimer = setTimeout(() => toastEl.classList.remove('is-visible'), 2300);
   }
 
   function escapeHtml(str) {
@@ -125,17 +173,11 @@
   }
 
   function loadMarginMap() {
-    try {
-      return JSON.parse(localStorage.getItem(MARGIN_KEY) || '{}');
-    } catch {
-      return {};
-    }
+    try { return JSON.parse(localStorage.getItem(MARGIN_KEY) || '{}'); } catch { return {}; }
   }
 
   function saveMarginMap(map) {
-    try {
-      localStorage.setItem(MARGIN_KEY, JSON.stringify(map));
-    } catch {}
+    try { localStorage.setItem(MARGIN_KEY, JSON.stringify(map)); } catch {}
   }
 
   // ============================================
@@ -164,24 +206,20 @@
     if (subtitle) introSubtext.textContent = subtitle;
     introContent.style.opacity = title || subtitle ? '' : '0';
     overlay.classList.remove('curtain-hidden', 'curtain-open');
-    void overlay.offsetWidth; // Force reflow before closing animation
+    void overlay.offsetWidth;
     overlay.classList.add('curtain-closing');
   }
 
   window.addEventListener('pageshow', (event) => {
-    if (event.persisted) {
-      openCurtain();
-    }
+    if (event.persisted) openCurtain();
   });
 
   function transitionWithCurtain(title, subtitle, onMidpoint) {
     showCurtainForTransition(title, subtitle);
     setTimeout(async () => {
       await onMidpoint();
-      setTimeout(() => {
-        openCurtain();
-      }, 180);
-    }, 620);
+      setTimeout(() => openCurtain(), 180);
+    }, 580);
   }
 
   function bindTransitionLinks(root = document) {
@@ -194,13 +232,13 @@
         showCurtainForTransition('', '');
         setTimeout(() => {
           window.location.href = target;
-        }, 560);
+        }, 520);
       });
     });
   }
 
   // ============================================
-  // VIEW 1: APPLE-STYLE VINYL / FOLIO COLLECTION SHELF
+  // VIEW 1: APPLE-STYLE 3D ISOMETRIC COLLECTION SHELF
   // ============================================
   async function loadShelfCollections() {
     collections = await window.StanzaStore.getCollections();
@@ -209,17 +247,17 @@
 
   function renderShelf() {
     shelfStage.innerHTML = '';
-    if (shelfCountNote) {
-      shelfCountNote.textContent =
-        collections.length === 1
-          ? '1 Collected Volume · Select the sleeve to enter its reading room'
-          : `${collections.length} Collected Volumes · Select a sleeve to enter its reading room`;
-    }
+    const lastRead = window.StanzaStore.getLastRead();
 
     collections.forEach((col, idx) => {
       const card = document.createElement('article');
       card.className = 'album-card';
       const volNum = String(idx + 1).padStart(2, '0');
+
+      const hasResume = lastRead && lastRead.collectionSlug === col.slug && lastRead.poemIdx > 0;
+      const resumeHtml = hasResume
+        ? `<button type="button" class="resume-reading-btn hover-target" data-resume="${col.slug}" data-resume-idx="${lastRead.poemIdx}">Continue at ${String(lastRead.poemIdx + 1).padStart(2, '0')} · ${escapeHtml(lastRead.poemTitle)} →</button>`
+        : '';
 
       card.innerHTML = `
         <div class="slab-number" aria-hidden="true">${volNum}</div>
@@ -259,10 +297,10 @@
             <a href="gallery.html?collection=${encodeURIComponent(col.slug)}" class="btn-open-gallery transition-link hover-target">Gallery Mode</a>
             <button type="button" class="btn-open-gallery hover-target" data-share-fb="${col.slug}" title="Share etched card on Facebook">Share on FB ↗</button>
           </div>
+          ${resumeHtml}
         </div>
       `;
 
-      // Interactive 3D angle response around the Apple-100-Albums right-angled hero pose
       const folioStage = card.querySelector('.folio-stage');
       const folioBook = card.querySelector('.folio-book');
       let rect = null;
@@ -287,7 +325,7 @@
         if (cursorApi) cursorApi.setInspect('');
       });
 
-      const triggerEnter = () => enterCollectionExperience(col.slug);
+      const triggerEnter = () => enterCollectionExperience(col.slug, false, 0);
       folioStage.addEventListener('click', triggerEnter);
       folioStage.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -296,6 +334,14 @@
         }
       });
       card.querySelector('[data-enter]').addEventListener('click', triggerEnter);
+
+      const resumeBtn = card.querySelector('[data-resume]');
+      if (resumeBtn) {
+        resumeBtn.addEventListener('click', () => {
+          const idxNum = parseInt(resumeBtn.dataset.resumeIdx, 10) || 0;
+          enterCollectionExperience(col.slug, false, idxNum);
+        });
+      }
 
       card.querySelector('[data-share-fb]').addEventListener('click', () => {
         const shareUrl = window.location.origin + window.location.pathname;
@@ -306,7 +352,6 @@
       shelfStage.appendChild(card);
     });
 
-    // Owner-only "Archive Next Volume" ghost sleeve
     if (isOwner) {
       const addCard = document.createElement('div');
       addCard.className = 'add-volume-card owner-only';
@@ -328,7 +373,7 @@
   // ============================================
   // VIEW 2: SINGLE-COLUMN FOCUS-STANZA EXPERIENCE
   // ============================================
-  async function enterCollectionExperience(slug, skipCurtain = false) {
+  async function enterCollectionExperience(slug, skipCurtain = false, initialPoemIdx = 0) {
     if (cursorApi) cursorApi.setInspect('');
     window.StanzaAudio?.playPaperRustle(0.055);
 
@@ -338,7 +383,7 @@
         showToast('Could not load collection');
         return;
       }
-      mountReaderMode(activeCollection);
+      mountReaderMode(activeCollection, initialPoemIdx);
 
       const url = new URL(window.location.href);
       url.searchParams.set('collection', slug);
@@ -360,10 +405,12 @@
 
   function exitToShelf() {
     window.StanzaAudio?.playPaperRustle(0.05);
+    closeNotePopover();
     transitionWithCurtain('Stanza.', 'Collection Shelf', async () => {
       isReaderMode = false;
       isFullPoemMode = false;
-      document.body.classList.remove('mode-reader', 'reading-full');
+      mobileLocked = false;
+      document.body.classList.remove('mode-reader', 'reading-full', 'mobile-locked-reader');
       if (rafId) {
         cancelAnimationFrame(rafId);
         rafId = null;
@@ -373,20 +420,28 @@
       url.searchParams.delete('mode');
       url.searchParams.delete('collection');
       history.replaceState(null, '', url.toString());
+      renderShelf();
     });
   }
 
-  function mountReaderMode(collection) {
+  function syncMobileLockClass() {
+    mobileLocked = isReaderMode && isMobileViewport();
+    document.body.classList.toggle('mobile-locked-reader', mobileLocked);
+  }
+
+  function mountReaderMode(collection, initialPoemIdx = 0) {
     isReaderMode = true;
     isFullPoemMode = false;
     document.body.classList.add('mode-reader');
     document.body.classList.remove('reading-full');
+    syncMobileLockClass();
+
     btnReadingMode.textContent = 'Full Poem';
     window.scrollTo(0, 0);
 
     targetScroll = 0;
     smoothScroll = 0;
-    activeSceneIndex = 0;
+    activeSceneIndex = clamp(initialPoemIdx, 0, Math.max(0, collection.poems.length - 1));
     displayedPlacardIdx = -1;
     inColophonMode = false;
     lastRailIdx = -1;
@@ -398,12 +453,10 @@
     navGalleryLink.href = galleryHref;
     colophonGalleryLink.href = galleryHref;
 
-    // Generous scroll runway so every stanza breathes cleanly
     const totalPoems = collection.poems.length;
     const scrollContainer = document.getElementById('scroll-container');
     scrollContainer.style.height = `${Math.max(1200, (totalPoems + 1.4) * 340)}vh`;
 
-    // Kinetic Marquee Ticker
     const tickerChunk = `${collection.title.toUpperCase()} • ${collection.poems.map((p) => p.title.toUpperCase()).join(' • ')} • `;
     tickerWrap.innerHTML = Array(4)
       .fill(`<span class="ticker-item">${tickerChunk}</span>`)
@@ -420,20 +473,18 @@
     collection.poems.forEach((poem, idx) => {
       const startP = idx * poemBandSpan;
       const endP = (idx + 1) * poemBandSpan;
-      chapterStops.push(idx === 0 ? 0 : clamp(startP + poemBandSpan * 0.08, 0, 0.87));
+      chapterStops.push(idx === 0 ? 0 : clamp(startP + poemBandSpan * 0.06, 0, 0.87));
 
-      // Chapter rail dot
       const railBtn = document.createElement('button');
-      railBtn.className = `chapter-dot-btn hover-target${idx === 0 ? ' active' : ''}`;
+      railBtn.className = `chapter-dot-btn hover-target${idx === activeSceneIndex ? ' active' : ''}`;
       railBtn.dataset.stop = String(chapterStops[idx]);
       railBtn.innerHTML = `
         <span class="chapter-indicator"></span>
         <span class="chapter-label">${poem.watermark} ${poem.title}</span>
       `;
-      railBtn.addEventListener('click', () => smoothScrollTo(parseFloat(railBtn.dataset.stop)));
+      railBtn.addEventListener('click', () => jumpToPoem(idx));
       chapterRail.appendChild(railBtn);
 
-      // Single-column chapbook scene
       const sceneEl = document.createElement('article');
       sceneEl.className = 'poem-scene';
       sceneEl.dataset.index = String(idx);
@@ -491,22 +542,33 @@
         idx
       };
 
-      // Clicking a non-focused stanza scrolls smoothly to focus it
+      // Prevent wheel scroll inside Full Poem viewport from bubbling to window when still scrollable
+      viewportEl.addEventListener(
+        'wheel',
+        (e) => {
+          if (!isFullPoemMode) return;
+          const atTop = viewportEl.scrollTop <= 0;
+          const atBottom = viewportEl.scrollTop + viewportEl.clientHeight >= viewportEl.scrollHeight - 2;
+          if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) {
+            e.stopPropagation();
+          }
+        },
+        { passive: true }
+      );
+
+      // Clicking a non-focused stanza focuses it smoothly
       stanzaEls.forEach((stanzaEl, sIdx) => {
         stanzaEl.addEventListener('click', (e) => {
           if (e.target.closest('.verse-line') && (stanzaEl.classList.contains('is-focused') || isFullPoemMode)) {
             return;
           }
           if (!isFullPoemMode) {
-            const count = stanzaEls.length;
-            const frac = count > 1 ? sIdx / (count - 1) : 0;
-            const targetP = startP + poemBandSpan * (0.08 + frac * 0.78);
-            smoothScrollTo(targetP);
+            goToStanza(idx, sIdx);
           }
         });
       });
 
-      // Clicking a line underlines & bookmarks it in the margin (up to 4 lines per poem)
+      // Clicking any line underlines & bookmarks it in the margin (up to 4 lines per poem)
       sceneEl.querySelectorAll('.verse-line').forEach((lineEl) => {
         lineEl.addEventListener('click', (e) => {
           const parentStanza = lineEl.closest('.stanza-block');
@@ -547,26 +609,197 @@
       <span class="chapter-indicator"></span>
       <span class="chapter-label">${String(totalPoems + 1).padStart(2, '0')} Colophon</span>
     `;
-    colophonRailBtn.addEventListener('click', () => smoothScrollTo(1));
+    colophonRailBtn.addEventListener('click', () => jumpToColophon());
     chapterRail.appendChild(colophonRailBtn);
 
     if (cursorApi) cursorApi.bindHoverTargets(chapterRail);
 
     resizeReader();
-    if (readerScenes[0]) {
-      updatePlacard(0, true);
-      centerFocusedStanza(readerScenes[0], 0);
-    }
 
-    if (!rafId) {
-      rafId = requestAnimationFrame(animateReader);
+    if (mobileLocked) {
+      renderMobileLockedScene(activeSceneIndex, 0, false);
+    } else {
+      if (activeSceneIndex > 0) {
+        const stop = chapterStops[activeSceneIndex] || 0;
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        window.scrollTo(0, max * stop);
+        targetScroll = stop;
+        smoothScroll = stop;
+      }
+      if (readerScenes[activeSceneIndex]) {
+        updatePlacard(activeSceneIndex, true);
+        centerFocusedStanza(readerScenes[activeSceneIndex], 0);
+      }
+      if (!rafId) rafId = requestAnimationFrame(animateReader);
     }
   }
 
+  // ============================================
+  // DETERMINISTIC NAVIGATION (Mobile Locked + Desktop Unified)
+  // ============================================
+  function persistProgress(idx) {
+    if (!activeCollection || !readerScenes[idx]) return;
+    window.StanzaStore.saveLastRead({
+      collectionSlug: activeCollection.slug,
+      poemIdx: idx,
+      poemTitle: readerScenes[idx].poem.title
+    });
+  }
+
+  function renderMobileLockedScene(poemIdx, stanzaIdx = 0, playSound = true) {
+    inColophonMode = poemIdx >= readerScenes.length;
+    if (!inColophonMode) {
+      activeSceneIndex = clamp(poemIdx, 0, readerScenes.length - 1);
+      persistProgress(activeSceneIndex);
+    }
+
+    if (playSound) window.StanzaAudio?.playPaperRustle(0.045);
+
+    readerScenes.forEach((sc, i) => {
+      const isCurrent = !inColophonMode && i === activeSceneIndex;
+      sc.el.style.transition = 'opacity 0.5s var(--ease-expo), transform 0.6s var(--ease-expo)';
+      sc.el.style.opacity = isCurrent ? '1' : '0';
+      sc.el.style.transform = isCurrent
+        ? 'translate3d(0, 0, 0) scale(1)'
+        : i < activeSceneIndex
+          ? 'translate3d(0, -28px, 0) scale(0.97)'
+          : 'translate3d(0, 28px, 0) scale(0.97)';
+      sc.el.classList.toggle('is-active', isCurrent);
+    });
+
+    readerHud.classList.toggle('hud-hidden', inColophonMode);
+    document.querySelectorAll('#colophon-section .contact-card').forEach((c) => c.classList.toggle('is-visible', inColophonMode));
+    backToTopBtn.classList.toggle('is-visible', inColophonMode);
+    colophonEyebrow.style.opacity = inColophonMode ? '1' : '0';
+    colophonEyebrow.style.transform = inColophonMode ? 'translateX(0)' : 'translateX(48px)';
+
+    if (!inColophonMode) {
+      const sc = readerScenes[activeSceneIndex];
+      sc.viewportEl.scrollTop = 0;
+      updatePlacard(activeSceneIndex, false);
+      centerFocusedStanza(sc, stanzaIdx);
+      updateStanzaMeter(sc);
+      const totalProgress = (activeSceneIndex + (sc.focusedStanzaIdx + 1) / sc.stanzaEls.length) / readerScenes.length;
+      scrollProgressLine.style.transform = `scaleX(${clamp(totalProgress, 0, 1).toFixed(3)})`;
+    } else {
+      closeNotePopover();
+      scrollProgressLine.style.transform = 'scaleX(1)';
+    }
+  }
+
+  function jumpToPoem(idx) {
+    closeNotePopover();
+    if (mobileLocked) {
+      renderMobileLockedScene(clamp(idx, 0, readerScenes.length - 1), 0, true);
+    } else {
+      smoothScrollTo(chapterStops[clamp(idx, 0, readerScenes.length - 1)] || 0);
+    }
+  }
+
+  function jumpToColophon() {
+    closeNotePopover();
+    if (mobileLocked) {
+      renderMobileLockedScene(readerScenes.length, 0, true);
+    } else {
+      smoothScrollTo(1);
+    }
+  }
+
+  function goToStanza(poemIdx, stanzaIdx) {
+    const sc = readerScenes[poemIdx];
+    if (!sc) return;
+    if (mobileLocked) {
+      centerFocusedStanza(sc, stanzaIdx);
+      updateStanzaMeter(sc);
+      const totalProgress = (activeSceneIndex + (sc.focusedStanzaIdx + 1) / sc.stanzaEls.length) / readerScenes.length;
+      scrollProgressLine.style.transform = `scaleX(${clamp(totalProgress, 0, 1).toFixed(3)})`;
+      return;
+    }
+    const poemBandSpan = 0.88 / Math.max(1, readerScenes.length);
+    const count = sc.stanzaEls.length;
+    const frac = count > 1 ? (stanzaIdx + 0.35) / count : 0.1;
+    const targetP = sc.startP + poemBandSpan * clamp(frac, 0.04, 0.92);
+    smoothScrollTo(targetP);
+  }
+
+  function stepStanza(delta) {
+    if (inColophonMode) {
+      if (delta < 0) jumpToPoem(readerScenes.length - 1);
+      return;
+    }
+    const sc = readerScenes[activeSceneIndex];
+    if (!sc) return;
+    const nextIdx = sc.focusedStanzaIdx + delta;
+    if (nextIdx >= 0 && nextIdx < sc.stanzaEls.length) {
+      goToStanza(activeSceneIndex, nextIdx);
+    } else if (delta > 0) {
+      if (activeSceneIndex + 1 < readerScenes.length) jumpToPoem(activeSceneIndex + 1);
+      else jumpToColophon();
+    } else if (delta < 0 && activeSceneIndex > 0) {
+      const prevIdx = activeSceneIndex - 1;
+      if (mobileLocked) {
+        renderMobileLockedScene(prevIdx, readerScenes[prevIdx].stanzaEls.length - 1, true);
+      } else {
+        jumpToPoem(prevIdx);
+      }
+    }
+  }
+
+  // Mobile Touch Swipe Controller (locked viewport, zero whole-screen swipe!)
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  poemStage.addEventListener(
+    'touchstart',
+    (e) => {
+      if (!mobileLocked || e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = performance.now();
+    },
+    { passive: true }
+  );
+
+  poemStage.addEventListener(
+    'touchend',
+    (e) => {
+      if (!mobileLocked || e.changedTouches.length !== 1) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      const dt = performance.now() - touchStartTime;
+      if (dt > 650) return;
+
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+
+      // Horizontal swipe flips poem-to-poem cleanly in BOTH Focus and Full Poem modes
+      if (absX > 52 && absX > absY * 1.35) {
+        if (dx < 0) {
+          if (activeSceneIndex + 1 < readerScenes.length) jumpToPoem(activeSceneIndex + 1);
+          else jumpToColophon();
+        } else if (activeSceneIndex > 0) {
+          jumpToPoem(activeSceneIndex - 1);
+        }
+        return;
+      }
+
+      // Vertical swipe in Focus Stanza mode steps stanza-by-stanza smoothly
+      // (In Full Poem mode, native touch scrolling inside .stanza-viewport handles vertical swipes!)
+      if (!isFullPoemMode && absY > 36 && absY > absX * 1.2) {
+        stepStanza(dy < 0 ? 1 : -1);
+      }
+    },
+    { passive: true }
+  );
+
+  // ============================================
+  // PLACARD, STANZA METER & MARGIN NOTES
+  // ============================================
   function updateShareButtonLink(sc) {
     if (!sc || !activeCollection) return;
     const count = sc.underlinedSet.size;
-    btnSharePoem.textContent = count > 0 ? `Share Lines (${count}/4)` : 'Share Lines';
+    btnSharePoem.textContent = count > 0 ? `Share (${count}/4)` : 'Share Lines';
     const url = new URL('gallery.html', window.location.href);
     url.searchParams.set('collection', activeCollection.slug);
     url.searchParams.set('poem', sc.poem.slug);
@@ -575,6 +808,49 @@
     }
     btnSharePoem.href = url.toString();
   }
+
+  function updateStanzaMeter(sc) {
+    if (!sc) return;
+    const stanzaCount = sc.stanzaEls.length;
+    const stanzaTag = `Stanza ${sc.focusedStanzaIdx + 1} / ${stanzaCount}`;
+    if (stanzaTag !== lastStanzaTag) {
+      lastStanzaTag = stanzaTag;
+      revealPct.textContent = stanzaTag;
+      if (mobileStanzaPct) mobileStanzaPct.textContent = stanzaTag;
+      const fillPct = Math.round(((sc.focusedStanzaIdx + 1) / stanzaCount) * 100);
+      revealBarFill.style.width = `${fillPct}%`;
+    }
+  }
+
+  function refreshNoteButtonForScene(sc) {
+    if (!sc) return;
+    const note = window.StanzaStore.getPoemNote(sc.poemKey);
+    const shouldShow = Boolean(note) || isOwner;
+    btnPoemNote.style.display = shouldShow ? '' : 'none';
+    noteBody.textContent = note || (isOwner ? 'No margin note written for this poem yet.' : '');
+    if (noteInput) noteInput.value = note || '';
+  }
+
+  function closeNotePopover() {
+    notePopover.classList.remove('is-open');
+  }
+
+  btnPoemNote.addEventListener('click', () => {
+    const sc = readerScenes[activeSceneIndex];
+    if (!sc) return;
+    refreshNoteButtonForScene(sc);
+    notePopover.classList.toggle('is-open');
+  });
+
+  noteClose.addEventListener('click', closeNotePopover);
+
+  noteSave.addEventListener('click', () => {
+    const sc = readerScenes[activeSceneIndex];
+    if (!sc || !isOwner) return;
+    window.StanzaStore.savePoemNote(sc.poemKey, noteInput.value);
+    refreshNoteButtonForScene(sc);
+    showToast('Margin Note Saved');
+  });
 
   function centerFocusedStanza(sc, stanzaIdx) {
     if (!sc || isFullPoemMode) return;
@@ -586,7 +862,7 @@
 
     const activeEl = sc.stanzaEls[clampedIdx];
     if (!activeEl) return;
-    const viewportH = sc.viewportEl.clientHeight || viewH * 0.56;
+    const viewportH = sc.viewportEl.clientHeight || viewH * 0.52;
     const targetOffset = activeEl.offsetTop - (viewportH / 2 - activeEl.offsetHeight / 2);
     sc.trackEl.style.transform = `translate3d(0, ${-Math.max(0, targetOffset)}px, 0)`;
   }
@@ -599,8 +875,20 @@
   function resizeReader() {
     viewW = window.innerWidth;
     viewH = window.innerHeight;
+    const wasLocked = mobileLocked;
+    syncMobileLockClass();
+
     maxScroll = Math.max(1, document.documentElement.scrollHeight - viewH);
     tickerHalfWidth = tickerWrap.scrollWidth / 2 || 1000;
+
+    if (mobileLocked && !wasLocked) {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      renderMobileLockedScene(activeSceneIndex, readerScenes[activeSceneIndex]?.focusedStanzaIdx || 0, false);
+    } else if (!mobileLocked && wasLocked) {
+      readerScenes.forEach((sc) => { sc.el.style.transition = ''; });
+      if (!rafId) rafId = requestAnimationFrame(animateReader);
+    }
+
     if (readerScenes[activeSceneIndex]) {
       centerFocusedStanza(readerScenes[activeSceneIndex], readerScenes[activeSceneIndex].focusedStanzaIdx);
     }
@@ -610,24 +898,30 @@
   btnReadingMode.addEventListener('click', () => {
     isFullPoemMode = !isFullPoemMode;
     document.body.classList.toggle('reading-full', isFullPoemMode);
-    btnReadingMode.textContent = isFullPoemMode ? 'Focus Stanza' : 'Full Poem';
+    btnReadingMode.textContent = isFullPoemMode ? 'Focus' : 'Full Poem';
     window.StanzaAudio?.playPaperRustle(0.045);
-    if (!isFullPoemMode && readerScenes[activeSceneIndex]) {
-      centerFocusedStanza(readerScenes[activeSceneIndex], readerScenes[activeSceneIndex].focusedStanzaIdx);
+    const sc = readerScenes[activeSceneIndex];
+    if (sc) {
+      if (isFullPoemMode) {
+        sc.viewportEl.scrollTop = 0;
+      } else {
+        centerFocusedStanza(sc, sc.focusedStanzaIdx);
+      }
     }
   });
 
   btnPrevChapter.addEventListener('click', () => {
     const cur = inColophonMode ? readerScenes.length : activeSceneIndex;
-    smoothScrollTo(chapterStops[Math.max(0, cur - 1)]);
+    jumpToPoem(Math.max(0, cur - 1));
   });
 
   btnNextChapter.addEventListener('click', () => {
-    const cur = inColophonMode ? readerScenes.length : activeSceneIndex;
-    smoothScrollTo(chapterStops[Math.min(chapterStops.length - 1, cur + 1)]);
+    if (inColophonMode) return;
+    if (activeSceneIndex + 1 < readerScenes.length) jumpToPoem(activeSceneIndex + 1);
+    else jumpToColophon();
   });
 
-  backToTopBtn.addEventListener('click', () => smoothScrollTo(0));
+  backToTopBtn.addEventListener('click', () => jumpToPoem(0));
   navBackShelf.addEventListener('click', exitToShelf);
   colophonShelfBtn.addEventListener('click', exitToShelf);
   brandLink.addEventListener('click', (e) => {
@@ -638,7 +932,66 @@
   });
 
   // ============================================
-  // CHOREOGRAPHED SCROLL ANIMATION LOOP
+  // TABLE OF CONTENTS DRAWER
+  // ============================================
+  function openToc() {
+    if (!activeCollection) return;
+    tocCollectionTitle.textContent = activeCollection.title;
+    tocList.innerHTML = '';
+
+    readerScenes.forEach((sc, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `toc-item${!inColophonMode && idx === activeSceneIndex ? ' is-current' : ''}`;
+      const marks = sc.underlinedSet.size;
+      btn.innerHTML = `
+        <span class="toc-item-left">
+          <span class="toc-num">${sc.poem.watermark}</span>
+          <span class="toc-title">${escapeHtml(sc.poem.title)}</span>
+        </span>
+        <span class="toc-marks">${marks > 0 ? `✦ ${marks}` : `${sc.stanzaEls.length} stanzas`}</span>
+      `;
+      btn.addEventListener('click', () => {
+        closeToc();
+        jumpToPoem(idx);
+      });
+      tocList.appendChild(btn);
+    });
+
+    const colBtn = document.createElement('button');
+    colBtn.type = 'button';
+    colBtn.className = `toc-item${inColophonMode ? ' is-current' : ''}`;
+    colBtn.innerHTML = `
+      <span class="toc-item-left">
+        <span class="toc-num">${String(readerScenes.length + 1).padStart(2, '0')}</span>
+        <span class="toc-title">Colophon &amp; Exhibition</span>
+      </span>
+      <span class="toc-marks">End</span>
+    `;
+    colBtn.addEventListener('click', () => {
+      closeToc();
+      jumpToColophon();
+    });
+    tocList.appendChild(colBtn);
+
+    document.body.classList.add('modal-open');
+    tocBackdrop.classList.add('is-open');
+    window.StanzaAudio?.playPaperRustle(0.04);
+  }
+
+  function closeToc() {
+    tocBackdrop.classList.remove('is-open');
+    document.body.classList.remove('modal-open');
+  }
+
+  navToc.addEventListener('click', openToc);
+  tocClose.addEventListener('click', closeToc);
+  tocBackdrop.addEventListener('click', (e) => {
+    if (e.target === tocBackdrop) closeToc();
+  });
+
+  // ============================================
+  // DESKTOP CHOREOGRAPHED SCROLL LOOP
   // ============================================
   function updatePlacard(sceneIdx, immediate = false) {
     const sc = readerScenes[sceneIdx];
@@ -651,6 +1004,7 @@
       placardSubtitle.textContent = sc.poem.subtitle || '';
       placardSubtitle.style.display = sc.poem.subtitle ? '' : 'none';
       updateShareButtonLink(sc);
+      refreshNoteButtonForScene(sc);
       placardTitle.classList.remove('switching');
       placardSubtitle.classList.remove('switching');
     };
@@ -660,7 +1014,7 @@
     } else {
       placardTitle.classList.add('switching');
       placardSubtitle.classList.add('switching');
-      setTimeout(apply, 200);
+      setTimeout(apply, 180);
     }
   }
 
@@ -674,6 +1028,8 @@
 
     if (newIdx !== activeSceneIndex) {
       activeSceneIndex = newIdx;
+      closeNotePopover();
+      persistProgress(activeSceneIndex);
       window.StanzaAudio?.playPaperRustle(0.048);
     }
 
@@ -681,7 +1037,6 @@
       updatePlacard(activeSceneIndex, false);
     }
 
-    // Compute active stanza within current poem from local scroll progress
     const sc = readerScenes[activeSceneIndex];
     const localP = clamp((p - sc.startP) / poemBandSpan, 0, 0.999);
     const stanzaCount = sc.stanzaEls.length;
@@ -690,14 +1045,7 @@
     if (targetStanzaIdx !== sc.focusedStanzaIdx) {
       centerFocusedStanza(sc, targetStanzaIdx);
     }
-
-    const stanzaTag = `Stanza ${sc.focusedStanzaIdx + 1} / ${stanzaCount}`;
-    if (stanzaTag !== lastStanzaTag) {
-      lastStanzaTag = stanzaTag;
-      revealPct.textContent = stanzaTag;
-      const fillPct = Math.round(((sc.focusedStanzaIdx + 1) / stanzaCount) * 100);
-      revealBarFill.style.width = `${fillPct}%`;
-    }
+    updateStanzaMeter(sc);
 
     const activeRailIdx = nowColophon ? total : activeSceneIndex;
     if (activeRailIdx !== lastRailIdx) {
@@ -715,11 +1063,12 @@
       backToTopBtn.classList.toggle('is-visible', inColophonMode);
       colophonEyebrow.style.opacity = inColophonMode ? '1' : '0';
       colophonEyebrow.style.transform = inColophonMode ? 'translateX(0)' : 'translateX(48px)';
+      if (inColophonMode) closeNotePopover();
     }
 
     const nextHint = inColophonMode
       ? `${activeCollection.title} · Complete`
-      : 'Scroll to Read Stanza by Stanza · Click Any Line to Underline';
+      : 'Scroll or Space to Read · Click Any Line to Underline';
     if (nextHint !== lastHintText) {
       lastHintText = nextHint;
       hintEl.textContent = nextHint;
@@ -727,7 +1076,7 @@
   }
 
   function animateReader() {
-    if (!isReaderMode || document.hidden) {
+    if (!isReaderMode || mobileLocked || document.hidden) {
       rafId = null;
       return;
     }
@@ -782,9 +1131,9 @@
 
         if (smoothScroll > 0.88) {
           const slideT = easeInOutCubic(clamp((smoothScroll - 0.88) / 0.11, 0, 1));
-          tx = viewW < 960 ? 0 : -slideT * viewW * 0.22;
+          tx = -slideT * viewW * 0.22;
           scale *= 1 - slideT * 0.14;
-          opacity *= viewW < 960 ? 1 - slideT * 0.88 : 1 - slideT * 0.35;
+          opacity *= 1 - slideT * 0.35;
         }
       } else {
         const inT = clamp((smoothScroll - (sStart - fadeInSpan * 0.4)) / fadeInSpan, 0, 1);
@@ -843,7 +1192,6 @@
     const epigraph = document.getElementById('col-epigraph').value.trim();
     const poemTitle = document.getElementById('first-poem-title').value.trim();
     const poemBody = document.getElementById('first-poem-body').value.trim();
-
     if (!title || !poemTitle || !poemBody) return;
 
     try {
@@ -868,7 +1216,7 @@
   window.addEventListener(
     'scroll',
     () => {
-      if (!isReaderMode) return;
+      if (!isReaderMode || mobileLocked) return;
       targetScroll = clamp(window.scrollY / maxScroll, 0, 1);
     },
     { passive: true }
@@ -884,7 +1232,6 @@
   );
 
   window.addEventListener('keydown', (e) => {
-    // Secret Owner Mode toggle: Shift + Alt + O
     if (e.shiftKey && e.altKey && (e.key === 'O' || e.key === 'o')) {
       isOwner = !isOwner;
       try {
@@ -893,23 +1240,41 @@
       } catch {}
       document.body.classList.toggle('is-owner', isOwner);
       renderShelf();
+      if (isReaderMode && readerScenes[activeSceneIndex]) {
+        refreshNoteButtonForScene(readerScenes[activeSceneIndex]);
+      }
       showToast(isOwner ? 'Owner Mode Enabled' : 'Owner Mode Disabled');
       return;
     }
 
+    if (tocBackdrop.classList.contains('is-open')) {
+      if (e.key === 'Escape') closeToc();
+      return;
+    }
     if (archiveModalBackdrop.classList.contains('is-open')) {
       if (e.key === 'Escape') closeArchiveModal();
       return;
     }
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
     if (!isReaderMode) return;
-    if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+
+    if (e.key === ' ' || e.key === 'ArrowRight') {
       e.preventDefault();
-      const cur = inColophonMode ? readerScenes.length : activeSceneIndex;
-      smoothScrollTo(chapterStops[Math.min(chapterStops.length - 1, cur + 1)]);
+      stepStanza(1);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      stepStanza(-1);
+    } else if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+      e.preventDefault();
+      if (inColophonMode) return;
+      if (activeSceneIndex + 1 < readerScenes.length) jumpToPoem(activeSceneIndex + 1);
+      else jumpToColophon();
     } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
       e.preventDefault();
       const cur = inColophonMode ? readerScenes.length : activeSceneIndex;
-      smoothScrollTo(chapterStops[Math.max(0, cur - 1)]);
+      jumpToPoem(Math.max(0, cur - 1));
+    } else if (e.key === 'Escape' && notePopover.classList.contains('is-open')) {
+      closeNotePopover();
     }
   });
 
@@ -925,7 +1290,7 @@
     if (document.hidden && rafId) {
       cancelAnimationFrame(rafId);
       rafId = null;
-    } else if (!document.hidden && isReaderMode && !rafId) {
+    } else if (!document.hidden && isReaderMode && !mobileLocked && !rafId) {
       rafId = requestAnimationFrame(animateReader);
     }
   });
@@ -935,6 +1300,7 @@
   // Initialize app
   (async function init() {
     detectOwnerMode();
+    syncThemeButton();
     setTimeout(() => {
       if (!curtainOpened) openCurtain();
     }, 600);
@@ -946,11 +1312,11 @@
     const modeParam = params.get('mode');
 
     if (colParam && modeParam === 'read') {
-      await enterCollectionExperience(colParam, true);
+      await enterCollectionExperience(colParam, true, 0);
     }
 
     setTimeout(() => {
       if (!curtainOpened) openCurtain();
-    }, 240);
+    }, 220);
   })();
 })();

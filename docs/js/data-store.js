@@ -581,7 +581,21 @@
     return { slug, volume: newCol.volume };
   }
 
-  async function createShareUrl({ collectionSlug, poemSlug, lines, cardStyle, showTitle, musicCode }) {
+  const THEME_KEY = 'stanza_theme_v1';
+  const PROGRESS_KEY = 'stanza_last_read_v1';
+  const NOTES_KEY = 'stanza_poem_notes_v1';
+
+  const BUILTIN_POEM_SLUGS = new Set(BUILTIN_COLLECTION.poems.map((p) => p.slug));
+
+  async function createShareUrl({
+    collectionSlug,
+    poemSlug,
+    lines,
+    cardStyle,
+    showTitle,
+    musicCode,
+    highlightIndex = -1
+  }) {
     if (IS_LOCAL_API) {
       try {
         const res = await fetch('api/shares', {
@@ -601,14 +615,21 @@
       } catch {}
     }
 
-    // Static GitHub Pages URL-encoded share link (works cross-device with zero backend!)
+    // Static GitHub Pages URL — uses per-poem share/<slug>.html for poem-specific Etched OG previews!
     const baseDir = window.location.href.split('?')[0].split('#')[0].replace(/\/[^/]*$/, '/');
-    const url = new URL('gallery.html', baseDir);
+    const targetPage =
+      collectionSlug === BUILTIN_COLLECTION.slug && BUILTIN_POEM_SLUGS.has(poemSlug)
+        ? `share/${poemSlug}.html`
+        : 'gallery.html';
+    const url = new URL(targetPage, baseDir);
     url.searchParams.set('share', '1');
     url.searchParams.set('col', collectionSlug);
     url.searchParams.set('poem', poemSlug);
-    url.searchParams.set('card', cardStyle || 'museum');
+    url.searchParams.set('card', cardStyle || 'etched');
     url.searchParams.set('title', showTitle ? '1' : '0');
+    if (highlightIndex >= 0 && highlightIndex < 4) {
+      url.searchParams.set('hl', String(highlightIndex));
+    }
     if (musicCode) url.searchParams.set('music', musicCode);
     url.searchParams.set('lines', encodeLines(lines));
     return url.toString();
@@ -617,7 +638,7 @@
   async function resolveShareFromLocation() {
     // 1. Check full-stack /share/:id route
     const pathMatch = window.location.pathname.match(/\/share\/([a-zA-Z0-9_-]+)$/);
-    if (pathMatch) {
+    if (pathMatch && !pathMatch[1].endsWith('.html')) {
       try {
         const res = await fetch(`/api/shares/${encodeURIComponent(pathMatch[1])}`);
         if (res.ok) return await res.json();
@@ -633,18 +654,63 @@
     const col = await getCollection(colSlug);
     const poem = (col.poems || []).find((p) => p.slug === poemSlug) || col.poems[0];
     const lines = decodeLines(params.get('lines') || '');
+    const hlRaw = params.get('hl');
+    const highlightIndex = hlRaw !== null && hlRaw !== '' ? parseInt(hlRaw, 10) : -1;
 
     return {
       collectionSlug: col.slug,
       poemSlug: poem.slug,
       lines: lines.length > 0 ? lines : (poem.stanzas[0] || []).slice(0, 4),
-      cardStyle: params.get('card') || 'museum',
+      cardStyle: params.get('card') || 'etched',
       showTitle: params.get('title') !== '0',
       musicCode: params.get('music') || '',
+      highlightIndex: Number.isNaN(highlightIndex) ? -1 : highlightIndex,
       collection: col,
       poem
     };
   }
+
+  // Theme persistence (Light Paper / Night Lamp)
+  function applySavedTheme() {
+    let saved = 'light';
+    try { saved = localStorage.getItem(THEME_KEY) || 'light'; } catch {}
+    document.documentElement.setAttribute('data-theme', saved);
+    return saved;
+  }
+
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem(THEME_KEY, next); } catch {}
+    return next;
+  }
+
+  function getLastRead() {
+    try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || 'null'); } catch { return null; }
+  }
+
+  function saveLastRead(info) {
+    try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(info)); } catch {}
+  }
+
+  function getPoemNote(poemKey) {
+    try {
+      const map = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+      return map[poemKey] || '';
+    } catch { return ''; }
+  }
+
+  function savePoemNote(poemKey, text) {
+    try {
+      const map = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+      if (text && text.trim()) map[poemKey] = text.trim();
+      else delete map[poemKey];
+      localStorage.setItem(NOTES_KEY, JSON.stringify(map));
+    } catch {}
+  }
+
+  applySavedTheme();
 
   window.StanzaStore = {
     DEFAULT_SLUG: BUILTIN_COLLECTION.slug,
@@ -652,6 +718,12 @@
     getCollection,
     createCollection,
     createShareUrl,
-    resolveShareFromLocation
+    resolveShareFromLocation,
+    applySavedTheme,
+    toggleTheme,
+    getLastRead,
+    saveLastRead,
+    getPoemNote,
+    savePoemNote
   };
 })();

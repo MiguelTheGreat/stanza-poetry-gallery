@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Stanza. | Exhibition Gallery</title>
-  <meta name="description" content="Explore the Stanza. poetry exhibition — hover to unveil stanzas, select up to 4 lines to craft custom shareable cards with optional Spotify or YouTube Music soundtracks.">
+  <meta name="description" content="Explore the Stanza. poetry exhibition — hover to unveil stanzas, select up to 4 lines to craft custom etched shareable cards with optional songs.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://miguelthegreat.github.io/stanza-poetry-gallery/gallery.html">
   <meta property="og:title" content="Cut on the Life of a Weeping Man | Stanza. Gallery">
@@ -18,10 +18,9 @@
   <meta name="twitter:image" content="https://miguelthegreat.github.io/stanza-poetry-gallery/assets/og-etched-card.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet"></noscript>
-  <link rel="stylesheet" href="css/base.css?v=6">
-  <link rel="stylesheet" href="css/gallery.css?v=6">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=11">
+  <link rel="stylesheet" href="css/gallery.css?v=11">
 </head>
 <body>
   <div class="paper-grain" aria-hidden="true"></div>
@@ -55,7 +54,8 @@
     </div>
     <div class="nav-right">
       <span class="nav-hint">Hover to unveil · Click to read &amp; share up to 4 lines</span>
-      <a href="index.html" id="back-to-experience" class="menu-item transition-link hover-target">Back to Experience</a>
+      <button type="button" id="nav-theme" class="menu-item hover-target" title="Toggle Night Lamp mode">Night</button>
+      <a href="index.html" id="back-to-experience" class="menu-item transition-link hover-target">Experience</a>
     </div>
   </nav>
 
@@ -72,11 +72,11 @@
 
       <div class="lb-controls">
         <div class="selection-pill" id="selection-pill">
-          <span>Selected: <strong id="selected-count">0 / 4</strong> lines</span>
+          <span><strong id="selected-count">0 / 4</strong> lines</span>
           <button type="button" class="selection-clear-btn" id="btn-clear-lines">Clear</button>
         </div>
         <button type="button" class="lb-btn lb-btn-accent" id="lb-share">Share Card</button>
-        <button type="button" class="lb-btn" id="lb-close">Close [ESC]</button>
+        <button type="button" class="lb-btn" id="lb-close">Close</button>
       </div>
     </header>
 
@@ -89,7 +89,7 @@
 
     <footer class="lightbox-footer">
       <button type="button" class="lb-btn" id="lb-prev">← Prev</button>
-      <div class="lb-caption" id="lb-caption">Click any line to highlight for your share card (up to 4 lines)</div>
+      <div class="lb-caption" id="lb-caption">Click any line to select (up to 4) · Swipe to flip poems</div>
       <button type="button" class="lb-btn" id="lb-next">Next →</button>
     </footer>
   </div>
@@ -110,7 +110,7 @@
 
         <div class="field-group">
           <div class="field-label-row">
-            <span class="field-label">Selected Verses</span>
+            <span class="field-label">Selected Verses <em class="field-hint">(tap line to highlight ✦)</em></span>
             <span class="field-count" id="share-lines-count">0 / 4 lines</span>
           </div>
           <div class="selected-lines-list" id="share-selected-lines"></div>
@@ -141,16 +141,29 @@
           <div class="toggle-switch"></div>
         </label>
 
+        <!-- Live Song Search + Optional URL Fallback -->
         <div class="field-group">
-          <label class="field-label" for="share-music-input">Soundtrack Link (Spotify or YouTube Music)</label>
-          <input
-            type="url"
-            id="share-music-input"
-            class="music-input"
-            placeholder="Paste a Spotify or YouTube Music URL (optional)"
-            autocomplete="off"
-          >
-          <div class="music-status" id="share-music-status">Optional — plays as an ambient soundtrack when the shared link is opened</div>
+          <label class="field-label" for="share-music-input">Attach Soundtrack (Search Song or Paste Link)</label>
+          <div class="song-search-wrap">
+            <input
+              type="text"
+              id="share-music-input"
+              class="music-input"
+              placeholder="Search any song or artist (e.g., Frank Ocean, Joji…)"
+              autocomplete="off"
+            >
+            <div class="song-results" id="song-results" role="listbox" aria-label="Song Search Results"></div>
+          </div>
+          <div class="attached-song-chip" id="attached-song-chip">
+            <img id="attached-song-art" src="" alt="" width="38" height="38">
+            <div class="attached-song-meta">
+              <strong id="attached-song-title"></strong>
+              <span id="attached-song-artist"></span>
+            </div>
+            <button type="button" class="attached-song-btn" id="attached-song-play" aria-label="Preview song">▶</button>
+            <button type="button" class="attached-song-btn" id="attached-song-clear" aria-label="Remove song">✕</button>
+          </div>
+          <div class="music-status" id="share-music-status">Search by title/artist or paste a Spotify / YouTube Music link</div>
         </div>
 
         <div class="share-actions">
@@ -158,9 +171,10 @@
           <button type="button" class="action-secondary" id="btn-share-fb">Share on FB ↗</button>
         </div>
 
-        <div class="share-actions">
-          <button type="button" class="action-secondary" id="btn-copy-link" style="flex: 1;">Copy Share Link</button>
-          <button type="button" class="action-secondary" id="btn-download-card">Download PNG</button>
+        <div class="share-actions share-actions-triple">
+          <button type="button" class="action-secondary" id="btn-copy-link">Copy Link</button>
+          <button type="button" class="action-secondary" id="btn-copy-quote">Copy Quote</button>
+          <button type="button" class="action-secondary" id="btn-download-card">Save PNG</button>
         </div>
       </div>
     </div>
@@ -187,10 +201,10 @@
 
   <div class="stanza-toast" id="stanza-toast" role="status" aria-live="polite"></div>
 
-  <script src="js/data-store.js?v=6"></script>
-  <script src="js/audio.js?v=6"></script>
-  <script src="js/cursor.js?v=6"></script>
-  <script src="js/share-cards.js?v=6"></script>
-  <script src="js/gallery.js?v=6"></script>
+  <script src="js/data-store.js?v=11"></script>
+  <script src="js/audio.js?v=11"></script>
+  <script src="js/cursor.js?v=11"></script>
+  <script src="js/share-cards.js?v=11"></script>
+  <script src="js/gallery.js?v=11"></script>
 </body>
 </html>

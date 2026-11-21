@@ -451,6 +451,93 @@ body.mode-reader #shelf-view {
   margin-top: clamp(0.45rem, 1.2dvh, 0.85rem);
 }
 
+.resume-reading-btn {
+  margin-top: 0.35rem;
+  background: none;
+  border: none;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.98rem;
+  color: var(--accent-warm);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  transition: opacity 0.25s ease, transform 0.35s var(--ease-expo);
+}
+
+.resume-reading-btn:hover {
+  opacity: 0.85;
+  transform: translateX(4px);
+}
+
+[data-theme="dark"] .folio-front {
+  background:
+    repeating-linear-gradient(0deg, rgba(239, 234, 224, 0.018) 0px, rgba(239, 234, 224, 0.018) 1px, transparent 1px, transparent 4px),
+    linear-gradient(142deg, #211f1c 0%, #191714 58%, #13110f 100%);
+  border-color: rgba(201, 158, 110, 0.34);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    -16px 22px 46px rgba(0, 0, 0, 0.58);
+}
+
+[data-theme="dark"] .folio-plate {
+  border-color: rgba(239, 234, 224, 0.2);
+  box-shadow:
+    inset 0 0 0 3px rgba(24, 22, 19, 0.9),
+    inset 0 0 0 4px rgba(201, 158, 110, 0.48);
+}
+
+[data-theme="dark"] .folio-cover-title {
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.65);
+}
+
+[data-theme="dark"] .folio-bottom-meta {
+  color: rgba(239, 234, 224, 0.45);
+}
+
+[data-theme="dark"] .folio-back {
+  background: #0e0d0b;
+}
+
+[data-theme="dark"] .btn-enter-exp {
+  background: var(--ink-primary);
+  color: #131210;
+  border-color: var(--ink-primary);
+}
+
+[data-theme="dark"] .btn-enter-exp:hover {
+  background: #ffffff;
+}
+
+[data-theme="dark"] .btn-open-gallery {
+  border-color: rgba(239, 234, 224, 0.28);
+}
+
+[data-theme="dark"] .btn-open-gallery:hover {
+  background: rgba(239, 234, 224, 0.08);
+}
+
+[data-theme="dark"] .contact-card {
+  background: var(--surface-card);
+  border-color: var(--border-subtle);
+}
+
+[data-theme="dark"] .contact-card.is-visible:hover {
+  background: #24211d;
+  border-color: rgba(239, 234, 224, 0.26);
+}
+
+[data-theme="dark"] .gallery-footer {
+  background: linear-gradient(180deg, rgba(19, 18, 16, 0), rgba(19, 18, 16, 0.85) 55%);
+}
+
+[data-theme="dark"] .ticker-item {
+  color: var(--ink-secondary);
+}
+
+[data-theme="dark"] .verse-line.is-underlined {
+  color: #ffffff;
+}
+
 .btn-enter-exp {
   font-family: var(--font-display);
   font-size: clamp(0.52rem, 1vw, 0.6rem);
@@ -725,13 +812,17 @@ body.mode-reader #reader-view {
 /* Full Poem Mode (clean single-column scrollable chapbook) */
 body.reading-full .stanza-viewport {
   overflow-y: auto;
-  mask-image: none;
-  -webkit-mask-image: none;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 5%, #000 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 5%, #000 94%, transparent 100%);
 }
 
 body.reading-full .stanza-track {
   transform: none !important;
-  padding: 0.5rem 0 3.5rem;
+  padding: 0.75rem 0 4.5rem;
   gap: 1.65rem;
 }
 
@@ -739,7 +830,7 @@ body.reading-full .stanza-block {
   opacity: 1;
   filter: none;
   transform: none;
-  border-left-color: rgba(26, 25, 23, 0.1);
+  border-left-color: var(--border-subtle);
 }
 
 /* Interactive Verse Line with Archival Pencil Underline */
@@ -1216,7 +1307,7 @@ body.reading-full .verse-line {
 
 .archive-modal {
   background: #1c1a17;
-  color: var(--bg-paper);
+  color: #f5f2e9;
   border: 1px solid rgba(245, 242, 233, 0.14);
   border-radius: 8px;
   width: min(620px, 95vw);
@@ -1251,7 +1342,7 @@ body.reading-full .verse-line {
 .modal-close-btn {
   background: none;
   border: 1px solid rgba(245, 242, 233, 0.25);
-  color: var(--bg-paper);
+  color: #f5f2e9;
   font-family: var(--font-display);
   font-size: 0.56rem;
   letter-spacing: 0.16em;
@@ -1262,8 +1353,8 @@ body.reading-full .verse-line {
 }
 
 .modal-close-btn:hover {
-  background: var(--bg-paper);
-  color: var(--ink-primary);
+  background: #f5f2e9;
+  color: #161513;
 }
 
 .form-grid {
@@ -1293,7 +1384,7 @@ body.reading-full .verse-line {
   border: 1px solid rgba(245, 242, 233, 0.16);
   border-radius: 6px;
   padding: 0.72rem 0.9rem;
-  color: var(--bg-paper);
+  color: #f5f2e9;
   font-family: var(--font-sans);
   font-size: 0.88rem;
   outline: none;
@@ -1315,9 +1406,9 @@ body.reading-full .verse-line {
 
 .modal-submit-btn {
   margin-top: 0.4rem;
-  background: var(--bg-paper);
-  color: var(--ink-primary);
-  border: 1px solid var(--bg-paper);
+  background: #f5f2e9;
+  color: #161513;
+  border: 1px solid #f5f2e9;
   font-family: var(--font-display);
   font-size: 0.62rem;
   letter-spacing: 0.2em;
@@ -1333,18 +1424,246 @@ body.reading-full .verse-line {
 }
 
 /* ============================================
-   RESPONSIVE BREAKPOINTS
+   TABLE OF CONTENTS DRAWER & MARGIN NOTE POPOVER
+   ============================================ */
+.placard-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobile-only-stanza {
+  display: none;
+}
+
+.toc-drawer {
+  background: #1a1815;
+  color: #f5f2e9;
+  border: 1px solid rgba(245, 242, 233, 0.14);
+  border-radius: 8px;
+  width: min(520px, 94vw);
+  max-height: 82dvh;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.25rem, 3vw, 1.9rem);
+  transform: translateY(18px) scale(0.97);
+  transition: transform 0.5s var(--ease-expo);
+}
+
+.modal-backdrop.is-open .toc-drawer {
+  transform: translateY(0) scale(1);
+}
+
+.toc-list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin-top: 0.25rem;
+}
+
+.toc-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0.65rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(245, 242, 233, 0.08);
+  color: rgba(245, 242, 233, 0.78);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease, padding-left 0.35s var(--ease-expo);
+}
+
+.toc-item:last-child {
+  border-bottom: none;
+}
+
+.toc-item:hover {
+  background: rgba(245, 242, 233, 0.05);
+  color: #ffffff;
+  padding-left: 1rem;
+}
+
+.toc-item.is-current {
+  color: #ffffff;
+  background: rgba(166, 124, 82, 0.14);
+}
+
+.toc-item-left {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.toc-num {
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  letter-spacing: 0.2em;
+  color: #c99e6e;
+  flex-shrink: 0;
+}
+
+.toc-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toc-marks {
+  font-family: var(--font-display);
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+  color: #c99e6e;
+  flex-shrink: 0;
+}
+
+/* Discreet Margin Note Popover */
+.margin-note-popover {
+  position: fixed;
+  right: clamp(1rem, 2.8vw, 2.15rem);
+  bottom: 7.5rem;
+  z-index: 65;
+  width: min(340px, calc(100vw - 2rem));
+  background: var(--surface-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.14);
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.45s var(--ease-expo);
+}
+
+.margin-note-popover.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.margin-note-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 0.54rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-warm);
+  margin-bottom: 0.55rem;
+}
+
+.margin-note-head button {
+  background: none;
+  border: none;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0 0.2rem;
+}
+
+.margin-note-body {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--ink-primary);
+  margin: 0;
+}
+
+.margin-note-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.margin-note-editor textarea {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.5rem 0.65rem;
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  color: var(--ink-primary);
+  resize: none;
+  outline: none;
+}
+
+.margin-note-editor button {
+  align-self: flex-end;
+  background: var(--ink-primary);
+  color: var(--bg-paper);
+  border: none;
+  border-radius: 999px;
+  padding: 0.42rem 0.9rem;
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* ============================================
+   MOBILE LOCKED READER VIEWPORT (Prevents Whole-Screen Swipe)
+   ============================================ */
+body.mobile-locked-reader {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+body.mobile-locked-reader #scroll-container {
+  display: none !important;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS (MOBILE & TABLET POLISH)
    ============================================ */
 @media (max-width: 960px) {
-  .shelf-count-note,
-  .shelf-footer {
-    display: none;
+  .top-header {
+    padding: 0.95rem 1.05rem;
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-subtle);
   }
 
-  .shelf-eyebrow-row {
-    justify-content: center;
-    text-align: center;
-    padding-bottom: 0.55rem;
+  .brand {
+    font-size: 0.95rem;
+    letter-spacing: 0.26em;
+  }
+
+  .top-menu {
+    gap: 0.85rem;
+  }
+
+  .menu-item {
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+  }
+
+  #nav-ambience {
+    display: none !important;
+  }
+
+  .shelf-footer {
+    display: none;
   }
 
   .album-card {
@@ -1353,8 +1672,8 @@ body.reading-full .verse-line {
   }
 
   .folio-stage {
-    width: min(280px, 42dvh, 72vw);
-    height: min(280px, 42dvh, 72vw);
+    width: min(275px, 41dvh, 72vw);
+    height: min(275px, 41dvh, 72vw);
   }
 
   .folio-book {
@@ -1365,12 +1684,18 @@ body.reading-full .verse-line {
     flex-wrap: wrap;
   }
 
-  .chapter-rail {
-    display: none;
+  .chapter-rail,
+  #hint,
+  .gallery-footer,
+  .desktop-only-stanza {
+    display: none !important;
   }
 
-  #hint {
-    display: none;
+  .mobile-only-stanza {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: var(--ink-secondary);
   }
 
   .mobile-nav-btn {
@@ -1378,53 +1703,124 @@ body.reading-full .verse-line {
     align-items: center;
     justify-content: center;
     min-width: 36px;
-    padding: 0.52rem 0.72rem;
+    padding: 0.5rem 0.68rem;
   }
 
   #poem-stage {
-    padding: 4.5rem 1.1rem 10.5rem;
+    padding: 4.1rem 1rem 8.9rem;
   }
 
   .poem-scene {
-    width: 92vw;
-    max-height: calc(100dvh - 14.5rem);
-    overflow-y: auto;
+    width: 100%;
+    max-width: 540px;
+    height: calc(100dvh - 13rem);
+    overflow: hidden;
     justify-content: flex-start;
-    padding-top: 0.5rem;
   }
 
-  .poem-spread {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+  .poem-scene-header {
+    margin-bottom: 0.65rem;
   }
 
-  .poem-spread::before {
-    display: none;
+  .poem-scene-title {
+    font-size: clamp(0.88rem, 4vw, 1.12rem);
+    letter-spacing: 0.14em;
+  }
+
+  .stanza-track {
+    padding: 10dvh 0 18dvh;
+    gap: 1.8rem;
+  }
+
+  .stanza-block {
+    padding-left: 0.95rem;
+  }
+
+  .verse-line {
+    font-size: clamp(1.12rem, 4.6vw, 1.35rem);
+    line-height: 1.5;
+  }
+
+  body.reading-full .verse-line {
+    font-size: clamp(1.04rem, 4.2vw, 1.22rem);
+  }
+
+  /* Unified, Clean Frosted Mobile Bottom Dock */
+  .reader-hud {
+    position: fixed;
+    left: 0.85rem;
+    right: 0.85rem;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    z-index: 48;
+    background: var(--surface-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 0.65rem 0.85rem 0.72rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    transition: opacity 0.5s var(--ease-expo), transform 0.5s var(--ease-expo);
+  }
+
+  .reader-hud.hud-hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
   }
 
   .artwork-placard {
-    left: 1rem;
-    right: 1rem;
-    bottom: 6.7rem;
+    position: static;
     max-width: none;
-    background: rgba(245, 242, 233, 0.84);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border-subtle);
-    border-radius: 10px;
-    padding: 0.65rem 0.9rem;
+    background: none;
+    border: none;
+    padding: 0;
+    backdrop-filter: none;
+    transform: none !important;
+  }
+
+  .placard-title {
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .reveal-meter {
+    margin-top: 0.35rem;
+  }
+
+  .reveal-bar-track {
+    width: 100%;
+    height: 2px;
   }
 
   .canvas-controls {
-    left: 1rem;
-    right: 1rem;
-    bottom: 3.1rem;
-    justify-content: center;
-    gap: 0.45rem;
+    position: static;
+    justify-content: space-between;
+    gap: 0.4rem;
+    width: 100%;
+  }
+
+  .canvas-controls .ctrl-btn {
+    padding: 0.5rem 0.72rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.12em;
+  }
+
+  .margin-note-popover {
+    bottom: 9.2rem;
+    left: 0.85rem;
+    right: 0.85rem;
+    width: auto;
   }
 
   #colophon-section {
     justify-content: center;
-    padding: 5.5rem 1.25rem 4rem;
+    padding: 4.5rem 1.25rem 2.5rem;
   }
 
   .contact-stack {
@@ -1432,3 +1828,4 @@ body.reading-full .verse-line {
     width: min(100%, 420px);
   }
 }
+

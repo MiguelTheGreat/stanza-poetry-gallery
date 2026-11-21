@@ -1,7 +1,7 @@
 /**
  * Stanza. — Gallery Mode Controller
  * Accordion Exhibition Strips + Fullscreen Poem Reader + 4-Line Selector
- * + 5-Style Share Card Studio + Full-Stack /api/shares + Shared Showcase
+ * + 5-Style Share Card Studio + Live Song Search + Line Highlight + Shared Showcase
  */
 (function () {
   const MAX_SELECTED_LINES = 4;
@@ -11,6 +11,7 @@
   const introContent = document.getElementById('intro-content');
   const galleryWrapper = document.getElementById('gallery-wrapper');
   const navCollectionName = document.getElementById('nav-collection-name');
+  const navThemeBtn = document.getElementById('nav-theme');
   const backToExperience = document.getElementById('back-to-experience');
   const toastEl = document.getElementById('stanza-toast');
 
@@ -32,9 +33,17 @@
   const shareLinesCountEl = document.getElementById('share-lines-count');
   const shareTitleToggle = document.getElementById('share-title-toggle');
   const shareMusicInput = document.getElementById('share-music-input');
+  const songResultsEl = document.getElementById('song-results');
+  const attachedSongChip = document.getElementById('attached-song-chip');
+  const attachedSongArt = document.getElementById('attached-song-art');
+  const attachedSongTitle = document.getElementById('attached-song-title');
+  const attachedSongArtist = document.getElementById('attached-song-artist');
+  const attachedSongPlay = document.getElementById('attached-song-play');
+  const attachedSongClear = document.getElementById('attached-song-clear');
   const shareMusicStatus = document.getElementById('share-music-status');
   const shareMusicPreview = document.getElementById('share-music-preview');
   const btnCopyLink = document.getElementById('btn-copy-link');
+  const btnCopyQuote = document.getElementById('btn-copy-quote');
   const btnDownloadCard = document.getElementById('btn-download-card');
 
   const cursorApi = window.StanzaCursor ? window.StanzaCursor.initCursor() : null;
@@ -49,6 +58,7 @@
     cardStyle: 'etched',
     format: 'story',
     showTitle: true,
+    highlightIndex: -1,
     music: null
   };
 
@@ -66,6 +76,33 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  function getMusicCardLabel(music) {
+    if (!music || music.invalid) return '';
+    if (music.trackName) {
+      return music.artistName ? `${music.trackName} — ${music.artistName}` : music.trackName;
+    }
+    return music.label || '';
+  }
+
+  // ============================================
+  // NIGHT LAMP THEME TOGGLE
+  // ============================================
+  function syncThemeButton() {
+    if (!navThemeBtn) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    navThemeBtn.textContent = isDark ? 'Paper' : 'Night';
+    navThemeBtn.classList.toggle('is-active', isDark);
+  }
+
+  if (navThemeBtn) {
+    syncThemeButton();
+    navThemeBtn.addEventListener('click', () => {
+      const next = window.StanzaStore?.toggleTheme?.() || 'light';
+      syncThemeButton();
+      showToast(next === 'dark' ? 'Night Lamp On' : 'Warm Paper Restored');
+    });
   }
 
   // ============================================
@@ -87,6 +124,7 @@
 
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
+      syncThemeButton();
       openCurtain();
     }
   });
@@ -164,9 +202,12 @@
       const strip = document.createElement('article');
       strip.className = 'gallery-strip';
       strip.dataset.index = String(idx);
+      strip.style.setProperty('--strip-idx', String(idx));
       strip.style.transitionDelay = `0s, 0s, 0s, ${(0.04 + idx * 0.05).toFixed(2)}s`;
 
-      const openingStanza = (poem.stanzas[0] || []).map((l) => escapeHtml(l)).join('<br>');
+      const openingStanza = (poem.stanzas[0] || [])
+        .map((l, lineIdx) => `<span class="preview-line" style="--li: ${lineIdx}">${escapeHtml(l)}</span>`)
+        .join('');
 
       strip.innerHTML = `
         <div class="strip-aura"></div>
@@ -257,6 +298,7 @@
     const existingPos = selectedLines.findIndex((s) => s.idx === idx);
     if (existingPos !== -1) {
       selectedLines.splice(existingPos, 1);
+      shareState.highlightIndex = -1;
     } else {
       if (selectedLines.length >= MAX_SELECTED_LINES) {
         showToast('Maximum 4 lines selected — deselect a line first');
@@ -264,6 +306,7 @@
       }
       selectedLines.push({ idx, text });
       selectedLines.sort((a, b) => a.idx - b.idx);
+      shareState.highlightIndex = -1;
     }
     updateSelectionUI();
   }
@@ -274,6 +317,7 @@
 
     const apply = () => {
       selectedLines = [];
+      shareState.highlightIndex = -1;
       lbIndex.textContent = poem.indexLabel;
       lbTitle.textContent = poem.title;
       lbSubtitle.textContent = collection.title;
@@ -335,11 +379,197 @@
   document.getElementById('lb-next').addEventListener('click', () => loadLightboxPoem(currentPoemIdx + 1, true));
   btnClearLines.addEventListener('click', () => {
     selectedLines = [];
+    shareState.highlightIndex = -1;
     updateSelectionUI();
   });
 
   lightbox.addEventListener('click', (e) => {
     if (e.target === lightbox) closeLightbox();
+  });
+
+  // Horizontal swipe inside Lightbox to flip poems on mobile
+  let lbTouchStartX = 0;
+  let lbTouchStartY = 0;
+  lbPoemStage.addEventListener(
+    'touchstart',
+    (e) => {
+      if (e.touches.length !== 1) return;
+      lbTouchStartX = e.touches[0].clientX;
+      lbTouchStartY = e.touches[0].clientY;
+    },
+    { passive: true }
+  );
+
+  lbPoemStage.addEventListener(
+    'touchend',
+    (e) => {
+      if (!lightbox.classList.contains('is-open') || shareModal.classList.contains('is-open')) return;
+      if (!e.changedTouches || e.changedTouches.length === 0) return;
+      const dx = e.changedTouches[0].clientX - lbTouchStartX;
+      const dy = e.changedTouches[0].clientY - lbTouchStartY;
+      if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        if (dx < 0) loadLightboxPoem(currentPoemIdx + 1, true);
+        else loadLightboxPoem(currentPoemIdx - 1, true);
+      }
+    },
+    { passive: true }
+  );
+
+  // ============================================
+  // LIVE SONG SEARCH & AUDITION ENGINE
+  // ============================================
+  const auditionAudio = new Audio();
+  auditionAudio.volume = 0.78;
+  let auditionTrackId = null;
+  let auditionBtnEl = null;
+  let songSearchTimer = null;
+  let songSearchSeq = 0;
+
+  function stopAudition() {
+    auditionAudio.pause();
+    auditionAudio.removeAttribute('src');
+    auditionTrackId = null;
+    if (auditionBtnEl) {
+      auditionBtnEl.textContent = '▶';
+      auditionBtnEl.classList.remove('is-playing');
+      auditionBtnEl = null;
+    }
+    if (attachedSongPlay) {
+      attachedSongPlay.textContent = '▶';
+      attachedSongPlay.classList.remove('is-playing');
+    }
+    songResultsEl?.querySelectorAll('.song-audition-btn.is-playing').forEach((b) => {
+      b.textContent = '▶';
+      b.classList.remove('is-playing');
+    });
+  }
+
+  auditionAudio.addEventListener('ended', stopAudition);
+
+  function toggleAudition(track, triggerBtn) {
+    if (!track || !track.previewUrl) return;
+    if (auditionTrackId === track.trackId && !auditionAudio.paused) {
+      stopAudition();
+      return;
+    }
+    stopAudition();
+    auditionTrackId = track.trackId;
+    auditionBtnEl = triggerBtn;
+    auditionAudio.src = track.previewUrl;
+    auditionAudio.play().then(
+      () => {
+        if (triggerBtn) {
+          triggerBtn.textContent = '❚❚';
+          triggerBtn.classList.add('is-playing');
+        }
+      },
+      () => {
+        stopAudition();
+        showToast('Preview unavailable for this track');
+      }
+    );
+  }
+
+  function closeSongDropdown() {
+    if (songResultsEl) songResultsEl.classList.remove('is-open');
+  }
+
+  function attachItunesTrack(track) {
+    stopAudition();
+    shareState.music = track;
+    shareMusicInput.value = '';
+    closeSongDropdown();
+    window.StanzaShare.mountMusicEmbed(shareMusicPreview, null);
+
+    if (attachedSongArt) {
+      attachedSongArt.src = track.artwork || '';
+      attachedSongArt.alt = track.trackName || '';
+    }
+    if (attachedSongTitle) attachedSongTitle.textContent = track.trackName || '';
+    if (attachedSongArtist) attachedSongArtist.textContent = track.artistName || '';
+    if (attachedSongChip) attachedSongChip.classList.add('is-visible');
+
+    shareMusicStatus.classList.remove('invalid');
+    shareMusicStatus.classList.add('valid');
+    shareMusicStatus.textContent = `✓ Attached “${track.trackName}” — ${track.artistName}`;
+    refreshSharePreview();
+  }
+
+  function clearAttachedSong() {
+    stopAudition();
+    shareState.music = null;
+    if (attachedSongChip) attachedSongChip.classList.remove('is-visible');
+    window.StanzaShare.mountMusicEmbed(shareMusicPreview, null);
+    shareMusicStatus.classList.remove('valid', 'invalid');
+    shareMusicStatus.textContent = 'Search by title/artist or paste a Spotify / YouTube Music link';
+    refreshSharePreview();
+  }
+
+  function renderSongResults(tracks, queryText) {
+    if (!songResultsEl) return;
+    songResultsEl.innerHTML = '';
+    if (!tracks || tracks.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'song-result-row';
+      empty.style.cursor = 'default';
+      empty.innerHTML = `
+        <div class="song-result-info">
+          <strong>No matching songs for “${escapeHtml(queryText)}”</strong>
+          <span>Try another title/artist or paste a Spotify / YouTube link</span>
+        </div>
+      `;
+      songResultsEl.appendChild(empty);
+      songResultsEl.classList.add('is-open');
+      return;
+    }
+
+    tracks.forEach((track) => {
+      const row = document.createElement('div');
+      row.className = 'song-result-row';
+      row.setAttribute('role', 'option');
+      row.innerHTML = `
+        <img src="${escapeHtml(track.artwork)}" alt="" width="36" height="36" loading="lazy">
+        <div class="song-result-info">
+          <strong>${escapeHtml(track.trackName)}</strong>
+          <span>${escapeHtml(track.artistName)}</span>
+        </div>
+        <button type="button" class="song-audition-btn" title="Preview 30s clip" aria-label="Preview ${escapeHtml(track.trackName)}">▶</button>
+      `;
+
+      const auditionBtn = row.querySelector('.song-audition-btn');
+      auditionBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleAudition(track, auditionBtn);
+      });
+
+      row.addEventListener('click', () => attachItunesTrack(track));
+      songResultsEl.appendChild(row);
+    });
+
+    songResultsEl.classList.add('is-open');
+  }
+
+  if (attachedSongPlay) {
+    attachedSongPlay.addEventListener('click', () => {
+      if (shareState.music && shareState.music.provider === 'itunes') {
+        toggleAudition(shareState.music, attachedSongPlay);
+      }
+    });
+  }
+
+  if (attachedSongClear) {
+    attachedSongClear.addEventListener('click', () => {
+      shareMusicInput.value = '';
+      clearAttachedSong();
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (songResultsEl && songResultsEl.classList.contains('is-open')) {
+      if (!e.target.closest('.song-search-wrap')) {
+        closeSongDropdown();
+      }
+    }
   });
 
   // ============================================
@@ -349,17 +579,36 @@
     shareLinesCountEl.textContent = `${selectedLines.length} / ${MAX_SELECTED_LINES} lines`;
     shareSelectedLinesEl.innerHTML = '';
 
-    selectedLines.forEach((item) => {
+    if (shareState.highlightIndex >= selectedLines.length) {
+      shareState.highlightIndex = -1;
+    }
+
+    selectedLines.forEach((item, chipIdx) => {
+      const isHighlighted = chipIdx === shareState.highlightIndex;
       const chip = document.createElement('div');
-      chip.className = 'selected-line-chip';
+      chip.className = `selected-line-chip${isHighlighted ? ' is-highlighted' : ''}`;
+      chip.title = isHighlighted ? 'Tap to remove bronze emphasis' : 'Tap to emphasize this line in bronze';
       chip.innerHTML = `
-        <span>“${escapeHtml(item.text)}”</span>
+        <span>${isHighlighted ? '<span class="chip-star">✦</span>' : ''}“${escapeHtml(item.text)}”</span>
         <button type="button" class="chip-remove" title="Remove line" aria-label="Remove line">✕</button>
       `;
-      chip.querySelector('.chip-remove').addEventListener('click', () => {
+
+      chip.addEventListener('click', () => {
+        shareState.highlightIndex = shareState.highlightIndex === chipIdx ? -1 : chipIdx;
+        renderSelectedLineChips();
+        refreshSharePreview();
+      });
+
+      chip.querySelector('.chip-remove').addEventListener('click', (e) => {
+        e.stopPropagation();
         if (selectedLines.length <= 1) {
           showToast('At least 1 line is needed for a share card');
           return;
+        }
+        if (shareState.highlightIndex === chipIdx) {
+          shareState.highlightIndex = -1;
+        } else if (shareState.highlightIndex > chipIdx) {
+          shareState.highlightIndex -= 1;
         }
         selectedLines = selectedLines.filter((s) => s.idx !== item.idx);
         updateSelectionUI();
@@ -380,7 +629,9 @@
       cardStyle: shareState.cardStyle,
       format: shareState.format,
       showTitle: shareState.showTitle,
-      hasMusic: !!(shareState.music && !shareState.music.invalid)
+      hasMusic: !!(shareState.music && !shareState.music.invalid),
+      musicLabel: getMusicCardLabel(shareState.music),
+      highlightIndex: shareState.highlightIndex
     });
   }
 
@@ -392,6 +643,7 @@
     if (selectedLines.length === 0) {
       const firstStanza = (poem.stanzas[0] || []).slice(0, MAX_SELECTED_LINES);
       selectedLines = firstStanza.map((text, idx) => ({ idx, text }));
+      shareState.highlightIndex = -1;
       updateSelectionUI();
     }
 
@@ -402,6 +654,8 @@
   }
 
   function closeShareModal() {
+    stopAudition();
+    closeSongDropdown();
     shareModal.classList.remove('is-open');
   }
 
@@ -433,24 +687,71 @@
   });
 
   shareMusicInput.addEventListener('input', () => {
-    const parsed = window.StanzaShare.parseMusicUrl(shareMusicInput.value);
-    shareMusicStatus.classList.remove('valid', 'invalid');
-    if (!parsed) {
-      shareState.music = null;
-      shareMusicStatus.textContent = 'Optional — plays as an ambient soundtrack when the shared link is opened';
-      window.StanzaShare.mountMusicEmbed(shareMusicPreview, null);
-    } else if (parsed.invalid) {
-      shareState.music = null;
-      shareMusicStatus.textContent = 'Paste a valid Spotify (track/album/playlist) or YouTube Music URL';
-      shareMusicStatus.classList.add('invalid');
-      window.StanzaShare.mountMusicEmbed(shareMusicPreview, null);
-    } else {
-      shareState.music = parsed;
-      shareMusicStatus.textContent = `✓ Attached ${parsed.label} soundtrack`;
-      shareMusicStatus.classList.add('valid');
-      window.StanzaShare.mountMusicEmbed(shareMusicPreview, parsed);
+    clearTimeout(songSearchTimer);
+    const val = shareMusicInput.value.trim();
+
+    if (!val) {
+      closeSongDropdown();
+      if (!shareState.music || shareState.music.provider !== 'itunes') {
+        clearAttachedSong();
+      }
+      return;
     }
-    refreshSharePreview();
+
+    // Check if user pasted a direct Spotify or YouTube Music URL
+    const parsedUrl = window.StanzaShare.parseMusicUrl(val);
+    if (parsedUrl && parsedUrl.provider !== 'itunes') {
+      stopAudition();
+      closeSongDropdown();
+      if (attachedSongChip) attachedSongChip.classList.remove('is-visible');
+      shareState.music = parsedUrl;
+      shareMusicStatus.classList.remove('invalid');
+      shareMusicStatus.classList.add('valid');
+      shareMusicStatus.textContent = `✓ Attached ${parsedUrl.label} soundtrack`;
+      window.StanzaShare.mountMusicEmbed(shareMusicPreview, parsedUrl);
+      refreshSharePreview();
+      return;
+    }
+
+    // If it looks like an unsupported URL, warn cleanly instead of searching
+    if (/^https?:\/\//i.test(val)) {
+      closeSongDropdown();
+      shareMusicStatus.classList.remove('valid');
+      shareMusicStatus.classList.add('invalid');
+      shareMusicStatus.textContent = 'Paste a Spotify or YouTube Music URL, or type a song title to search';
+      return;
+    }
+
+    if (val.length < 2) {
+      closeSongDropdown();
+      return;
+    }
+
+    const seq = ++songSearchSeq;
+    shareMusicStatus.classList.remove('valid', 'invalid');
+    shareMusicStatus.textContent = 'Searching songs…';
+
+    songSearchTimer = setTimeout(async () => {
+      try {
+        const tracks = await window.StanzaShare.searchSongs(val);
+        if (seq !== songSearchSeq) return;
+        renderSongResults(tracks, val);
+        if (shareState.music && shareState.music.provider === 'itunes') {
+          shareMusicStatus.classList.add('valid');
+          shareMusicStatus.textContent = `✓ Attached “${shareState.music.trackName}” — ${shareState.music.artistName}`;
+        } else {
+          shareMusicStatus.textContent =
+            tracks.length > 0
+              ? 'Tap ▶ to preview, or click a song to attach it to your card'
+              : 'No matches found — try another song or paste a Spotify/YouTube link';
+        }
+      } catch {
+        if (seq !== songSearchSeq) return;
+        closeSongDropdown();
+        shareMusicStatus.classList.add('invalid');
+        shareMusicStatus.textContent = 'Could not reach song search — you can still paste a Spotify or YouTube link';
+      }
+    }, 280);
   });
 
   async function buildCurrentShareLink() {
@@ -461,7 +762,8 @@
       lines: selectedLines.map((s) => s.text),
       cardStyle: shareState.cardStyle,
       showTitle: shareState.showTitle,
-      musicCode: shareState.music && !shareState.music.invalid ? shareState.music.code : ''
+      musicCode: shareState.music && !shareState.music.invalid ? shareState.music.code : '',
+      highlightIndex: shareState.highlightIndex
     });
   }
 
@@ -470,7 +772,6 @@
     const poem = poems[currentPoemIdx];
     if (!poem || selectedLines.length === 0) return;
 
-    // Ensure 9:16 Story canvas is rendered for crisp Story sharing
     const storyCanvas = document.createElement('canvas');
     window.StanzaShare.renderPoetryCard(storyCanvas, {
       collection,
@@ -479,7 +780,9 @@
       cardStyle: shareState.cardStyle,
       format: 'story',
       showTitle: shareState.showTitle,
-      hasMusic: !!(shareState.music && !shareState.music.invalid)
+      hasMusic: !!(shareState.music && !shareState.music.invalid),
+      musicLabel: getMusicCardLabel(shareState.music),
+      highlightIndex: shareState.highlightIndex
     });
 
     const shareUrl = await buildCurrentShareLink();
@@ -503,7 +806,6 @@
       if (err && err.name === 'AbortError') return;
     }
 
-    // Desktop fallback: download 9:16 Story PNG + copy share link for Story sticker
     downloadCanvasPng(storyCanvas, filename);
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -513,7 +815,7 @@
     }
   });
 
-  // Share directly on Facebook with Etched Card OG preview + quote
+  // Share directly on Facebook with Poem-Specific Etched Card OG preview + quote
   document.getElementById('btn-share-fb').addEventListener('click', async () => {
     const poem = poems[currentPoemIdx];
     if (!poem || selectedLines.length === 0) return;
@@ -523,33 +825,61 @@
     window.open(fbUrl, '_blank', 'noopener,noreferrer,width=640,height=540');
   });
 
-  // Persist share card via StanzaStore (Express /api/shares or static GitHub Pages URL)
+  // Copy Share Link
   btnCopyLink.addEventListener('click', async () => {
     const poem = poems[currentPoemIdx];
     if (!poem || selectedLines.length === 0) return;
 
-    btnCopyLink.textContent = 'Creating Link…';
+    btnCopyLink.textContent = 'Creating…';
     try {
       const fullUrl = await buildCurrentShareLink();
-
       try {
         await navigator.clipboard.writeText(fullUrl);
-        btnCopyLink.textContent = 'Share Link Copied ✓';
+        btnCopyLink.textContent = 'Copied ✓';
         showToast('Share Link Copied to Clipboard');
       } catch {
         window.prompt('Copy your Stanza share link:', fullUrl);
-        btnCopyLink.textContent = 'Link Ready ✓';
+        btnCopyLink.textContent = 'Ready ✓';
       }
     } catch {
-      btnCopyLink.textContent = 'Copy Share Link';
+      btnCopyLink.textContent = 'Copy Link';
       showToast('Could not create share link');
       return;
     }
 
     setTimeout(() => {
-      btnCopyLink.textContent = 'Copy Share Link';
-    }, 2400);
+      btnCopyLink.textContent = 'Copy Link';
+    }, 2200);
   });
+
+  // 1-Tap Copy Formatted Quote + Share Link
+  if (btnCopyQuote) {
+    btnCopyQuote.addEventListener('click', async () => {
+      const poem = poems[currentPoemIdx];
+      if (!poem || selectedLines.length === 0) return;
+
+      try {
+        const shareUrl = await buildCurrentShareLink();
+        const quotedLines = selectedLines.map((s) => s.text).join('\n');
+        const formatted = `“${quotedLines}”\n— ${poem.title} (${collection.title})\n${shareUrl}`;
+        try {
+          await navigator.clipboard.writeText(formatted);
+          btnCopyQuote.textContent = 'Copied ✓';
+          showToast('Quote & Link Copied');
+        } catch {
+          window.prompt('Copy this formatted verse:', formatted);
+          btnCopyQuote.textContent = 'Ready ✓';
+        }
+      } catch {
+        showToast('Could not copy quote');
+        return;
+      }
+
+      setTimeout(() => {
+        btnCopyQuote.textContent = 'Copy Quote';
+      }, 2200);
+    });
+  }
 
   function downloadCanvasPng(canvasEl, filename) {
     const a = document.createElement('a');
@@ -567,7 +897,13 @@
   // Keyboard shortcuts
   window.addEventListener('keydown', (e) => {
     if (shareModal.classList.contains('is-open')) {
-      if (e.key === 'Escape') closeShareModal();
+      if (e.key === 'Escape') {
+        if (songResultsEl && songResultsEl.classList.contains('is-open')) {
+          closeSongDropdown();
+        } else {
+          closeShareModal();
+        }
+      }
       return;
     }
     if (!lightbox.classList.contains('is-open')) return;
@@ -585,7 +921,6 @@
 
     const showcase = document.getElementById('shared-showcase');
     const showcaseCanvas = document.getElementById('showcase-canvas');
-    const showcaseGlow = document.getElementById('showcase-glow');
     const showcaseExpLink = document.getElementById('showcase-experience-link');
 
     if (data.collection?.slug) {
@@ -595,7 +930,12 @@
     showcase.classList.add('is-open');
     document.body.classList.add('modal-open');
 
-    const parsedMusic = window.StanzaShare.parseMusicUrl(data.musicCode || '');
+    let parsedMusic = window.StanzaShare.parseMusicUrl(data.musicCode || '');
+    if (parsedMusic && parsedMusic.provider === 'itunes' && parsedMusic.trackId) {
+      const resolved = await window.StanzaShare.lookupSong(parsedMusic.trackId);
+      if (resolved) parsedMusic = resolved;
+    }
+
     await document.fonts.ready;
     window.StanzaShare.renderPoetryCard(showcaseCanvas, {
       collection: data.collection,
@@ -603,7 +943,9 @@
       lines: data.lines,
       cardStyle: data.cardStyle,
       showTitle: data.showTitle,
-      hasMusic: !!(parsedMusic && !parsedMusic.invalid)
+      hasMusic: !!(parsedMusic && !parsedMusic.invalid),
+      musicLabel: getMusicCardLabel(parsedMusic),
+      highlightIndex: typeof data.highlightIndex === 'number' ? data.highlightIndex : -1
     });
 
     const stopAudio = window.StanzaShare.setupShowcaseAudio(parsedMusic);
@@ -631,6 +973,7 @@
   // ============================================
   (async function init() {
     bindTransitionLinks();
+    syncThemeButton();
 
     const sharedCollectionSlug = await initSharedShowcaseIfPresent();
     const params = new URLSearchParams(window.location.search);

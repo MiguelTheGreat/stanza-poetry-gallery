@@ -19,8 +19,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=14">
-  <link rel="stylesheet" href="css/experience.css?v=14">
+  <link rel="stylesheet" href="css/base.css?v=15">
+  <link rel="stylesheet" href="css/experience.css?v=15">
 </head>
 <body>
   <div class="paper-grain" aria-hidden="true"></div>
@@ -69,14 +69,16 @@
        ============================================ -->
   <main id="shelf-view" aria-label="Poetry Collection Shelf">
     <section class="shelf-hero">
+      <button type="button" id="shelf-prev" class="shelf-nav-arrow shelf-nav-prev hover-target" aria-label="Previous volume">←</button>
       <div class="vinyl-shelf-stage" id="vinyl-shelf-stage" aria-live="polite">
         <!-- Populated dynamically -->
       </div>
+      <button type="button" id="shelf-next" class="shelf-nav-arrow shelf-nav-next hover-target" aria-label="Next volume">→</button>
     </section>
 
     <footer class="shelf-footer">
       <span>Stanza. Digital Poetry House</span>
-      <span>Click volume to enter Experience Mode</span>
+      <span id="shelf-footer-hint">Click volume to enter Experience Mode · Use ← → to switch volumes</span>
     </footer>
   </main>
 
@@ -225,9 +227,9 @@
 
   <div class="stanza-toast" id="stanza-toast" role="status" aria-live="polite"></div>
 
-  <script src="js/data-store.js?v=14"></script>
-  <script src="js/audio.js?v=14"></script>
-  <script src="js/cursor.js?v=14"></script>
-  <script src="js/experience.js?v=14"></script>
+  <script src="js/data-store.js?v=15"></script>
+  <script src="js/audio.js?v=15"></script>
+  <script src="js/cursor.js?v=15"></script>
+  <script src="js/experience.js?v=15"></script>
 </body>
 </html>

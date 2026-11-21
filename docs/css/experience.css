@@ -168,37 +168,129 @@ body.mode-reader #shelf-view {
   margin: 0;
 }
 
-/* Centered 3D Stage — overflow: visible on desktop so 3D rotated corners are NEVER clipped */
+/* Centered 3D Diagonal Carousel Stage (Apple 100 Best Albums style) */
 .vinyl-shelf-stage {
   position: relative;
   flex: 1;
   min-height: 0;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1.5rem, 4vw, 3.8rem);
+  height: 100%;
   overflow: visible;
-  padding: 0 clamp(1rem, 3vw, 2.5rem);
+  perspective: 1400px;
 }
 
-/* Featured Collection — Centered Apple 100 Best Albums Isometric Slab */
+.shelf-nav-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink-primary);
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.35s var(--ease-expo), background-color 0.25s ease, opacity 0.35s ease, border-color 0.25s ease;
+}
+
+.shelf-nav-prev { left: clamp(0.85rem, 2.8vw, 2.4rem); }
+.shelf-nav-next { right: clamp(0.85rem, 2.8vw, 2.4rem); }
+
+.shelf-nav-arrow:hover {
+  background: var(--ink-primary);
+  color: var(--bg-paper);
+  border-color: var(--ink-primary);
+  transform: translateY(-50%) scale(1.07);
+}
+
+.shelf-nav-arrow.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Featured Collection — Centered Active Slab + Diagonal Off-Center Neighbor Peeks */
 .album-card {
-  flex: 0 1 auto;
-  width: min(450px, 44vw);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(520px, 88vw);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: clamp(0.35rem, 1dvh, 0.65rem);
-  position: relative;
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    transform 0.95s cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 0.7s ease,
+    filter 0.7s ease;
+  will-change: transform, opacity;
+  z-index: 10;
+}
+
+.album-card.is-prev {
+  transform: translate(-50%, -50%) translate3d(-46vw, 25vh, 0) scale(0.54);
+  opacity: 0.82;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.album-card.is-next {
+  transform: translate(-50%, -50%) translate3d(46vw, -25vh, 0) scale(0.54);
+  opacity: 0.82;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.album-card.is-prev:hover {
+  transform: translate(-50%, -50%) translate3d(-43vw, 22vh, 0) scale(0.6);
+  opacity: 0.96;
+}
+
+.album-card.is-next:hover {
+  transform: translate(-50%, -50%) translate3d(43vw, -22vh, 0) scale(0.6);
+  opacity: 0.96;
+}
+
+.album-card.is-far-prev {
+  transform: translate(-50%, -50%) translate3d(-78vw, 44vh, 0) scale(0.36);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.album-card.is-far-next {
+  transform: translate(-50%, -50%) translate3d(78vw, -44vh, 0) scale(0.36);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.album-card:not(.is-active) .slab-number,
+.album-card:not(.is-active) .album-details {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.album-card.is-active .slab-number,
+.album-card.is-active .album-details {
+  opacity: 1;
+  transition: opacity 0.55s ease 0.2s;
 }
 
 /* Floating Bronze Volume Number above the Slab */
 .slab-number {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(1.5rem, min(3.6vw, 4dvh), 2.4rem);
+  font-size: clamp(1.5rem, min(4vw, 4.2dvh), 2.55rem);
   letter-spacing: 0.08em;
   line-height: 1;
   margin-bottom: 0;
@@ -212,8 +304,8 @@ body.mode-reader #shelf-view {
 
 .folio-stage {
   position: relative;
-  width: min(325px, 43dvh, 34vw);
-  height: min(325px, 43dvh, 34vw);
+  width: min(350px, 46dvh, 72vw);
+  height: min(350px, 46dvh, 72vw);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1667,22 +1759,25 @@ body.mobile-locked-reader #scroll-container {
     display: none;
   }
 
-  .vinyl-shelf-stage {
-    justify-content: flex-start;
-    overflow-x: auto;
-    overflow-y: visible;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-    padding: 0 4vw;
-    gap: 1.5rem;
+  .shelf-nav-arrow {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
   }
 
   .album-card {
-    flex: 0 0 92vw;
-    width: 92vw;
-    scroll-snap-align: center;
+    width: 90vw;
     gap: 0.45rem;
+  }
+
+  .album-card.is-prev {
+    transform: translate(-50%, -50%) translate3d(-44vw, 24vh, 0) scale(0.42);
+    opacity: 0.65;
+  }
+
+  .album-card.is-next {
+    transform: translate(-50%, -50%) translate3d(44vw, -24vh, 0) scale(0.42);
+    opacity: 0.65;
   }
 
   .folio-stage {

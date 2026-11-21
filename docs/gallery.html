@@ -19,8 +19,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/base.css?v=14">
-  <link rel="stylesheet" href="css/gallery.css?v=14">
+  <link rel="stylesheet" href="css/base.css?v=15">
+  <link rel="stylesheet" href="css/gallery.css?v=15">
 </head>
 <body>
   <div class="paper-grain" aria-hidden="true"></div>
@@ -53,11 +53,18 @@
       <span class="nav-collection-name" id="nav-collection-name">Cut on the Life of a Weeping Man</span>
     </div>
     <div class="nav-right">
-      <span class="nav-hint">Hover to unveil · Click to read &amp; share up to 4 lines</span>
+      <span class="nav-hint" id="nav-hint">Hover to unveil · Click to read &amp; share up to 4 lines</span>
+      <button type="button" id="nav-volumes-btn" class="menu-item hover-target" style="display: none;">← Volumes</button>
       <button type="button" id="nav-theme" class="menu-item hover-target" title="Toggle Night Lamp mode">Night</button>
       <a href="index.html" id="back-to-experience" class="menu-item transition-link hover-target">Experience</a>
     </div>
   </nav>
+
+  <!-- Horizontal Volume Index (shown when entering Gallery from Main Menu) -->
+  <section class="gallery-volumes" id="gallery-volumes" aria-label="Poetry Volumes"></section>
+
+  <!-- 90-Degree Rotating & Spreading Divider Lines Transition Layer -->
+  <div class="gallery-grid-transition" id="gallery-grid-transition" aria-hidden="true"></div>
 
   <!-- Accordion Exhibition Strips -->
   <main class="gallery-wrapper" id="gallery-wrapper" aria-label="Poetry Exhibition Strips"></main>
@@ -201,10 +208,10 @@
 
   <div class="stanza-toast" id="stanza-toast" role="status" aria-live="polite"></div>
 
-  <script src="js/data-store.js?v=14"></script>
-  <script src="js/audio.js?v=14"></script>
-  <script src="js/cursor.js?v=14"></script>
-  <script src="js/share-cards.js?v=14"></script>
-  <script src="js/gallery.js?v=14"></script>
+  <script src="js/data-store.js?v=15"></script>
+  <script src="js/audio.js?v=15"></script>
+  <script src="js/cursor.js?v=15"></script>
+  <script src="js/share-cards.js?v=15"></script>
+  <script src="js/gallery.js?v=15"></script>
 </body>
 </html>

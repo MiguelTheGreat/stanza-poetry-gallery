@@ -67,6 +67,214 @@ body.gallery-ready .nav {
 }
 
 /* ============================================
+   HORIZONTAL VOLUME CHOOSER (Gallery Welcome Index)
+   ============================================ */
+.gallery-volumes {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  flex-direction: column;
+  padding-top: 4.5rem;
+  background-color: var(--bg-paper);
+  overflow: hidden;
+}
+
+body.mode-volumes .gallery-volumes {
+  display: flex;
+}
+
+body.mode-volumes .gallery-wrapper {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gallery-volumes.is-leaving {
+  pointer-events: none;
+}
+
+.gallery-volumes.is-leaving .volume-band {
+  border-bottom-color: transparent;
+}
+
+.gallery-volumes.is-leaving .volume-band-inner {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.volume-band {
+  position: relative;
+  flex: var(--band-flex, 1);
+  min-height: 0;
+  width: 100%;
+  border-bottom: 1px solid var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 3.5vh, 3rem) clamp(1.5rem, 5.5vw, 5.5rem);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    flex 0.92s cubic-bezier(0.19, 1, 0.22, 1),
+    background-color 0.6s ease,
+    border-color 0.35s ease,
+    opacity 0.55s ease;
+}
+
+.volume-band:last-child {
+  border-bottom: none;
+}
+
+.volume-band:hover {
+  background-color: var(--bg-paper-focus);
+}
+
+.volume-band-aura {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 253, 248, 0.92) 0%, rgba(245, 242, 233, 0.14) 62%, transparent 100%);
+  transition: opacity 0.55s ease;
+}
+
+[data-theme="dark"] .volume-band-aura {
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(42, 38, 33, 0.78) 0%, rgba(24, 22, 19, 0.14) 62%, transparent 100%);
+}
+
+.volume-band:hover .volume-band-aura {
+  opacity: 1;
+}
+
+.volume-band-inner {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  max-width: 1240px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  transition: opacity 0.34s ease, transform 0.55s var(--ease-expo);
+}
+
+.volume-band-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.volume-band-kicker {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent-warm);
+}
+
+.volume-band-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.75rem, 3.8vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: 0.02em;
+  color: var(--ink-primary);
+  margin: 0;
+  transition: transform 0.65s var(--ease-expo), letter-spacing 0.65s var(--ease-expo);
+}
+
+.volume-band:hover .volume-band-title {
+  transform: translateX(8px);
+}
+
+.volume-band-epigraph {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1rem, 1.35vw, 1.24rem);
+  color: var(--ink-secondary);
+  margin: 0.15rem 0 0;
+  opacity: 0.78;
+  transition: opacity 0.45s ease, transform 0.65s var(--ease-expo);
+}
+
+.volume-band:hover .volume-band-epigraph {
+  opacity: 1;
+  transform: translateX(8px);
+}
+
+.volume-band-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.volume-band-meta {
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+
+.volume-band-cta {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-primary);
+  opacity: 0.62;
+  transform: translateX(0);
+  transition: opacity 0.4s ease, transform 0.55s var(--ease-expo), color 0.35s ease;
+}
+
+.volume-band:hover .volume-band-cta {
+  opacity: 1;
+  color: var(--accent-warm);
+  transform: translateX(6px);
+}
+
+/* ============================================
+   90-DEGREE ROTATING & SPREADING DIVIDER LINES
+   ============================================ */
+.gallery-grid-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 48;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.42s ease;
+}
+
+.gallery-grid-transition.is-active {
+  opacity: 1;
+}
+
+.grid-rot-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160vmax;
+  height: 1px;
+  margin-left: -80vmax;
+  margin-top: -0.5px;
+  background: rgba(26, 25, 23, 0.22);
+  transform-origin: center center;
+  will-change: transform, opacity;
+  transition:
+    transform 0.58s cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 0.36s ease;
+}
+
+[data-theme="dark"] .grid-rot-line {
+  background: rgba(239, 234, 224, 0.22);
+}
+
+/* ============================================
    ACCORDION EXHIBITION STRIPS
    ============================================ */
 .gallery-wrapper {
@@ -76,6 +284,7 @@ body.gallery-ready .nav {
   position: absolute;
   inset: 0;
   z-index: 10;
+  transition: opacity 0.55s ease;
 }
 
 .gallery-strip {
@@ -1375,6 +1584,24 @@ body.gallery-ready .gallery-strip {
 
   .lb-caption {
     display: none;
+  }
+
+  .gallery-volumes {
+    padding-top: 3.7rem;
+  }
+
+  .volume-band {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .volume-band-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .volume-band-right {
+    align-items: flex-start;
   }
 }
 

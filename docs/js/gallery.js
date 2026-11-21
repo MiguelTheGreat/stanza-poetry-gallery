@@ -9,8 +9,12 @@
 
   const overlay = document.getElementById('intro-overlay');
   const introContent = document.getElementById('intro-content');
+  const galleryVolumes = document.getElementById('gallery-volumes');
+  const gridTransition = document.getElementById('gallery-grid-transition');
   const galleryWrapper = document.getElementById('gallery-wrapper');
   const navCollectionName = document.getElementById('nav-collection-name');
+  const navHint = document.getElementById('nav-hint');
+  const navVolumesBtn = document.getElementById('nav-volumes-btn');
   const navThemeBtn = document.getElementById('nav-theme');
   const backToExperience = document.getElementById('back-to-experience');
   const toastEl = document.getElementById('stanza-toast');
@@ -49,10 +53,12 @@
   const cursorApi = window.StanzaCursor ? window.StanzaCursor.initCursor() : null;
 
   // State
+  let allCollections = [];
   let collection = null;
   let poems = [];
   let currentPoemIdx = 0;
   let selectedLines = []; // Array of { idx, text } in order of poem appearance
+  let isTransitioningVolume = false;
 
   const shareState = {
     cardStyle: 'etched',
@@ -149,11 +155,169 @@
   }
 
   // ============================================
+  // HORIZONTAL VOLUME CHOOSER & 90° DIVIDER UNFOLD
+  // ============================================
+  function showVolumeIndex(updateHistory = false) {
+    if (isTransitioningVolume) return;
+    if (cursorApi) cursorApi.setInspect('');
+    document.body.classList.add('mode-volumes');
+    galleryVolumes.classList.remove('is-leaving');
+    galleryVolumes.innerHTML = '';
+
+    navCollectionName.textContent = 'Anthology Volumes';
+    if (navHint) navHint.textContent = 'Hover a volume · Click to unfold its poems';
+    if (navVolumesBtn) navVolumesBtn.style.display = 'none';
+    backToExperience.href = 'index.html';
+
+    if (updateHistory) {
+      const cleanUrl = new URL('gallery.html', window.location.href);
+      history.replaceState(null, '', cleanUrl.toString());
+    }
+
+    const bandEls = [];
+    allCollections.forEach((col, idx) => {
+      const band = document.createElement('article');
+      band.className = 'volume-band';
+      band.innerHTML = `
+        <div class="volume-band-aura"></div>
+        <div class="volume-band-inner">
+          <div class="volume-band-left">
+            <span class="volume-band-kicker">${escapeHtml(col.volume)} · ${escapeHtml(col.year)}</span>
+            <h2 class="volume-band-title">${escapeHtml(col.title)}</h2>
+            ${col.epigraph ? `<p class="volume-band-epigraph">“${escapeHtml(col.epigraph)}”</p>` : ''}
+          </div>
+          <div class="volume-band-right">
+            <span class="volume-band-meta">${col.author ? `By ${escapeHtml(col.author)} · ` : ''}${col.poemCount} ${col.poemCount === 1 ? 'Poem' : 'Poems'}</span>
+            <span class="volume-band-cta">Unfold Poems →</span>
+          </div>
+        </div>
+      `;
+
+      const aura = band.querySelector('.volume-band-aura');
+      band.addEventListener('mouseenter', (e) => {
+        bandEls.forEach((el, i) => {
+          el.style.setProperty('--band-flex', i === idx ? '1.75' : '0.76');
+        });
+        const r = band.getBoundingClientRect();
+        aura.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+        aura.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+        if (cursorApi) cursorApi.setInspect('OPEN');
+      });
+
+      band.addEventListener(
+        'mousemove',
+        (e) => {
+          const r = band.getBoundingClientRect();
+          aura.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+          aura.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+        },
+        { passive: true }
+      );
+
+      band.addEventListener('click', () => unfoldVolumeIntoPoems(col));
+      bandEls.push(band);
+      galleryVolumes.appendChild(band);
+    });
+
+    galleryVolumes.addEventListener('mouseleave', () => {
+      bandEls.forEach((el) => el.style.setProperty('--band-flex', '1'));
+      if (cursorApi) cursorApi.setInspect('');
+    });
+  }
+
+  async function unfoldVolumeIntoPoems(selectedCol) {
+    if (isTransitioningVolume) return;
+    isTransitioningVolume = true;
+    if (cursorApi) cursorApi.setInspect('');
+    window.StanzaAudio?.playPaperRustle(0.055);
+
+    // Measure current horizontal divider Y positions between the volume bands
+    const bands = Array.from(galleryVolumes.querySelectorAll('.volume-band'));
+    const midY = window.innerHeight / 2;
+    const dividerYs = [];
+    for (let i = 0; i < bands.length - 1; i++) {
+      dividerYs.push(bands[i].getBoundingClientRect().bottom - midY);
+    }
+    if (dividerYs.length === 0) dividerYs.push(0);
+
+    // Load full collection data & prepare vertical poem strips underneath
+    collection = await window.StanzaStore.getCollection(selectedCol.slug);
+    poems = collection.poems || [];
+    const stripCount = Math.max(1, poems.length);
+    const lineCount = Math.max(1, stripCount - 1);
+
+    // Spawn architectural divider lines right on top of the horizontal separators
+    gridTransition.innerHTML = '';
+    const lineEls = [];
+    for (let k = 0; k < lineCount; k++) {
+      const startY = dividerYs[k % dividerYs.length];
+      const line = document.createElement('div');
+      line.className = 'grid-rot-line';
+      line.style.transition = 'none';
+      line.style.transform = `translate3d(0, ${startY.toFixed(1)}px, 0) rotate(0deg)`;
+      gridTransition.appendChild(line);
+      lineEls.push(line);
+    }
+
+    gridTransition.classList.add('is-active');
+    galleryVolumes.classList.add('is-leaving');
+
+    // Render target poem strips while still masked behind volume layer
+    renderGalleryStrips();
+    const nextUrl = new URL('gallery.html', window.location.href);
+    nextUrl.searchParams.set('collection', collection.slug);
+    history.replaceState(null, '', nextUrl.toString());
+
+    // Force layout, then Phase 1: rotate horizontal separators 90deg upright
+    void gridTransition.offsetWidth;
+    requestAnimationFrame(() => {
+      lineEls.forEach((line) => {
+        line.style.transition = 'transform 0.56s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.35s ease';
+        line.style.transform = 'translate3d(0, 0, 0) rotate(90deg)';
+      });
+    });
+
+    // Phase 2: spread upright lines horizontally to exact poem-strip borders
+    setTimeout(() => {
+      const vw = window.innerWidth;
+      lineEls.forEach((line, k) => {
+        const targetX = ((k + 1) / stripCount - 0.5) * vw;
+        line.style.transition = 'transform 0.62s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s ease';
+        line.style.transform = `translate3d(${targetX.toFixed(1)}px, 0, 0) rotate(90deg)`;
+      });
+    }, 390);
+
+    // Phase 3: unveil the real poem strips right between the spread vertical lines
+    setTimeout(() => {
+      document.body.classList.remove('mode-volumes');
+      galleryVolumes.classList.remove('is-leaving');
+    }, 560);
+
+    // Phase 4: dissolve the architectural transition layer cleanly
+    setTimeout(() => {
+      gridTransition.classList.remove('is-active');
+      setTimeout(() => {
+        gridTransition.innerHTML = '';
+        isTransitioningVolume = false;
+      }, 420);
+    }, 960);
+  }
+
+  if (navVolumesBtn) {
+    navVolumesBtn.addEventListener('click', () => {
+      window.StanzaAudio?.playPaperRustle(0.045);
+      showVolumeIndex(true);
+    });
+  }
+
+  // ============================================
   // RENDER ACCORDION EXHIBITION STRIPS
   // ============================================
   function renderGalleryStrips() {
     galleryWrapper.innerHTML = '';
     navCollectionName.textContent = collection.title;
+    if (navHint) navHint.textContent = 'Hover to unveil · Click to read & share up to 4 lines';
+    if (navVolumesBtn) navVolumesBtn.style.display = allCollections.length > 1 ? '' : 'none';
     backToExperience.href = `index.html?collection=${encodeURIComponent(collection.slug)}&mode=read`;
 
     const stripEls = [];
@@ -977,15 +1141,22 @@
     bindTransitionLinks();
     syncThemeButton();
 
+    allCollections = await window.StanzaStore.getCollections();
     const sharedCollectionSlug = await initSharedShowcaseIfPresent();
     const params = new URLSearchParams(window.location.search);
-    const colSlug = sharedCollectionSlug || params.get('collection') || DEFAULT_COLLECTION_SLUG;
+    const requestedSlug = sharedCollectionSlug || params.get('collection');
     const poemParam = params.get('poem');
     const pickParam = params.get('pick');
 
-    collection = await window.StanzaStore.getCollection(colSlug);
-    poems = collection.poems || [];
-    renderGalleryStrips();
+    if (requestedSlug || poemParam) {
+      const colSlug = requestedSlug || DEFAULT_COLLECTION_SLUG;
+      collection = await window.StanzaStore.getCollection(colSlug);
+      poems = collection.poems || [];
+      document.body.classList.remove('mode-volumes');
+      renderGalleryStrips();
+    } else {
+      showVolumeIndex(false);
+    }
 
     setTimeout(openCurtain, 240);
 

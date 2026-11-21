@@ -238,8 +238,69 @@
   }
 
   // ============================================
-  // VIEW 1: APPLE-STYLE 3D ISOMETRIC COLLECTION SHELF
+  // VIEW 1: APPLE-STYLE 3D ISOMETRIC DIAGONAL SHELF
   // ============================================
+  const shelfPrevBtn = document.getElementById('shelf-prev');
+  const shelfNextBtn = document.getElementById('shelf-next');
+  let shelfIndex = 0;
+  let shelfCards = [];
+
+  function updateShelfCarousel(playSound = false) {
+    if (collections.length === 0) return;
+    shelfIndex = clamp(shelfIndex, 0, collections.length - 1);
+    if (playSound) window.StanzaAudio?.playPaperRustle(0.04);
+
+    shelfCards.forEach((card, idx) => {
+      const diff = idx - shelfIndex;
+      card.classList.remove('is-active', 'is-prev', 'is-next', 'is-far-prev', 'is-far-next');
+      if (diff === 0) card.classList.add('is-active');
+      else if (diff === -1) card.classList.add('is-prev');
+      else if (diff === 1) card.classList.add('is-next');
+      else if (diff < -1) card.classList.add('is-far-prev');
+      else card.classList.add('is-far-next');
+    });
+
+    if (shelfPrevBtn) shelfPrevBtn.classList.toggle('is-hidden', shelfIndex <= 0);
+    if (shelfNextBtn) shelfNextBtn.classList.toggle('is-hidden', shelfIndex >= collections.length - 1);
+  }
+
+  function stepShelf(delta) {
+    if (collections.length <= 1) return;
+    const next = clamp(shelfIndex + delta, 0, collections.length - 1);
+    if (next !== shelfIndex) {
+      shelfIndex = next;
+      updateShelfCarousel(true);
+    }
+  }
+
+  if (shelfPrevBtn) shelfPrevBtn.addEventListener('click', () => stepShelf(-1));
+  if (shelfNextBtn) shelfNextBtn.addEventListener('click', () => stepShelf(1));
+
+  // Horizontal touch swipe on the Welcome Shelf to glide between volumes
+  let shelfTouchX = 0;
+  let shelfTouchY = 0;
+  shelfStage.addEventListener(
+    'touchstart',
+    (e) => {
+      if (isReaderMode || e.touches.length !== 1) return;
+      shelfTouchX = e.touches[0].clientX;
+      shelfTouchY = e.touches[0].clientY;
+    },
+    { passive: true }
+  );
+  shelfStage.addEventListener(
+    'touchend',
+    (e) => {
+      if (isReaderMode || !e.changedTouches || e.changedTouches.length !== 1) return;
+      const dx = e.changedTouches[0].clientX - shelfTouchX;
+      const dy = e.changedTouches[0].clientY - shelfTouchY;
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+        stepShelf(dx < 0 ? 1 : -1);
+      }
+    },
+    { passive: true }
+  );
+
   async function loadShelfCollections() {
     collections = await window.StanzaStore.getCollections();
     renderShelf();
@@ -247,6 +308,9 @@
 
   function renderShelf() {
     shelfStage.innerHTML = '';
+    shelfCards = [];
+    // On the main menu, top-nav Gallery welcomes the user with all volumes horizontally
+    navGalleryLink.href = 'gallery.html';
     const lastRead = window.StanzaStore.getLastRead();
 
     collections.forEach((col, idx) => {
@@ -308,10 +372,11 @@
 
       folioStage.addEventListener('mouseenter', () => {
         rect = folioStage.getBoundingClientRect();
-        if (cursorApi) cursorApi.setInspect('OPEN');
+        if (cursorApi) cursorApi.setInspect(idx === shelfIndex ? 'OPEN' : 'VIEW');
       });
 
       folioStage.addEventListener('mousemove', (e) => {
+        if (idx !== shelfIndex) return;
         if (!rect) rect = folioStage.getBoundingClientRect();
         const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
         const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
@@ -327,11 +392,23 @@
       });
 
       const triggerEnter = () => enterCollectionExperience(col.slug, false, 0);
-      folioStage.addEventListener('click', triggerEnter);
+      folioStage.addEventListener('click', () => {
+        if (idx !== shelfIndex) {
+          shelfIndex = idx;
+          updateShelfCarousel(true);
+          return;
+        }
+        triggerEnter();
+      });
       folioStage.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          triggerEnter();
+          if (idx !== shelfIndex) {
+            shelfIndex = idx;
+            updateShelfCarousel(true);
+          } else {
+            triggerEnter();
+          }
         }
       });
       card.querySelector('[data-enter]').addEventListener('click', triggerEnter);
@@ -350,22 +427,11 @@
         window.open(fbUrl, '_blank', 'noopener,noreferrer,width=640,height=520');
       });
 
+      shelfCards.push(card);
       shelfStage.appendChild(card);
     });
 
-    if (isOwner) {
-      const addCard = document.createElement('div');
-      addCard.className = 'add-volume-card owner-only';
-      addCard.innerHTML = `
-        <button type="button" class="add-sleeve-box hover-target" id="shelf-add-sleeve">
-          <span class="add-plus">+</span>
-          <span class="add-sleeve-label">Archive<br>Next Volume</span>
-        </button>
-        <p class="add-sleeve-note">Owner Mode · Press a new volume onto the shelf</p>
-      `;
-      addCard.querySelector('#shelf-add-sleeve').addEventListener('click', openArchiveModal);
-      shelfStage.appendChild(addCard);
-    }
+    updateShelfCarousel(false);
 
     if (cursorApi) cursorApi.bindHoverTargets(shelfStage);
     bindTransitionLinks(shelfStage);
@@ -1259,7 +1325,16 @@
       return;
     }
     if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
-    if (!isReaderMode) return;
+    if (!isReaderMode) {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        stepShelf(1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        stepShelf(-1);
+      }
+      return;
+    }
 
     if (e.key === ' ' || e.key === 'ArrowRight') {
       e.preventDefault();

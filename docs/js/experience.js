@@ -404,6 +404,18 @@
     }
   }
 
+  function setColophonVisible(visible) {
+    inColophonMode = visible;
+    placard.classList.toggle('placard-hidden', visible);
+    canvasControls.classList.toggle('controls-hidden', visible);
+    readerHud.classList.toggle('hud-hidden', visible);
+    document.querySelectorAll('#colophon-section .contact-card').forEach((c) => c.classList.toggle('is-visible', visible));
+    backToTopBtn.classList.toggle('is-visible', visible);
+    colophonEyebrow.style.opacity = visible ? '1' : '0';
+    colophonEyebrow.style.transform = visible ? 'translateX(0)' : 'translateX(48px)';
+    if (visible) closeNotePopover();
+  }
+
   function exitToShelf() {
     window.StanzaAudio?.playPaperRustle(0.05);
     closeNotePopover();
@@ -411,6 +423,7 @@
       isReaderMode = false;
       isFullPoemMode = false;
       mobileLocked = false;
+      setColophonVisible(false);
       document.body.classList.remove('mode-reader', 'reading-full', 'mobile-locked-reader');
       if (rafId) {
         cancelAnimationFrame(rafId);
@@ -444,7 +457,7 @@
     smoothScroll = 0;
     activeSceneIndex = clamp(initialPoemIdx, 0, Math.max(0, collection.poems.length - 1));
     displayedPlacardIdx = -1;
-    inColophonMode = false;
+    setColophonVisible(false);
     lastRailIdx = -1;
     lastStanzaTag = '';
     lastHintText = '';
@@ -668,11 +681,7 @@
       sc.el.classList.toggle('is-active', isCurrent);
     });
 
-    readerHud.classList.toggle('hud-hidden', inColophonMode);
-    document.querySelectorAll('#colophon-section .contact-card').forEach((c) => c.classList.toggle('is-visible', inColophonMode));
-    backToTopBtn.classList.toggle('is-visible', inColophonMode);
-    colophonEyebrow.style.opacity = inColophonMode ? '1' : '0';
-    colophonEyebrow.style.transform = inColophonMode ? 'translateX(0)' : 'translateX(48px)';
+    setColophonVisible(inColophonMode);
 
     if (!inColophonMode) {
       const sc = readerScenes[activeSceneIndex];
@@ -1057,14 +1066,7 @@
     }
 
     if (nowColophon !== inColophonMode) {
-      inColophonMode = nowColophon;
-      placard.classList.toggle('placard-hidden', inColophonMode);
-      canvasControls.classList.toggle('controls-hidden', inColophonMode);
-      document.querySelectorAll('#colophon-section .contact-card').forEach((c) => c.classList.toggle('is-visible', inColophonMode));
-      backToTopBtn.classList.toggle('is-visible', inColophonMode);
-      colophonEyebrow.style.opacity = inColophonMode ? '1' : '0';
-      colophonEyebrow.style.transform = inColophonMode ? 'translateX(0)' : 'translateX(48px)';
-      if (inColophonMode) closeNotePopover();
+      setColophonVisible(nowColophon);
     }
 
     const nextHint = inColophonMode

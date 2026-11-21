@@ -820,7 +820,8 @@
     const poem = poems[currentPoemIdx];
     if (!poem || selectedLines.length === 0) return;
     const shareUrl = await buildCurrentShareLink();
-    const quote = `“${selectedLines.map((s) => s.text).join(' / ')}” — ${poem.title} (${collection.title})`;
+    const byline = collection.author ? `, by ${collection.author}` : '';
+    const quote = `“${selectedLines.map((s) => s.text).join(' / ')}” — ${poem.title} (${collection.title}${byline})`;
     const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(quote)}`;
     window.open(fbUrl, '_blank', 'noopener,noreferrer,width=640,height=540');
   });
@@ -861,7 +862,8 @@
       try {
         const shareUrl = await buildCurrentShareLink();
         const quotedLines = selectedLines.map((s) => s.text).join('\n');
-        const formatted = `“${quotedLines}”\n— ${poem.title} (${collection.title})\n${shareUrl}`;
+        const byline = collection.author ? `, by ${collection.author}` : '';
+        const formatted = `“${quotedLines}”\n— ${poem.title} (${collection.title}${byline})\n${shareUrl}`;
         try {
           await navigator.clipboard.writeText(formatted);
           btnCopyQuote.textContent = 'Copied ✓';

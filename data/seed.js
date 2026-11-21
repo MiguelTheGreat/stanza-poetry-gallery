@@ -10,7 +10,7 @@ const INITIAL_COLLECTION = {
   title: 'Cut on the Life of a Weeping Man',
   subtitle: '',
   epigraph: 'Words that were never meant to be songs.',
-  author: 'Vince',
+  author: 'Visitor',
   coverImage: '',
   accentColor: '#a67c52',
   ambientGlow: 'radial-gradient(circle at 50% 45%, rgba(166, 124, 82, 0.28) 0%, rgba(196, 168, 134, 0.14) 45%, transparent 75%)',

@@ -280,7 +280,7 @@
                   <div class="folio-cover-rule" aria-hidden="true"></div>
                   ${col.epigraph ? `<p class="folio-cover-epigraph">“${escapeHtml(col.epigraph)}”</p>` : ''}
                 </div>
-                <div class="folio-bottom-meta">${col.poemCount} ${col.poemCount === 1 ? 'Poem' : 'Poems'} · Stanza.</div>
+                <div class="folio-bottom-meta">${col.author ? `By ${escapeHtml(col.author)} · ` : ''}${col.poemCount} ${col.poemCount === 1 ? 'Poem' : 'Poems'}</div>
               </div>
             </div>
           </div>
@@ -288,6 +288,7 @@
         <div class="album-details">
           <h3 class="album-title">${escapeHtml(col.title)}</h3>
           <div class="album-meta-row">
+            ${col.author ? `<span>By ${escapeHtml(col.author)}</span><span class="album-meta-dot"></span>` : ''}
             <span>${col.poemCount} ${col.poemCount === 1 ? 'Poem' : 'Poems'}</span>
             <span class="album-meta-dot"></span>
             <span>${escapeHtml(col.year)}</span>

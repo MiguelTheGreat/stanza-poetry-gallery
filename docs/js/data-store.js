@@ -15,7 +15,7 @@
     title: 'Cut on the Life of a Weeping Man',
     subtitle: '',
     epigraph: 'Words that were never meant to be songs.',
-    author: 'Vince',
+    author: 'Visitor',
     coverImage: '',
     accentColor: '#a67c52',
     ambientGlow:
@@ -569,7 +569,7 @@
       title,
       subtitle: subtitle || 'Original Poetry Collection',
       epigraph: epigraph || '',
-      author: '',
+      author: 'Visitor',
       coverImage: '',
       accentColor: '#a67c52',
       ambientGlow,

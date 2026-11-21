@@ -290,6 +290,8 @@
 
     if (showTitle) {
       const shortMusic = musicLabel ? (musicLabel.length > 26 ? musicLabel.slice(0, 25) + '…' : musicLabel) : '';
+      const authorLabel = collection?.author ? ` — ${collection.author}` : '';
+      const colWithAuthor = `${collection?.title || 'Cut on the Life of a Weeping Man'}${authorLabel}`;
       if (isKeepsake) {
         g.textAlign = 'center';
         g.fillStyle = '#1a1917';
@@ -297,8 +299,8 @@
         g.fillText(poem?.title || 'Untitled', cw / 2, ch - 138 - storySafeBottom);
 
         g.fillStyle = '#767067';
-        g.font = '400 14px "Syncopate", sans-serif';
-        g.fillText(colTitle, cw / 2, ch - 92 - storySafeBottom);
+        g.font = '400 13px "Syncopate", sans-serif';
+        g.fillText(`${colTitle}${collection?.author ? `  ·  ${collection.author.toUpperCase()}` : ''}`, cw / 2, ch - 92 - storySafeBottom);
 
         if (hasMusic) {
           g.fillStyle = accent;
@@ -318,7 +320,7 @@
 
         g.fillStyle = muted;
         g.font = 'italic 26px "Cormorant Garamond", Georgia, serif';
-        g.fillText(collection?.title || 'Cut on the Life of a Weeping Man', padX, footerY + 38);
+        g.fillText(colWithAuthor, padX, footerY + 38);
 
         g.textAlign = 'right';
         g.fillStyle = isDarkCard ? brightAccent : accent;

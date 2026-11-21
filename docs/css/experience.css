@@ -236,38 +236,38 @@ body.mode-reader #shelf-view {
 }
 
 .album-card.is-prev {
-  transform: translate(-50%, -50%) translate3d(-46vw, 25vh, 0) scale(0.54);
-  opacity: 0.82;
+  transform: translate(-50%, -50%) translate3d(-37vw, 3vh, 0) scale(0.35);
+  opacity: 0.68;
   z-index: 5;
   cursor: pointer;
 }
 
 .album-card.is-next {
-  transform: translate(-50%, -50%) translate3d(46vw, -25vh, 0) scale(0.54);
-  opacity: 0.82;
+  transform: translate(-50%, -50%) translate3d(37vw, -3vh, 0) scale(0.35);
+  opacity: 0.68;
   z-index: 5;
   cursor: pointer;
 }
 
 .album-card.is-prev:hover {
-  transform: translate(-50%, -50%) translate3d(-43vw, 22vh, 0) scale(0.6);
-  opacity: 0.96;
+  transform: translate(-50%, -50%) translate3d(-35vw, 2vh, 0) scale(0.41);
+  opacity: 0.94;
 }
 
 .album-card.is-next:hover {
-  transform: translate(-50%, -50%) translate3d(43vw, -22vh, 0) scale(0.6);
-  opacity: 0.96;
+  transform: translate(-50%, -50%) translate3d(35vw, -2vh, 0) scale(0.41);
+  opacity: 0.94;
 }
 
 .album-card.is-far-prev {
-  transform: translate(-50%, -50%) translate3d(-78vw, 44vh, 0) scale(0.36);
+  transform: translate(-50%, -50%) translate3d(-66vw, 8vh, 0) scale(0.24);
   opacity: 0;
   pointer-events: none;
   z-index: 1;
 }
 
 .album-card.is-far-next {
-  transform: translate(-50%, -50%) translate3d(78vw, -44vh, 0) scale(0.36);
+  transform: translate(-50%, -50%) translate3d(66vw, -8vh, 0) scale(0.24);
   opacity: 0;
   pointer-events: none;
   z-index: 1;
@@ -633,13 +633,14 @@ body.mode-reader #shelf-view {
 
 .btn-enter-exp {
   font-family: var(--font-display);
-  font-size: clamp(0.52rem, 1vw, 0.6rem);
-  letter-spacing: 0.18em;
+  font-size: clamp(0.5rem, 0.9vw, 0.58rem);
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  white-space: nowrap;
   background: var(--ink-primary);
   color: var(--bg-paper);
   border: 1px solid var(--ink-primary);
-  padding: clamp(0.62rem, 1.2dvh, 0.82rem) clamp(1rem, 2vw, 1.4rem);
+  padding: clamp(0.62rem, 1.2dvh, 0.8rem) clamp(1rem, 1.8vw, 1.35rem);
   border-radius: 999px;
   cursor: pointer;
   transition: transform 0.4s var(--ease-expo), background-color 0.3s ease, box-shadow 0.4s ease;
@@ -647,19 +648,20 @@ body.mode-reader #shelf-view {
 
 .btn-enter-exp:hover {
   transform: translateY(-2px);
-  background: #2c2925;
+  opacity: 0.9;
   box-shadow: 0 12px 28px rgba(26, 25, 23, 0.16);
 }
 
 .btn-open-gallery {
   font-family: var(--font-display);
-  font-size: clamp(0.52rem, 1vw, 0.6rem);
-  letter-spacing: 0.18em;
+  font-size: clamp(0.5rem, 0.9vw, 0.58rem);
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  white-space: nowrap;
   background: transparent;
   color: var(--ink-primary);
-  border: 1px solid rgba(26, 25, 23, 0.26);
-  padding: clamp(0.62rem, 1.2dvh, 0.82rem) clamp(0.95rem, 1.8vw, 1.25rem);
+  border: 1px solid var(--border-subtle);
+  padding: clamp(0.62rem, 1.2dvh, 0.8rem) clamp(0.9rem, 1.6vw, 1.2rem);
   border-radius: 999px;
   text-decoration: none;
   display: inline-flex;
@@ -669,7 +671,7 @@ body.mode-reader #shelf-view {
 }
 
 .btn-open-gallery:hover {
-  background: rgba(26, 25, 23, 0.06);
+  background: rgba(166, 124, 82, 0.12);
   transform: translateY(-2px);
 }
 
@@ -1771,13 +1773,13 @@ body.mobile-locked-reader #scroll-container {
   }
 
   .album-card.is-prev {
-    transform: translate(-50%, -50%) translate3d(-44vw, 24vh, 0) scale(0.42);
-    opacity: 0.65;
+    transform: translate(-50%, -50%) translate3d(-42vw, 2vh, 0) scale(0.28);
+    opacity: 0.55;
   }
 
   .album-card.is-next {
-    transform: translate(-50%, -50%) translate3d(44vw, -24vh, 0) scale(0.42);
-    opacity: 0.65;
+    transform: translate(-50%, -50%) translate3d(42vw, -2vh, 0) scale(0.28);
+    opacity: 0.55;
   }
 
   .folio-stage {

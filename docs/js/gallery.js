@@ -214,7 +214,7 @@
         { passive: true }
       );
 
-      band.addEventListener('click', () => unfoldVolumeIntoPoems(col));
+      band.addEventListener('click', (e) => unfoldVolumeIntoPoems(col, e.clientX));
       bandEls.push(band);
       galleryVolumes.appendChild(band);
     });
@@ -225,7 +225,9 @@
     });
   }
 
-  async function unfoldVolumeIntoPoems(selectedCol) {
+  let lockedHoverIdx = -1;
+
+  async function unfoldVolumeIntoPoems(selectedCol, clickClientX = -1) {
     if (isTransitioningVolume) return;
     isTransitioningVolume = true;
     if (cursorApi) cursorApi.setInspect('');
@@ -245,6 +247,13 @@
     poems = collection.poems || [];
     const stripCount = Math.max(1, poems.length);
     const lineCount = Math.max(1, stripCount - 1);
+
+    // Remember whichever strip lies directly under the user's click so it doesn't auto-open
+    if (clickClientX >= 0 && window.innerWidth > 0) {
+      lockedHoverIdx = Math.min(stripCount - 1, Math.max(0, Math.floor((clickClientX / window.innerWidth) * stripCount)));
+    } else {
+      lockedHoverIdx = -1;
+    }
 
     // Spawn architectural divider lines right on top of the horizontal separators
     gridTransition.innerHTML = '';
@@ -303,11 +312,84 @@
     }, 960);
   }
 
-  if (navVolumesBtn) {
-    navVolumesBtn.addEventListener('click', () => {
-      window.StanzaAudio?.playPaperRustle(0.045);
-      showVolumeIndex(true);
+  function foldPoemsBackToVolumes() {
+    if (isTransitioningVolume) return;
+    isTransitioningVolume = true;
+    lockedHoverIdx = -1;
+    if (cursorApi) cursorApi.setInspect('');
+    window.StanzaAudio?.playPaperRustle(0.05);
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const stripEls = Array.from(galleryWrapper.querySelectorAll('.gallery-strip'));
+    const midX = vw / 2;
+    const startXs = [];
+    for (let i = 0; i < stripEls.length - 1; i++) {
+      startXs.push(stripEls[i].getBoundingClientRect().right - midX);
+    }
+    if (startXs.length === 0) startXs.push(0);
+
+    // Spawn vertical lines directly on top of the current poem-strip dividers
+    gridTransition.innerHTML = '';
+    const lineEls = startXs.map((sx) => {
+      const line = document.createElement('div');
+      line.className = 'grid-rot-line';
+      line.style.transition = 'none';
+      line.style.transform = `translate3d(${sx.toFixed(1)}px, 0, 0) rotate(90deg)`;
+      gridTransition.appendChild(line);
+      return line;
     });
+
+    gridTransition.classList.add('is-active');
+    galleryWrapper.style.opacity = '0';
+
+    // Phase 1: gather vertical lines smoothly back to center
+    void gridTransition.offsetWidth;
+    requestAnimationFrame(() => {
+      lineEls.forEach((line) => {
+        line.style.transition = 'transform 0.46s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.35s ease';
+        line.style.transform = 'translate3d(0, 0, 0) rotate(90deg)';
+      });
+    });
+
+    // Phase 2: rotate 90deg back to horizontal & settle onto volume divider Y positions
+    setTimeout(() => {
+      const volCount = Math.max(1, allCollections.length);
+      const navOffset = 72;
+      const availH = Math.max(200, vh - navOffset);
+      const targetYs = [];
+      for (let i = 0; i < volCount - 1; i++) {
+        targetYs.push(navOffset + ((i + 1) / volCount) * availH - vh / 2);
+      }
+      if (targetYs.length === 0) targetYs.push(0);
+
+      lineEls.forEach((line, k) => {
+        const ty = targetYs[k % targetYs.length];
+        line.style.transition = 'transform 0.56s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.35s ease';
+        line.style.transform = `translate3d(0, ${ty.toFixed(1)}px, 0) rotate(0deg)`;
+      });
+    }, 340);
+
+    // Phase 3: unveil the Horizontal Volume Chooser between the horizontal dividers
+    setTimeout(() => {
+      galleryWrapper.style.opacity = '';
+      isTransitioningVolume = false;
+      showVolumeIndex(true);
+      isTransitioningVolume = true;
+    }, 580);
+
+    // Phase 4: dissolve the architectural transition layer
+    setTimeout(() => {
+      gridTransition.classList.remove('is-active');
+      setTimeout(() => {
+        gridTransition.innerHTML = '';
+        isTransitioningVolume = false;
+      }, 420);
+    }, 920);
+  }
+
+  if (navVolumesBtn) {
+    navVolumesBtn.addEventListener('click', foldPoemsBackToVolumes);
   }
 
   // ============================================
@@ -400,6 +482,11 @@
       let pendingY = 0;
 
       strip.addEventListener('mouseenter', (e) => {
+        if (isTransitioningVolume) return;
+        if (lockedHoverIdx !== -1) {
+          if (idx === lockedHoverIdx) return;
+          lockedHoverIdx = -1;
+        }
         applyStripFocus(idx);
         cachedRect = strip.getBoundingClientRect();
         const mx = ((e.clientX - cachedRect.left) / cachedRect.width) * 100;

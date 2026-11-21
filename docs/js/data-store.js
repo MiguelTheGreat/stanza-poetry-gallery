@@ -431,6 +431,145 @@
     ]
   };
 
+  const BUILTIN_COLLECTION_2 = {
+    slug: 'the-empress-and-the-warlord',
+    volume: 'VOL. 02',
+    year: '2026',
+    title: 'The Empress and the Warlord',
+    subtitle: '',
+    epigraph: 'I sought blood, you sought love.',
+    author: 'Visitor',
+    coverImage: '',
+    accentColor: '#9e5a4c',
+    ambientGlow:
+      'radial-gradient(circle at 50% 45%, rgba(158, 90, 76, 0.28) 0%, rgba(186, 148, 112, 0.14) 45%, transparent 75%)',
+    poemCount: 3,
+    poems: [
+      {
+        slug: 'for-you-my-empress',
+        orderIndex: 1,
+        indexLabel: '01 / 03',
+        watermark: '01',
+        title: 'Part 1: For You, My Empress',
+        subtitle: '',
+        mood: '',
+        accentHex: '#9e5a4c',
+        glow: 'radial-gradient(circle at 50% 46%, rgba(176, 98, 84, 0.28) 0%, rgba(206, 174, 138, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '158, 90, 76',
+        stanzas: [
+          [
+            'A warlord cannot defeat an army all alone.',
+            'An empress cannot love herself on her own.',
+            'For he isn\'t able to handle the cries of the dead.',
+            'For she can\'t share joy with someone filled with dread.'
+          ],
+          [
+            'I sought blood, you sought love.',
+            'The anger welled up inside me, I shoved.',
+            'Giving me reason to further conquer lands.',
+            'Presenting you our expansive barren sand.'
+          ],
+          [
+            'Tireless days and nights spent building our empire,',
+            'As the blood I desire turns into a love I admire.',
+            'Dear empress, I can\'t see you from this distance!',
+            'Can you see what I\'ve done for the empire\'s expanse?'
+          ],
+          [
+            'Now, I stand atop the bodies of the dead and their flesh,',
+            'Waiting for your return as we celebrate this mess.',
+            'Tell me, my empress, where have you been?',
+            'Did you go to a place left unseen?'
+          ]
+        ]
+      },
+      {
+        slug: 'always-you-my-warlord',
+        orderIndex: 2,
+        indexLabel: '02 / 03',
+        watermark: '02',
+        title: 'Part 2: Always You, My Warlord',
+        subtitle: '',
+        mood: '',
+        accentHex: '#a67c52',
+        glow: 'radial-gradient(circle at 48% 48%, rgba(196, 156, 108, 0.28) 0%, rgba(212, 192, 162, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '166, 124, 82',
+        stanzas: [
+          [
+            'I once walked the path that burned my feet,',
+            'Just to stand where our eyes might meet.',
+            'I waited for your return every passing day,',
+            'Hoping your gaze would focus on me rather than somewhere astray.'
+          ],
+          [
+            'Beloved, you need to know your presence is enough.',
+            'I know war\'s your life and that change is tough.',
+            'You worry that without your grandiose gifts',
+            'My affection is one that you can\'t lift.'
+          ],
+          [
+            'After all, the expanse wasn\'t what I want.',
+            'I wish for the love only you could grant,',
+            'Not the endless bodies you have slain.',
+            'My mistake wasn\'t letting you know, causing great pain.'
+          ],
+          [
+            'For now, I will stay right here in a place left unseen',
+            'I shall wait for you, like it\'s always been.',
+            'Until you realize what will forever be true:',
+            'That you can change and I\'ll still choose you.'
+          ]
+        ]
+      },
+      {
+        slug: 'an-empresss-blade-and-a-warlords-thorn',
+        orderIndex: 3,
+        indexLabel: '03 / 03',
+        watermark: '03',
+        title: 'Part 3: An Empress\'s Blade and A Warlord\'s Thorn',
+        subtitle: '',
+        mood: '',
+        accentHex: '#7d524c',
+        glow: 'radial-gradient(circle at 52% 48%, rgba(146, 84, 78, 0.28) 0%, rgba(176, 148, 134, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '125, 82, 76',
+        stanzas: [
+          [
+            'Horrors unlike any other,',
+            'A man\'s sin forgiven, never.',
+            'Wandering desolate forests,',
+            'Taming heart\'s endless unrest.'
+          ],
+          [
+            'Forsake my life as punishment!',
+            'Erase my love\'s resentment!',
+            'Stop my core from ever beating',
+            'And the souls\' continued screaming.'
+          ],
+          [
+            'To appear in front of you, I did.',
+            'Embrace the one I called beloved,',
+            'Calm the waters of your teary eyes.',
+            'Crying and waiting for your demise.'
+          ],
+          [
+            'Judgements, forgiveness not mine to give',
+            'Handed to the souls who once lived.',
+            'I wanted to bring the peace you need',
+            'But the joy you want, is to fall and bleed.'
+          ],
+          [
+            'Thrust the sword, the one left to protect',
+            'Myself, buried in your heart, direct.',
+            '"You have my gratitude, my empress',
+            'Appease the souls I laid to rest."'
+          ]
+        ]
+      }
+    ]
+  };
+
+  const BUILTIN_COLLECTIONS = [BUILTIN_COLLECTION, BUILTIN_COLLECTION_2];
+
   function slugify(text) {
     return (
       String(text || '')
@@ -456,7 +595,7 @@
   }
 
   function getStaticCollections() {
-    return [BUILTIN_COLLECTION, ...loadCustomCollections()];
+    return [...BUILTIN_COLLECTIONS, ...loadCustomCollections()];
   }
 
   function encodeLines(lines) {
@@ -535,7 +674,7 @@
 
     // Static GitHub Pages fallback (localStorage)
     const custom = loadCustomCollections();
-    const volNum = String(custom.length + 2).padStart(2, '0');
+    const volNum = String(custom.length + BUILTIN_COLLECTIONS.length + 1).padStart(2, '0');
     const slug = slugify(title);
     const ambientGlow =
       'radial-gradient(circle at 50% 45%, rgba(166, 124, 82, 0.28) 0%, rgba(196, 168, 134, 0.14) 45%, transparent 75%)';
@@ -585,7 +724,8 @@
   const PROGRESS_KEY = 'stanza_last_read_v1';
   const NOTES_KEY = 'stanza_poem_notes_v1';
 
-  const BUILTIN_POEM_SLUGS = new Set(BUILTIN_COLLECTION.poems.map((p) => p.slug));
+  const BUILTIN_COLLECTION_SLUGS = new Set(BUILTIN_COLLECTIONS.map((c) => c.slug));
+  const BUILTIN_POEM_SLUGS = new Set(BUILTIN_COLLECTIONS.flatMap((c) => c.poems.map((p) => p.slug)));
 
   async function createShareUrl({
     collectionSlug,
@@ -618,7 +758,7 @@
     // Static GitHub Pages URL — uses per-poem share/<slug>.html for poem-specific Etched OG previews!
     const baseDir = window.location.href.split('?')[0].split('#')[0].replace(/\/[^/]*$/, '/');
     const targetPage =
-      collectionSlug === BUILTIN_COLLECTION.slug && BUILTIN_POEM_SLUGS.has(poemSlug)
+      BUILTIN_COLLECTION_SLUGS.has(collectionSlug) && BUILTIN_POEM_SLUGS.has(poemSlug)
         ? `share/${poemSlug}.html`
         : 'gallery.html';
     const url = new URL(targetPage, baseDir);

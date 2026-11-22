@@ -568,7 +568,428 @@
     ]
   };
 
-  const BUILTIN_COLLECTIONS = [BUILTIN_COLLECTION, BUILTIN_COLLECTION_2];
+  const BUILTIN_COLLECTION_3 = {
+    slug: 'an-attempt-at-poetry-by-the-visitor',
+    volume: 'VOL. 03',
+    year: '2026',
+    title: 'An Attempt at Poetry by the Visitor',
+    subtitle: '',
+    epigraph: 'Here I am, writing with a pen.',
+    author: 'Visitor',
+    coverImage: '',
+    accentColor: '#7d8294',
+    ambientGlow:
+      'radial-gradient(circle at 50% 45%, rgba(125, 130, 148, 0.28) 0%, rgba(166, 124, 82, 0.14) 45%, transparent 75%)',
+    poemCount: 10,
+    poems: [
+      {
+        slug: 'untitled',
+        orderIndex: 1,
+        indexLabel: '01 / 10',
+        watermark: '01',
+        title: 'Untitled',
+        subtitle: '',
+        mood: '',
+        accentHex: '#9c8a72',
+        glow: 'radial-gradient(circle at 50% 46%, rgba(156, 138, 114, 0.28) 0%, rgba(206, 188, 164, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '156, 138, 114',
+        stanzas: [
+          [
+            'I can\'t explain things clearly;',
+            'The door of love awaits me;',
+            'Unable to think freely;',
+            'I want you to get out of my head quickly.'
+          ],
+          [
+            'You do not know what is up;',
+            'Making this all tough.',
+            'I fell into your trap,',
+            'Freeing the feelings I once cuffed.'
+          ],
+          [
+            'Feeling like this, I should\'ve never let;',
+            'This warm sensation I\'ll never forget;',
+            'However, do not fret,',
+            'Countermeasures are already set.'
+          ],
+          [
+            'Oh, you are such a fine lady;',
+            'But there\'s a catch for every pretty;',
+            'Moving on is something I\'d plea,',
+            'I\'m happy to be falling for someone like thee.'
+          ]
+        ]
+      },
+      {
+        slug: 'just-my-thoughts',
+        orderIndex: 2,
+        indexLabel: '02 / 10',
+        watermark: '02',
+        title: 'Just my Thoughts',
+        subtitle: '',
+        mood: '',
+        accentHex: '#a67c52',
+        glow: 'radial-gradient(circle at 48% 48%, rgba(166, 124, 82, 0.28) 0%, rgba(208, 184, 152, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '166, 124, 82',
+        stanzas: [
+          [
+            'A name like those beautiful flowers;',
+            'You are all that mattered;',
+            'A romance that will last forever;',
+            'Yet, it is all just my thoughts.'
+          ],
+          [
+            'Why did you suddenly become cold?',
+            'Was it because I acted so bold?',
+            'Or was it because you knew? or so I\'ve been told;',
+            'Are these correct or are they just thoughts?'
+          ],
+          [
+            'The greetings and all the reminders we made;',
+            'Abruptly, they are starting to fade;',
+            'Sometimes, it\'s best for feelings to be kept in the shade;',
+            'But, all of these are just my thoughts.'
+          ],
+          [
+            'You were the light that kept me smiling;',
+            'Hopefully, you aren\'t the type to leave me crying;',
+            'In a world full of romance, you were the one that caught me;',
+            'But, hey! These are just my thoughts, in this world of reality.'
+          ]
+        ]
+      },
+      {
+        slug: 'wandering-soul',
+        orderIndex: 3,
+        indexLabel: '03 / 10',
+        watermark: '03',
+        title: 'Wandering Soul',
+        subtitle: '',
+        mood: '',
+        accentHex: '#6c859e',
+        glow: 'radial-gradient(circle at 52% 46%, rgba(108, 133, 158, 0.28) 0%, rgba(176, 184, 196, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '108, 133, 158',
+        stanzas: [
+          [
+            'Ahh, it\'s that time of the year again;',
+            'Here I am, writing with a pen.',
+            'A time full of fun and events;',
+            'How I wish I could be with them.'
+          ],
+          [
+            'Over on that corner, we see the couple;',
+            'It\'s no wonder how they made each other fall.',
+            'It\'s not luck they are together, it\'s fate.',
+            'How I long for their relationship to belong to the greats.'
+          ],
+          [
+            'On that side, there lies Kenneth;',
+            'Wanting nothing but death.',
+            'Blaming himself for something he hasn\'t done;',
+            'His girl left him close to none.'
+          ],
+          [
+            'I wish I could feel the same way as them;',
+            'How I want to help someone like him.',
+            'Oh yeah, I completely forgot;',
+            'Being alive is something I am not.'
+          ],
+          [
+            'The wandering soul that I am;',
+            'I could still love like them.',
+            'They may be unable to love or see me;',
+            'However, I can still cherish myself truly.'
+          ]
+        ]
+      },
+      {
+        slug: 'believed',
+        orderIndex: 4,
+        indexLabel: '04 / 10',
+        watermark: '04',
+        title: 'Believed',
+        subtitle: '',
+        mood: '',
+        accentHex: '#9e5a4c',
+        glow: 'radial-gradient(circle at 50% 48%, rgba(158, 90, 76, 0.28) 0%, rgba(196, 148, 134, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '158, 90, 76',
+        stanzas: [
+          [
+            'A beautiful day had risen, the sound of birds chirping;',
+            'A day so pretty, one could believe that this day is never ending.',
+            'As the sun sets, people were singing and cheering;',
+            'There, I saw a man smiling beautifully.'
+          ],
+          [
+            'I can\'t help myself, but I\'m attracted to it;',
+            'It\'s like this person always wanted us to meet.',
+            'He grabbed my arm, and I knew it was over...',
+            'It was not a smile that\'s beautiful, it\'s something sinister.'
+          ],
+          [
+            'Broken as a plate, that\'s what I remembered;',
+            'It was the only memory that never disappeared or faltered.',
+            'This was what I was for my whole life,',
+            'No matter how much I strived.'
+          ],
+          [
+            'He has taken me into his shack;',
+            'I wanted to scream as loud as a lightning that struck.',
+            'To no avail, he covered my mouth with tape.',
+            'Like a superhero who always puts on a cape.'
+          ],
+          [
+            'Numerous times, I lived to tell a tale;',
+            'No one believed what I began to tell.',
+            'They believed that its significance was no more than a snail.',
+            'Today, it changed as my blood began to fall.'
+          ],
+          [
+            'If only someone had cared, someone had known;',
+            'They may have felt the fear behind those moans.',
+            'If only someone just... believed.',
+            'Now, all that is left is a soul that no longer lives.'
+          ]
+        ]
+      },
+      {
+        slug: 'that-warm-embrace',
+        orderIndex: 5,
+        indexLabel: '05 / 10',
+        watermark: '05',
+        title: 'That Warm Embrace...',
+        subtitle: '',
+        mood: '',
+        accentHex: '#b37452',
+        glow: 'radial-gradient(circle at 48% 50%, rgba(179, 116, 82, 0.28) 0%, rgba(212, 174, 142, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '179, 116, 82',
+        stanzas: [
+          [
+            'I knew it was all too early,',
+            'Early for everything to end.',
+            'Yet, you were saying, you were broken by me?',
+            'Oh, you know, your wounds only I can mend.'
+          ],
+          [
+            'Accusing me of doing those things!',
+            'If only you were more willing,',
+            'Then, I wouldn\'t have broken that gaze.',
+            'Setting up our relationship ablaze!'
+          ],
+          [
+            'Your caress is something that I miss.',
+            'I know you just need my apologies.',
+            'Then, that would fix everything, right?',
+            'To feel once more, the hug that made me bright.'
+          ],
+          [
+            'Baby, I know it\'s my mistake...',
+            'But, can you really blame me?',
+            'I am ready to put everything at stake.',
+            'You deserve better? Better, I can be.'
+          ],
+          [
+            'So, please, even for just a day,',
+            'Let me feel that warm embrace.',
+            'I want your only to be me.',
+            'Therefore, please, let me be...'
+          ]
+        ]
+      },
+      {
+        slug: 'depths',
+        orderIndex: 6,
+        indexLabel: '06 / 10',
+        watermark: '06',
+        title: 'Depths',
+        subtitle: '',
+        mood: '',
+        accentHex: '#5b7285',
+        glow: 'radial-gradient(circle at 50% 50%, rgba(91, 114, 133, 0.28) 0%, rgba(146, 164, 178, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '91, 114, 133',
+        stanzas: [
+          [
+            'Sinking, losing all hope,',
+            'Longing, no way to cope.',
+            'Wishing, life on a slope,',
+            'Waiting, akin to a dope.'
+          ],
+          [
+            'The gravity... it\'s dawning on me,',
+            'Helpless, in the wide grand sea.',
+            'The gravity... it\'s pulling me,',
+            'Pulling me to face thee.'
+          ],
+          [
+            'Deep, in too deep, no floating back,',
+            'Scared... to confront the weight in my back.',
+            'Darkness, the bleakness, it\'s pulling me back,',
+            'Alone... no one to raise and lift my back.'
+          ],
+          [
+            'Thou who destroyed myself,',
+            'The depths of the sea I delved.',
+            'I woke up finding light,',
+            'Knowing my life has taken its flight.'
+          ]
+        ]
+      },
+      {
+        slug: 'someone-like-the-stars',
+        orderIndex: 7,
+        indexLabel: '07 / 10',
+        watermark: '07',
+        title: 'Someone like the Stars',
+        subtitle: '',
+        mood: '',
+        accentHex: '#c49a52',
+        glow: 'radial-gradient(circle at 50% 45%, rgba(196, 154, 82, 0.28) 0%, rgba(218, 194, 146, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '196, 154, 82',
+        stanzas: [
+          [
+            'Shine, you shine, among the never-ending sky.',
+            'Beauty that everyone wants to become and try.',
+            'No wonder when people gaze, they are left in awe.',
+            'Trying to comprehend the alluring beauty they saw.'
+          ],
+          [
+            'A thousand words can\'t describe your light.',
+            'The radiance you bring illuminates the night.',
+            'A twinkling and dazzling aura you emit.',
+            'To the cold and frozen heart, you once again lit.'
+          ],
+          [
+            'Far, you\'re far, from the relentless human reach.',
+            'Defying the laws set, we fly and we will breach.',
+            'To feel and embrace your phenomenal beauty.',
+            'To make you feel our love, unrequited as it may be.'
+          ],
+          [
+            'Always keep shining, as I admire you from afar.',
+            'Unfailingly here to support as you are my star.',
+            'To the cold and dark heart you broke, I stand.',
+            'Someone like a star, a dazzling star that is grand.'
+          ]
+        ]
+      },
+      {
+        slug: 'skipping-school',
+        orderIndex: 8,
+        indexLabel: '08 / 10',
+        watermark: '08',
+        title: 'Skipping School',
+        subtitle: '',
+        mood: '',
+        accentHex: '#8a7a62',
+        glow: 'radial-gradient(circle at 48% 48%, rgba(138, 122, 98, 0.28) 0%, rgba(194, 178, 154, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '138, 122, 98',
+        stanzas: [
+          [
+            'It\'s late at night, writing my excuse letter to skip another day.',
+            'My mother saw me struggling to pen the proper words.',
+            'Lots of things to be written, but more things I can\'t say.',
+            'Yet, your name appears first-never second nor third.'
+          ],
+          [
+            'I skipped school that day, mailed in the letter to my teacher.',
+            'Was it right? Was it the correct decision?',
+            'Because, to learn is an opportunity to be better.',
+            'But, I only want to grow to be the one you call your perfection.'
+          ],
+          [
+            'Indeed, I was wrong. The next day, everyone had grown.',
+            'Including you, the only field I want to spend my life with.',
+            'You had flown. With someone, you had already flown.',
+            'Saw you fly, with your gaze and my eyes that barely meet.'
+          ],
+          [
+            'I regret skipping school that day.',
+            'Every living being of me regrets skipping that chance.',
+            'Had I gone, we would have flown together and in the air, we\'d dance.',
+            'Now, all that remains is our past and the present that had gone astray.'
+          ]
+        ]
+      },
+      {
+        slug: 'winters-end',
+        orderIndex: 9,
+        indexLabel: '09 / 10',
+        watermark: '09',
+        title: 'Winter\'s End',
+        subtitle: '',
+        mood: '',
+        accentHex: '#7d8f82',
+        glow: 'radial-gradient(circle at 52% 48%, rgba(125, 143, 130, 0.28) 0%, rgba(196, 174, 168, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '125, 143, 130',
+        stanzas: [
+          [
+            'The winter breeze is quietly fading.',
+            'The cold sensation and the chills it\'s giving',
+            'Became an afterthought, as the ice and snow',
+            'Slowly melt and bathe our home in its afterglow'
+          ],
+          [
+            'Spring is coming, the sights of pink cherries',
+            'And the warmer air is beginning to seize',
+            'Capturing every beat of our hearts with solemn ease',
+            'Cheeks flushing, eyes wandering, this feeling I\'ve missed'
+          ],
+          [
+            'How I wish for this season to never end,',
+            'But life will always be rough on its edges.',
+            'That\'s why we make most of this time, fleeting at best.',
+            'Because, these memories are what we\'ll need to make amends.'
+          ],
+          [
+            'The last of the snow has melted,',
+            'Together with the icy heart it protected.',
+            'Thank God, the winter is over!',
+            'I can now start with you, a life that will forever prosper.'
+          ]
+        ]
+      },
+      {
+        slug: 'irony-of-it-all',
+        orderIndex: 10,
+        indexLabel: '10 / 10',
+        watermark: '10',
+        title: 'Irony of It All',
+        subtitle: '',
+        mood: '',
+        accentHex: '#a35049',
+        glow: 'radial-gradient(circle at 50% 48%, rgba(163, 80, 73, 0.28) 0%, rgba(186, 136, 122, 0.14) 44%, transparent 75%)',
+        watercolorRgb: '163, 80, 73',
+        stanzas: [
+          [
+            'Walls. Walls. Walls. They\'re closing in. Closing in.',
+            'The sirens, the police, I\'m running... panting.',
+            'Damn it, it\'s the edge of the building!',
+            '"Come on, tell me is this all you can bring?!"'
+          ],
+          [
+            'I once knew a friend, he was a good one.',
+            'He spoke of the truth, behind all the jokes.',
+            'For saying it, there came the smell of gun smoke.',
+            'Fuck! My good friend... he\'s done, he\'s gone...'
+          ],
+          [
+            'That\'s what you do best... "ordered" killing,',
+            'The past tells us everything!',
+            'You say, "you must take accountability!"',
+            'But we know, all you want is impunity.'
+          ],
+          [
+            'Your choices resulted in what\'s rotting!',
+            'You speak of wanting the truth, but when one spoke of it,',
+            'You silenced him, and when another starts speaking,',
+            'You kill them, good God, the irony of it!'
+          ]
+        ]
+      }
+    ]
+  };
+
+  const BUILTIN_COLLECTIONS = [BUILTIN_COLLECTION, BUILTIN_COLLECTION_2, BUILTIN_COLLECTION_3];
 
   function slugify(text) {
     return (

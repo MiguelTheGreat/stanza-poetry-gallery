@@ -837,6 +837,24 @@
     { passive: true }
   );
 
+  // Block native browser pull-to-refresh when swiping in locked mobile Experience Mode
+  poemStage.addEventListener(
+    'touchmove',
+    (e) => {
+      if (!mobileLocked || e.touches.length !== 1) return;
+      if (!isFullPoemMode) {
+        e.preventDefault();
+        return;
+      }
+      const sc = readerScenes[activeSceneIndex];
+      const dy = e.touches[0].clientY - touchStartY;
+      if (sc && sc.viewportEl && sc.viewportEl.scrollTop <= 0 && dy > 0) {
+        e.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+
   poemStage.addEventListener(
     'touchend',
     (e) => {

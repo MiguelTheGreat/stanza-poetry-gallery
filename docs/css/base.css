@@ -50,6 +50,8 @@ html {
   background-color: var(--bg-paper);
   color: var(--ink-primary);
   overflow-x: clip;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
   transition: background-color 0.45s ease, color 0.45s ease;
 }
 
@@ -60,6 +62,8 @@ body {
   padding: 0;
   font-family: var(--font-sans);
   overflow-x: clip;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.45s ease, color 0.45s ease;
@@ -351,6 +355,8 @@ body.cursor-hidden #cursor-dot {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: letter-spacing 0.5s var(--ease-expo), opacity 0.3s ease;
 }
 
@@ -363,6 +369,8 @@ body.cursor-hidden #cursor-dot {
   font-size: 0.68rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
   color: var(--ink-primary);
   text-decoration: none;
   cursor: pointer;

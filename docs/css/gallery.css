@@ -1533,24 +1533,32 @@ body.gallery-ready .gallery-strip {
 
   /* Compact, non-cramped Mobile Lightbox Header & Footer */
   .lightbox-header {
-    padding: 0.85rem 1rem;
-    gap: 0.6rem;
+    padding: max(0.8rem, env(safe-area-inset-top)) 1rem 0.8rem;
+    gap: 0.65rem;
     flex-direction: column;
     align-items: stretch;
   }
 
   .lb-title-group {
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+
+  .lb-index {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 0.56rem;
+    letter-spacing: 0.16em;
   }
 
   .lb-title {
-    font-size: 0.78rem;
-    letter-spacing: 0.13em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.74rem;
+    letter-spacing: 0.11em;
+    line-height: 1.35;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .lb-controls {
@@ -1562,20 +1570,43 @@ body.gallery-ready .gallery-strip {
   .selection-pill {
     padding: 0.38rem 0.7rem;
     font-size: 0.68rem;
+    white-space: nowrap;
   }
 
   .lb-btn {
     padding: 0.46rem 0.82rem;
     font-size: 0.5rem;
     letter-spacing: 0.14em;
+    white-space: nowrap;
   }
 
   .lb-poem-stage {
-    padding: 1.25rem 1.05rem;
+    padding: 1.15rem 1.05rem;
+    overscroll-behavior-y: contain;
+  }
+
+  .lb-poem-subtitle {
+    margin: 0 0 1.25rem;
+    font-size: 0.98rem;
+  }
+
+  .lb-stanzas-grid {
+    gap: 1.65rem;
+  }
+
+  .lb-stanza {
+    gap: 0.08rem;
+  }
+
+  .selectable-line {
+    padding: 0.22rem 0.48rem 0.22rem 0.42rem;
+    margin-left: -0.42rem;
+    gap: 0.65rem;
   }
 
   .line-text {
-    font-size: 1.12rem;
+    font-size: 1.06rem;
+    line-height: 1.38;
   }
 
   .lightbox-footer {

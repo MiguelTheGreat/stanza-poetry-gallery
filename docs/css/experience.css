@@ -1069,8 +1069,9 @@ body.reading-full .verse-line {
   font-family: var(--font-display);
   font-size: 0.58rem;
   letter-spacing: 0.25em;
+  line-height: 1;
   color: var(--accent-warm);
-  margin-bottom: 0.3rem;
+  margin: 0;
 }
 
 .placard-title-wrap {
@@ -1526,6 +1527,7 @@ body.reading-full .verse-line {
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
+  margin-bottom: 0.32rem;
 }
 
 .mobile-only-stanza {
@@ -1807,8 +1809,9 @@ body.mobile-locked-reader #scroll-container {
 
   .mobile-only-stanza {
     display: inline-block;
-    font-size: 0.6rem;
+    font-size: 0.56rem;
     letter-spacing: 0.14em;
+    line-height: 1;
     color: var(--ink-secondary);
   }
 

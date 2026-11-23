@@ -493,3 +493,295 @@ body.cursor-hidden #cursor-dot {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ============================================
+   LIQUID GLASS BUTTON SYSTEM (Tactile Spring + Specular Sheen)
+   Restrained museum-grade translucent glass on key pill & floating buttons
+   ============================================ */
+.ctrl-btn,
+.shelf-nav-arrow,
+.btn-open-gallery,
+.btn-enter-exp,
+.lb-btn,
+.action-primary,
+.action-secondary,
+#showcase-audio-btn,
+#back-to-top {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.32s ease,
+    border-color 0.32s ease,
+    box-shadow 0.38s var(--ease-expo),
+    color 0.28s ease !important;
+}
+
+/* Cursor-tracked liquid caustic specular highlight */
+.ctrl-btn::after,
+.shelf-nav-arrow::after,
+.btn-open-gallery::after,
+.btn-enter-exp::after,
+.lb-btn::after,
+.action-primary::after,
+.action-secondary::after,
+#showcase-audio-btn::after,
+#back-to-top::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  background: radial-gradient(
+    115px circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(255, 255, 255, 0.46) 0%,
+    rgba(255, 255, 255, 0.14) 38%,
+    transparent 72%
+  );
+  transition: opacity 0.32s ease;
+}
+
+.ctrl-btn:hover::after,
+.shelf-nav-arrow:hover::after,
+.btn-open-gallery:hover::after,
+.btn-enter-exp:hover::after,
+.lb-btn:hover::after,
+.action-primary:hover::after,
+.action-secondary:hover::after,
+#showcase-audio-btn:hover::after,
+#back-to-top:hover::after,
+.ctrl-btn:active::after,
+.shelf-nav-arrow:active::after,
+.btn-open-gallery:active::after,
+.btn-enter-exp:active::after,
+.lb-btn:active::after,
+.action-primary:active::after,
+.action-secondary:active::after,
+#showcase-audio-btn:active::after,
+#back-to-top:active::after {
+  opacity: 1;
+}
+
+/* Light Paper Mode Liquid Glass Surfaces */
+.ctrl-btn,
+.shelf-nav-arrow,
+.btn-open-gallery,
+#back-to-top {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 254, 250, 0.72) 0%,
+    rgba(245, 241, 231, 0.46) 100%
+  ) !important;
+  backdrop-filter: blur(18px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -1px 0 rgba(26, 25, 23, 0.08),
+    0 6px 20px rgba(26, 25, 23, 0.07),
+    0 1px 2px rgba(26, 25, 23, 0.06) !important;
+}
+
+.ctrl-btn::before,
+#back-to-top::before {
+  display: none;
+}
+
+.ctrl-btn:hover,
+.btn-open-gallery:hover,
+#back-to-top.is-visible:hover {
+  color: var(--ink-primary) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 253, 0.88) 0%,
+    rgba(245, 240, 229, 0.64) 100%
+  ) !important;
+  border-color: rgba(166, 124, 82, 0.42) !important;
+  transform: translateY(-2px) scale(1.03) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 0 -1px 0 rgba(166, 124, 82, 0.14),
+    0 12px 28px rgba(26, 25, 23, 0.11),
+    0 2px 6px rgba(166, 124, 82, 0.1) !important;
+}
+
+.shelf-nav-arrow:hover {
+  color: var(--ink-primary) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 253, 0.92) 0%,
+    rgba(245, 240, 229, 0.7) 100%
+  ) !important;
+  border-color: rgba(166, 124, 82, 0.46) !important;
+  transform: translateY(-50%) scale(1.09) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 12px 28px rgba(26, 25, 23, 0.13) !important;
+}
+
+/* Primary Smoked-Obsidian Liquid Glass Pill (Enter Experience) */
+.btn-enter-exp {
+  background: linear-gradient(
+    180deg,
+    rgba(38, 35, 31, 0.88) 0%,
+    rgba(22, 20, 18, 0.95) 100%
+  ) !important;
+  backdrop-filter: blur(18px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 10px 26px rgba(22, 20, 17, 0.2) !important;
+}
+
+.btn-enter-exp:hover {
+  transform: translateY(-2px) scale(1.035) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 16px 34px rgba(22, 20, 17, 0.26) !important;
+}
+
+/* Dark Night Lamp Liquid Glass Surfaces */
+[data-theme="dark"] .ctrl-btn,
+[data-theme="dark"] .shelf-nav-arrow,
+[data-theme="dark"] .btn-open-gallery,
+[data-theme="dark"] #back-to-top {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 240, 0.11) 0%,
+    rgba(255, 250, 240, 0.04) 100%
+  ) !important;
+  border: 1px solid rgba(255, 248, 235, 0.18) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 240, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+    0 8px 24px rgba(0, 0, 0, 0.36) !important;
+}
+
+[data-theme="dark"] .ctrl-btn:hover,
+[data-theme="dark"] .btn-open-gallery:hover,
+[data-theme="dark"] #back-to-top.is-visible:hover {
+  color: #f5f2e9 !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 240, 0.19) 0%,
+    rgba(201, 158, 110, 0.12) 100%
+  ) !important;
+  border-color: rgba(201, 158, 110, 0.48) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 240, 0.34),
+    0 12px 30px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="dark"] .shelf-nav-arrow:hover {
+  color: #f5f2e9 !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 240, 0.2) 0%,
+    rgba(201, 158, 110, 0.14) 100%
+  ) !important;
+  border-color: rgba(201, 158, 110, 0.5) !important;
+}
+
+[data-theme="dark"] .btn-enter-exp {
+  background: linear-gradient(
+    180deg,
+    rgba(248, 243, 233, 0.94) 0%,
+    rgba(229, 220, 204, 0.84) 100%
+  ) !important;
+  color: #161513 !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 10px 28px rgba(0, 0, 0, 0.42) !important;
+}
+
+/* Always-Dark Overlays (Gallery Lightbox, Share Studio, Showcase Audio Pill) */
+.lb-btn,
+.action-secondary,
+#showcase-audio-btn {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 240, 0.12) 0%,
+    rgba(255, 250, 240, 0.04) 100%
+  ) !important;
+  backdrop-filter: blur(18px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+  border: 1px solid rgba(255, 248, 235, 0.22) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 240, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.38),
+    0 8px 22px rgba(0, 0, 0, 0.3) !important;
+}
+
+.lb-btn:hover,
+.action-secondary:hover,
+#showcase-audio-btn:hover {
+  color: #ffffff !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 240, 0.22) 0%,
+    rgba(255, 250, 240, 0.09) 100%
+  ) !important;
+  border-color: rgba(255, 248, 235, 0.42) !important;
+  transform: translateY(-2px) scale(1.03) !important;
+}
+
+.lb-btn-accent {
+  background: linear-gradient(
+    180deg,
+    rgba(201, 158, 110, 0.3) 0%,
+    rgba(166, 124, 82, 0.14) 100%
+  ) !important;
+  border-color: rgba(216, 174, 126, 0.56) !important;
+  color: #f6e4cc !important;
+}
+
+.lb-btn-accent:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(216, 174, 126, 0.46) 0%,
+    rgba(166, 124, 82, 0.26) 100%
+  ) !important;
+  color: #ffffff !important;
+  border-color: rgba(235, 198, 154, 0.8) !important;
+}
+
+.action-primary {
+  background: linear-gradient(
+    180deg,
+    rgba(250, 247, 239, 0.96) 0%,
+    rgba(235, 228, 214, 0.88) 100%
+  ) !important;
+  border: 1px solid rgba(255, 255, 255, 0.78) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 10px 26px rgba(0, 0, 0, 0.36) !important;
+}
+
+.action-primary:hover {
+  transform: translateY(-2px) scale(1.028) !important;
+}
+
+/* Tactile Liquid Spring Press Squish on Click / Tap */
+.ctrl-btn:active,
+.btn-open-gallery:active,
+.btn-enter-exp:active,
+.lb-btn:active,
+.action-primary:active,
+.action-secondary:active,
+#showcase-audio-btn:active,
+#back-to-top.is-visible:active {
+  transform: translateY(0px) scale(0.955) !important;
+  transition-duration: 0.12s !important;
+}
+
+.shelf-nav-arrow:active {
+  transform: translateY(-50%) scale(0.92) !important;
+  transition-duration: 0.12s !important;
+}

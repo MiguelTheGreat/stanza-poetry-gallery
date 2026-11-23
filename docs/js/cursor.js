@@ -87,5 +87,23 @@
     };
   }
 
+  // Delegated Liquid Glass specular sheen tracking (--gx, --gy)
+  const LIQUID_GLASS_SELECTOR =
+    '.ctrl-btn, .shelf-nav-arrow, .btn-enter-exp, .btn-open-gallery, .lb-btn, .action-primary, .action-secondary, #showcase-audio-btn, #back-to-top';
+
+  function updateLiquidSheen(e) {
+    const target = e.target && e.target.closest ? e.target.closest(LIQUID_GLASS_SELECTOR) : null;
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const gx = (((e.clientX - rect.left) / rect.width) * 100).toFixed(1);
+    const gy = (((e.clientY - rect.top) / rect.height) * 100).toFixed(1);
+    target.style.setProperty('--gx', `${gx}%`);
+    target.style.setProperty('--gy', `${gy}%`);
+  }
+
+  document.addEventListener('pointermove', updateLiquidSheen, { passive: true });
+  document.addEventListener('pointerdown', updateLiquidSheen, { passive: true });
+
   window.StanzaCursor = { initCursor };
 })();

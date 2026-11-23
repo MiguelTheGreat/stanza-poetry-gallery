@@ -227,13 +227,47 @@
 
   let lockedHoverIdx = -1;
 
+  function isMobileGallery() {
+    return window.matchMedia('(max-width: 820px), (orientation: portrait)').matches;
+  }
+
   async function unfoldVolumeIntoPoems(selectedCol, clickClientX = -1) {
     if (isTransitioningVolume) return;
     isTransitioningVolume = true;
     if (cursorApi) cursorApi.setInspect('');
     window.StanzaAudio?.playPaperRustle(0.055);
 
-    // Measure current horizontal divider Y positions between the volume bands
+    // Load full collection data
+    collection = await window.StanzaStore.getCollection(selectedCol.slug);
+    poems = collection.poems || [];
+    const stripCount = Math.max(1, poems.length);
+
+    const nextUrl = new URL('gallery.html', window.location.href);
+    nextUrl.searchParams.set('collection', collection.slug);
+    history.replaceState(null, '', nextUrl.toString());
+
+    // Mobile: smooth editorial vertical glide + staggered card-rise (no desktop line-split)
+    if (isMobileGallery()) {
+      lockedHoverIdx = -1;
+      galleryVolumes.classList.add('is-mobile-leaving');
+      setTimeout(() => {
+        renderGalleryStrips();
+        galleryWrapper.classList.add('is-mobile-entering');
+        document.body.classList.remove('mode-volumes');
+        galleryVolumes.classList.remove('is-mobile-leaving');
+        window.scrollTo(0, 0);
+        void galleryWrapper.offsetWidth;
+        requestAnimationFrame(() => {
+          galleryWrapper.classList.remove('is-mobile-entering');
+        });
+        setTimeout(() => {
+          isTransitioningVolume = false;
+        }, 480);
+      }, 310);
+      return;
+    }
+
+    // Desktop: 90-degree rotating & spreading architectural divider lines
     const bands = Array.from(galleryVolumes.querySelectorAll('.volume-band'));
     const midY = window.innerHeight / 2;
     const dividerYs = [];
@@ -242,10 +276,6 @@
     }
     if (dividerYs.length === 0) dividerYs.push(0);
 
-    // Load full collection data & prepare vertical poem strips underneath
-    collection = await window.StanzaStore.getCollection(selectedCol.slug);
-    poems = collection.poems || [];
-    const stripCount = Math.max(1, poems.length);
     const lineCount = Math.max(1, stripCount - 1);
 
     // Remember whichever strip lies directly under the user's click so it doesn't auto-open
@@ -255,7 +285,6 @@
       lockedHoverIdx = -1;
     }
 
-    // Spawn architectural divider lines right on top of the horizontal separators
     gridTransition.innerHTML = '';
     const lineEls = [];
     for (let k = 0; k < lineCount; k++) {
@@ -271,13 +300,8 @@
     gridTransition.classList.add('is-active');
     galleryVolumes.classList.add('is-leaving');
 
-    // Render target poem strips while still masked behind volume layer
     renderGalleryStrips();
-    const nextUrl = new URL('gallery.html', window.location.href);
-    nextUrl.searchParams.set('collection', collection.slug);
-    history.replaceState(null, '', nextUrl.toString());
 
-    // Force layout, then Phase 1: rotate horizontal separators 90deg upright
     void gridTransition.offsetWidth;
     requestAnimationFrame(() => {
       lineEls.forEach((line) => {
@@ -286,7 +310,6 @@
       });
     });
 
-    // Phase 2: spread upright lines horizontally to exact poem-strip borders
     setTimeout(() => {
       const vw = window.innerWidth;
       lineEls.forEach((line, k) => {
@@ -296,13 +319,11 @@
       });
     }, 390);
 
-    // Phase 3: unveil the real poem strips right between the spread vertical lines
     setTimeout(() => {
       document.body.classList.remove('mode-volumes');
       galleryVolumes.classList.remove('is-leaving');
     }, 560);
 
-    // Phase 4: dissolve the architectural transition layer cleanly
     setTimeout(() => {
       gridTransition.classList.remove('is-active');
       setTimeout(() => {
@@ -319,6 +340,28 @@
     if (cursorApi) cursorApi.setInspect('');
     window.StanzaAudio?.playPaperRustle(0.05);
 
+    // Mobile: soft editorial fade & rise back to the Volume list
+    if (isMobileGallery()) {
+      galleryWrapper.classList.add('is-mobile-leaving');
+      setTimeout(() => {
+        galleryWrapper.classList.remove('is-mobile-leaving');
+        isTransitioningVolume = false;
+        showVolumeIndex(true);
+        isTransitioningVolume = true;
+        galleryVolumes.classList.add('is-mobile-entering');
+        galleryVolumes.scrollTop = 0;
+        void galleryVolumes.offsetWidth;
+        requestAnimationFrame(() => {
+          galleryVolumes.classList.remove('is-mobile-entering');
+        });
+        setTimeout(() => {
+          isTransitioningVolume = false;
+        }, 420);
+      }, 280);
+      return;
+    }
+
+    // Desktop: reverse 90-degree architectural divider fold
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const stripEls = Array.from(galleryWrapper.querySelectorAll('.gallery-strip'));
@@ -329,7 +372,6 @@
     }
     if (startXs.length === 0) startXs.push(0);
 
-    // Spawn vertical lines directly on top of the current poem-strip dividers
     gridTransition.innerHTML = '';
     const lineEls = startXs.map((sx) => {
       const line = document.createElement('div');
@@ -343,7 +385,6 @@
     gridTransition.classList.add('is-active');
     galleryWrapper.style.opacity = '0';
 
-    // Phase 1: gather vertical lines smoothly back to center
     void gridTransition.offsetWidth;
     requestAnimationFrame(() => {
       lineEls.forEach((line) => {
@@ -352,7 +393,6 @@
       });
     });
 
-    // Phase 2: rotate 90deg back to horizontal & settle onto volume divider Y positions
     setTimeout(() => {
       const volCount = Math.max(1, allCollections.length);
       const navOffset = 72;
@@ -370,7 +410,6 @@
       });
     }, 340);
 
-    // Phase 3: unveil the Horizontal Volume Chooser between the horizontal dividers
     setTimeout(() => {
       galleryWrapper.style.opacity = '';
       isTransitioningVolume = false;
@@ -378,7 +417,6 @@
       isTransitioningVolume = true;
     }, 580);
 
-    // Phase 4: dissolve the architectural transition layer
     setTimeout(() => {
       gridTransition.classList.remove('is-active');
       setTimeout(() => {

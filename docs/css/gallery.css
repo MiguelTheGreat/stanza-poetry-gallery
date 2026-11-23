@@ -1633,6 +1633,30 @@ body.gallery-ready .gallery-strip {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
+    transition: opacity 0.36s var(--ease-expo), transform 0.44s var(--ease-expo);
+  }
+
+  .gallery-volumes.is-mobile-leaving {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.985);
+    pointer-events: none;
+  }
+
+  .gallery-volumes.is-mobile-entering {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  .gallery-wrapper.is-mobile-leaving {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.28s ease, transform 0.34s var(--ease-expo);
+  }
+
+  .gallery-wrapper.is-mobile-entering .gallery-strip {
+    opacity: 0 !important;
+    transform: translateY(20px) !important;
+    transition: none !important;
   }
 
   .volume-band {

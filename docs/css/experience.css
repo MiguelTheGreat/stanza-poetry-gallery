@@ -63,7 +63,7 @@ body.app-ready .top-header {
 }
 
 body.mode-reader .reader-only-nav {
-  display: inline-block;
+  display: inline-flex;
 }
 
 .owner-only {

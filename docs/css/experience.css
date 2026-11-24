@@ -466,6 +466,8 @@ body.mode-reader #shelf-view {
   width: 12px;
   transform-origin: right center;
   transform: translateZ(6px) rotateY(-90deg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   background: linear-gradient(180deg, #cfb08a 0%, #a67c52 50%, #7d5b39 100%);
 }
 
@@ -1767,10 +1769,14 @@ body.mobile-locked-reader #scroll-container {
   }
 
   .shelf-nav-arrow {
-    width: 36px;
-    height: 36px;
-    font-size: 0.8rem;
+    width: 34px;
+    height: 34px;
+    font-size: 0.78rem;
+    top: 46%;
   }
+
+  .shelf-nav-prev { left: 0.55rem; }
+  .shelf-nav-next { right: 0.55rem; }
 
   .album-card {
     width: 90vw;
@@ -1778,13 +1784,13 @@ body.mobile-locked-reader #scroll-container {
   }
 
   .album-card.is-prev {
-    transform: translate(-50%, -50%) translate3d(-42vw, 2vh, 0) scale(0.28);
-    opacity: 0.55;
+    transform: translate(-50%, -50%) translate3d(-48vw, 18vh, 0) scale(0.24);
+    opacity: 0.45;
   }
 
   .album-card.is-next {
-    transform: translate(-50%, -50%) translate3d(42vw, -2vh, 0) scale(0.28);
-    opacity: 0.55;
+    transform: translate(-50%, -50%) translate3d(48vw, -18vh, 0) scale(0.24);
+    opacity: 0.45;
   }
 
   .folio-stage {
